@@ -29,12 +29,14 @@ namespace m3u8_downloader.Dialogs
         /// <param name="e"></param>
         private void VideoPlayerElement_MediaOpened(object sender, RoutedEventArgs e)
         {
-            Console.WriteLine($@"视频加载完成 - 时长: {VideoPlayerElement.NaturalDuration}");
-
             // 获取视频的原始宽高
             double videoWidth = VideoPlayerElement.NaturalVideoWidth;
             double videoHeight = VideoPlayerElement.NaturalVideoHeight;
             PlayerRootWindow.SizeToContent = videoWidth > videoHeight ? SizeToContent.Height : SizeToContent.Width;
+
+            var duration = VideoPlayerElement.NaturalDuration;
+            DurationSlider.Maximum = duration.TimeSpan.Seconds;
+            DurationTextBlock.Text = $"{duration}";
         }
 
         private void VideoPlayerElement_MediaEnded(object sender, RoutedEventArgs e)

@@ -16,5 +16,77 @@
             MediaEnded="VideoPlayerElement_MediaEnded"
             MediaOpened="VideoPlayerElement_MediaOpened"
             UnloadedBehavior="Stop" />
+
+        <Grid
+            x:Name="ControllerGrid"
+            VerticalAlignment="Bottom"
+            Background="Black">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <Grid Grid.Row="0" Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock
+                    Grid.Column="0"
+                    VerticalAlignment="Center"
+                    FontSize="10"
+                    Foreground="White"
+                    Text="00:00:00"
+                    TextWrapping="NoWrap" />
+
+                <Slider
+                    x:Name="DurationSlider"
+                    Grid.Column="1"
+                    Margin="5,0"
+                    Minimum="0"
+                    Value="0" />
+
+                <TextBlock
+                    x:Name="DurationTextBlock"
+                    Grid.Column="2"
+                    VerticalAlignment="Center"
+                    FontSize="10"
+                    Foreground="White"
+                    Text="00:00:00"
+                    TextWrapping="NoWrap" />
+            </Grid>
+
+            <Grid Grid.Row="1" Margin="5">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Grid Grid.Column="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Content="快退5s" />
+                    <Button Grid.Column="1" Content="播放" />
+                    <Button Grid.Column="2" Content="快进5s" />
+                </Grid>
+
+                <Grid Grid.Column="2">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Content="调节音量" />
+                    <Button Grid.Column="1" Content="全屏" />
+                </Grid>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>
