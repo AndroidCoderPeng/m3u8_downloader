@@ -1,0 +1,21 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:o="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
+    <SolidColorBrush
+        x:Key="AppBackgroundBrush"
+        o:Freeze="True"
+        Color="{DynamicResource AppBackgroundColor}" />
+    <SolidColorBrush
+        x:Key="AppBorderBrush"
+        o:Freeze="True"
+        Color="{DynamicResource AppBorderColor}" />
+    <SolidColorBrush
+        x:Key="AppMouseOverBrush"
+        o:Freeze="True"
+        Color="{DynamicResource AppMouseOverColor}" />
+    <SolidColorBrush
+        x:Key="AppTextBrush"
+        o:Freeze="True"
+        Color="{DynamicResource AppTextColor}" />
+</ResourceDictionary>
