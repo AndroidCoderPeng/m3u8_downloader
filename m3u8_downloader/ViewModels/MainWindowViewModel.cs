@@ -165,24 +165,27 @@ namespace m3u8_downloader.ViewModels
             task.Duration = durationTime;
             task.TaskState = "下载中";
 
-            var outputFolder = ConfigurationManager.AppSettings["VideoFolder"];
-            if (string.IsNullOrEmpty(outputFolder))
-            {
-                MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            await segments.DownloadTsSegmentsAsync(outputFolder, new Progress<TaskProgress>(progress =>
-                {
-                    task.TotalSize = $"{progress.TotalBytes / 1024.0 / 1024.0:N2} MB";
-                    task.PercentComplete = $"{progress.PercentComplete}%";
-                }
-            ));
-
-            task.TaskState = "合并中";
-            await outputFolder.MergeTsSegmentsAsync(task.TaskName);
-            await outputFolder.DeleteTsSegments();
-            task.TaskState = "下载完成";
+            // var outputFolder = ConfigurationManager.AppSettings["VideoFolder"];
+            // if (string.IsNullOrEmpty(outputFolder))
+            // {
+            //     MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            //     return;
+            // }
+            //
+            // await segments.DownloadTsSegmentsAsync(outputFolder, new Progress<TaskProgress>(progress =>
+            //     {
+            //         task.TotalSize = $"{progress.TotalBytes / 1024.0 / 1024.0:N2} MB";
+            //         task.PercentComplete = $"{progress.PercentComplete}%";
+            //     }
+            // ));
+            //
+            // task.TaskState = "合并中";
+            // await outputFolder.MergeTsSegmentsAsync(task.TaskName);
+            // await outputFolder.DeleteTsSegments();
+            // task.TaskState = "下载完成";
+            
+            
+            new PlayVideoWindow(@"C:\Users\Administrator\Desktop\文件\temp\火影忍者640集.mp4"){ Owner = Application.Current.MainWindow }.ShowDialog();
         }
     }
 }

@@ -10,6 +10,29 @@
     ShowInTaskbar="False"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
+
+    <Window.Resources>
+        <!--  显示 ControllerGrid 动画  -->
+        <Storyboard x:Key="ShowControllerAnimation">
+            <DoubleAnimation
+                Storyboard.TargetName="ControllerGrid"
+                Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.Y)"
+                From="80"
+                To="0"
+                Duration="0:0:0.3" />
+        </Storyboard>
+
+        <!--  隐藏 ControllerGrid 动画  -->
+        <Storyboard x:Key="HideControllerAnimation">
+            <DoubleAnimation
+                Storyboard.TargetName="ControllerGrid"
+                Storyboard.TargetProperty="(Grid.RenderTransform).(TranslateTransform.Y)"
+                From="0"
+                To="80"
+                Duration="0:0:0.3" />
+        </Storyboard>
+    </Window.Resources>
+
     <Grid>
         <MediaElement
             x:Name="VideoPlayerElement"
@@ -20,12 +43,18 @@
 
         <Grid
             x:Name="ControllerGrid"
+            Height="80"
             VerticalAlignment="Bottom"
-            Background="Black">
+            Background="Black"
+            RenderTransformOrigin="0.5,0.5">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition />
             </Grid.RowDefinitions>
+
+            <Grid.RenderTransform>
+                <TranslateTransform Y="80" />
+            </Grid.RenderTransform>
 
             <Grid Grid.Row="0" Margin="5">
                 <Grid.ColumnDefinitions>
@@ -57,7 +86,7 @@
                     TextWrapping="NoWrap" />
             </Grid>
 
-            <Grid Grid.Row="1" Margin="5,0,5,10">
+            <Grid Grid.Row="1" Margin="5,0,10,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="2*" />
@@ -110,7 +139,7 @@
 
                     <Button
                         Grid.Column="0"
-                        Padding="5"
+                        Padding="10,5"
                         Background="Transparent"
                         Content="&#xe6d7;"
                         FontFamily="/m3u8_downloader;component/#iconfont"
@@ -121,7 +150,7 @@
                     <Button
                         Grid.Column="1"
                         Margin="10,0,0,0"
-                        Padding="5"
+                        Padding="10,5"
                         Background="Transparent"
                         Content="&#xe60c;"
                         FontFamily="/m3u8_downloader;component/#iconfont"
