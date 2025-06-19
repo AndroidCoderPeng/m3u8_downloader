@@ -8,6 +8,7 @@ using HandyControl.Controls;
 using m3u8_downloader.Dialogs;
 using m3u8_downloader.Models;
 using m3u8_downloader.Utils;
+using m3u8_downloader.Views;
 using Prism.Commands;
 using Prism.Mvvm;
 using Application = System.Windows.Application;
@@ -105,7 +106,7 @@ namespace m3u8_downloader.ViewModels
                     return;
                 }
 
-                new PlayVideoDialog(filePath){ Owner = Application.Current.MainWindow }.ShowDialog();
+                new PlayVideoWindow(filePath){ Owner = Application.Current.MainWindow }.ShowDialog();
             });
 
             DeleteTaskCommand = new DelegateCommand<string>(url =>

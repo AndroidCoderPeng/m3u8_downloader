@@ -2,13 +2,13 @@
 using System.IO;
 using System.Windows;
 
-namespace m3u8_downloader.Dialogs
+namespace m3u8_downloader.Views
 {
-    public partial class PlayVideoDialog
+    public partial class PlayVideoWindow
     {
         private bool _isDraggingProgress;
 
-        public PlayVideoDialog(string videoPath)
+        public PlayVideoWindow(string videoPath)
         {
             InitializeComponent();
             try

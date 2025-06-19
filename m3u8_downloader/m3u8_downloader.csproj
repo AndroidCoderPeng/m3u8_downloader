@@ -110,9 +110,6 @@
     <Compile Include="Dialogs\AboutSoftwareDialog.xaml.cs">
       <DependentUpon>AboutSoftwareDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\PlayVideoDialog.xaml.cs">
-      <DependentUpon>PlayVideoDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Models\DownloadTask.cs" />
     <Compile Include="Models\TaskProgress.cs" />
     <Compile Include="Utils\MethodExtensions.cs" />
@@ -120,6 +117,9 @@
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Views\PlayVideoWindow.xaml.cs">
+      <DependentUpon>PlayVideoWindow.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -138,17 +138,18 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <Resource Include="iconfont.ttf" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Colors\ApplicationBrushes.xaml" />
     <Page Include="Colors\ApplicationColor.xaml" />
     <Page Include="Dialogs\AboutSoftwareDialog.xaml" />
-    <Page Include="Dialogs\PlayVideoDialog.xaml" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\PlayVideoWindow.xaml" />
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\application.ico" />
