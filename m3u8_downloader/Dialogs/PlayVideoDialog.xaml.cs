@@ -1,13 +1,14 @@
-﻿using System;
-
-namespace m3u8_downloader.Dialogs
+﻿namespace m3u8_downloader.Dialogs
 {
     public partial class PlayVideoDialog
     {
+        private bool _isDraggingProgress;
+        private readonly string _currentFilePath;
+
         public PlayVideoDialog(string videoPath)
         {
             InitializeComponent();
-            Console.WriteLine(videoPath);
+            _currentFilePath = videoPath;
         }
     }
 }
