@@ -127,7 +127,7 @@ namespace m3u8_downloader.Utils
         /// <param name="fileName"></param>
         public static async Task MergeTsSegmentsAsync(this string folder, string fileName)
         {
-            const string ffmpeg = @"D:\Dev\ffmpeg\bin\ffmpeg.exe";
+            var ffmpeg = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg.exe");
             var files = Directory.GetFiles(folder, "*.ts");
             if (!files.Any())
             {

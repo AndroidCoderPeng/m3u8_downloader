@@ -4,9 +4,17 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    d:DesignHeight="600"
-    d:DesignWidth="800"
+    x:Name="PlayerRootWindow"
+    d:DesignHeight="300"
+    d:DesignWidth="400"
     WindowStartupLocation="CenterOwner"
     mc:Ignorable="d">
-    <Grid />
+    <Grid>
+        <MediaElement
+            x:Name="VideoPlayerElement"
+            LoadedBehavior="Play"
+            MediaEnded="VideoPlayerElement_MediaEnded"
+            MediaOpened="VideoPlayerElement_MediaOpened"
+            UnloadedBehavior="Stop" />
+    </Grid>
 </Window>
