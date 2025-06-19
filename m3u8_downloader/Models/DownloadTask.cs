@@ -63,5 +63,16 @@ namespace m3u8_downloader.Models
             get => _percentComplete;
             set => SetProperty(ref _percentComplete, value);
         }
+
+        /// <summary>
+        /// 任务状态
+        /// </summary>
+        private string _taskState;
+
+        public string TaskState
+        {
+            get => _taskState;
+            set => SetProperty(ref _taskState, value);
+        }
     }
 }

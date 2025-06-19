@@ -152,11 +152,28 @@
                         </Style>
                     </DataGridTextColumn.ElementStyle>
                 </DataGridTextColumn>
+
+                <DataGridTextColumn
+                    Width="*"
+                    Binding="{Binding TaskState}"
+                    CanUserResize="False"
+                    Header="状态"
+                    IsReadOnly="True">
+                    <DataGridTextColumn.ElementStyle>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="VerticalAlignment" Value="Center" />
+                        </Style>
+                    </DataGridTextColumn.ElementStyle>
+                </DataGridTextColumn>
             </DataGrid.Columns>
 
             <!--  右键菜单  -->
             <DataGrid.ContextMenu>
                 <ContextMenu Width="120" HorizontalOffset="120">
+                    <MenuItem
+                        Command="{Binding PlayVideoCommand}"
+                        CommandParameter="{Binding Path=PlacementTarget.(DataGrid.SelectedItem).(model:DownloadTask.TaskName), RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                        Header="播放" />
                     <MenuItem
                         Command="{Binding RetryTaskCommand}"
                         CommandParameter="{Binding Path=PlacementTarget.(DataGrid.SelectedItem).(model:DownloadTask.Url), RelativeSource={RelativeSource AncestorType=ContextMenu}}"

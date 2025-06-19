@@ -24,6 +24,7 @@ namespace m3u8_downloader.ViewModels
         public DelegateCommand ShowDocumentCommand { set; get; }
         public DelegateCommand ShowAboutCommand { set; get; }
         public DelegateCommand ParseUrlCommand { set; get; }
+        public DelegateCommand PlayVideoCommand { set; get; }
         public DelegateCommand RetryTaskCommand { set; get; }
         public DelegateCommand DeleteTaskCommand { set; get; }
 
@@ -120,7 +121,8 @@ namespace m3u8_downloader.ViewModels
                 TotalSegments = 0,
                 Duration = "00:00:00",
                 TotalSize = "0 MB",
-                PercentComplete = "0%"
+                PercentComplete = "0%",
+                TaskState = "等待中"
             };
             DownloadTaskSource.Add(task);
 
@@ -129,24 +131,26 @@ namespace m3u8_downloader.ViewModels
             var durationTime = TimeSpan.FromSeconds(duration).ToString(@"hh\:mm\:ss");
             task.TotalSegments = segments.Count;
             task.Duration = durationTime;
-
+            task.TaskState = "下载中";
+            
             var outputFolder = ConfigurationManager.AppSettings["VideoFolder"];
             if (string.IsNullOrEmpty(outputFolder))
             {
                 MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-
+            
             await segments.DownloadTsSegmentsAsync(outputFolder, new Progress<TaskProgress>(progress =>
                 {
                     task.TotalSize = $"{progress.TotalBytes / 1024.0 / 1024.0:N2} MB";
                     task.PercentComplete = $"{progress.PercentComplete}%";
                 }
             ));
-
-            Growl.Success("所有片段下载完成，开始合并片段");
+            
+            task.TaskState = "合并中";
             await outputFolder.MergeTsSegmentsAsync(task.TaskName);
-            Growl.Success("所有片段合并完成！");
+            await outputFolder.DeleteTsSegments();
+            task.TaskState = "下载完成";
         }
     }
 }

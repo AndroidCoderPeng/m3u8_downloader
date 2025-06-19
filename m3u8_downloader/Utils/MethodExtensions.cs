@@ -160,8 +160,18 @@ namespace m3u8_downloader.Utils
                 await Task.Run(() => process.WaitForExit());
             }
 
-            // 可选：删除临时文件列表
+            // 删除临时文件列表
             File.Delete(fileListFile);
+        }
+
+        /// <summary>
+        /// 删除文件夹下面所有的ts文件
+        /// </summary>
+        /// <param name="folder"></param>
+        public static async Task DeleteTsSegments(this string folder)
+        {
+            var files = Directory.GetFiles(folder, "*.ts");
+            await Task.Run(() => Parallel.ForEach(files, File.Delete));
         }
     }
 }
