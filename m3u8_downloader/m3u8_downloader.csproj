@@ -110,10 +110,12 @@
     <Compile Include="Dialogs\AboutSoftwareDialog.xaml.cs">
       <DependentUpon>AboutSoftwareDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Dialogs\PlayVideoDialog.xaml.cs">
+      <DependentUpon>PlayVideoDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Models\DownloadTask.cs" />
     <Compile Include="Models\TaskProgress.cs" />
     <Compile Include="Utils\MethodExtensions.cs" />
-    <Compile Include="ViewModels\AboutSoftwareDialogViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -142,6 +144,7 @@
     <Page Include="Colors\ApplicationBrushes.xaml" />
     <Page Include="Colors\ApplicationColor.xaml" />
     <Page Include="Dialogs\AboutSoftwareDialog.xaml" />
+    <Page Include="Dialogs\PlayVideoDialog.xaml" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

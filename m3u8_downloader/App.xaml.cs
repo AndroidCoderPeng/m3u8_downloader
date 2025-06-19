@@ -1,6 +1,4 @@
 using System.Windows;
-using m3u8_downloader.Dialogs;
-using m3u8_downloader.ViewModels;
 using m3u8_downloader.Views;
 using Prism.DryIoc;
 using Prism.Ioc;
@@ -19,8 +17,6 @@ namespace m3u8_downloader
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            //Dialog
-            containerRegistry.RegisterDialog<AboutSoftwareDialog, AboutSoftwareDialogViewModel>();
         }
     }
 }

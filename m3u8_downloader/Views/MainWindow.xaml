@@ -175,10 +175,6 @@
                         CommandParameter="{Binding Path=PlacementTarget.(DataGrid.SelectedItem).(model:DownloadTask.TaskName), RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                         Header="播放" />
                     <MenuItem
-                        Command="{Binding RetryTaskCommand}"
-                        CommandParameter="{Binding Path=PlacementTarget.(DataGrid.SelectedItem).(model:DownloadTask.Url), RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                        Header="重试" />
-                    <MenuItem
                         Command="{Binding DeleteTaskCommand}"
                         CommandParameter="{Binding Path=PlacementTarget.(DataGrid.SelectedItem).(model:DownloadTask.Url), RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                         Header="删除" />

@@ -1,8 +1,6 @@
-﻿using System.Windows.Controls;
-
-namespace m3u8_downloader.Dialogs
+﻿namespace m3u8_downloader.Dialogs
 {
-    public partial class AboutSoftwareDialog : UserControl
+    public partial class AboutSoftwareDialog
     {
         public AboutSoftwareDialog()
         {

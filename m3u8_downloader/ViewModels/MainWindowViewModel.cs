@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using HandyControl.Controls;
+using m3u8_downloader.Dialogs;
 using m3u8_downloader.Models;
 using m3u8_downloader.Utils;
 using Prism.Commands;
 using Prism.Mvvm;
-using Prism.Services.Dialogs;
 using Application = System.Windows.Application;
 using DialogResult = System.Windows.Forms.DialogResult;
 using MessageBox = System.Windows.Forms.MessageBox;
@@ -24,9 +25,8 @@ namespace m3u8_downloader.ViewModels
         public DelegateCommand ShowDocumentCommand { set; get; }
         public DelegateCommand ShowAboutCommand { set; get; }
         public DelegateCommand ParseUrlCommand { set; get; }
-        public DelegateCommand PlayVideoCommand { set; get; }
-        public DelegateCommand RetryTaskCommand { set; get; }
-        public DelegateCommand DeleteTaskCommand { set; get; }
+        public DelegateCommand<string> PlayVideoCommand { set; get; }
+        public DelegateCommand<string> DeleteTaskCommand { set; get; }
 
         private string _m3u8Url = "https://t30.cdn2020.com/video/m3u8/2025/06/10/5b80adba/index.m3u8";
 
@@ -52,7 +52,7 @@ namespace m3u8_downloader.ViewModels
             get => _downloadTaskSource;
         }
 
-        public MainWindowViewModel(IDialogService dialogService)
+        public MainWindowViewModel()
         {
             OpenFileCommand = new DelegateCommand(() =>
             {
@@ -89,9 +89,40 @@ namespace m3u8_downloader.ViewModels
 
             ShowDocumentCommand = new DelegateCommand(() => { });
 
-            ShowAboutCommand = new DelegateCommand(() => { dialogService.ShowDialog("AboutSoftwareDialog"); });
+            ShowAboutCommand = new DelegateCommand(() =>
+            {
+                new AboutSoftwareDialog { Owner = Application.Current.MainWindow }.ShowDialog();
+            });
 
             ParseUrlCommand = new DelegateCommand(ParseUrl);
+
+            PlayVideoCommand = new DelegateCommand<string>(name =>
+            {
+                var filePath = name.IsVideoExists();
+                if (filePath == string.Empty)
+                {
+                    MessageBox.Show(@"视频文件不存在，请先下载", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                new PlayVideoDialog(filePath){ Owner = Application.Current.MainWindow }.ShowDialog();
+            });
+
+            DeleteTaskCommand = new DelegateCommand<string>(url =>
+            {
+                var dialogResult = MessageBox.Show(
+                    @"要删除该任务以及下载的资源吗？", @"提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question
+                );
+                if (dialogResult == DialogResult.No) return;
+                var task = _downloadTaskSource.FirstOrDefault(x => x.Url.Equals(url));
+                if (task == null) return;
+                DownloadTaskSource.Remove(task);
+                var filePath = task.TaskName.IsVideoExists();
+                if (filePath != string.Empty)
+                {
+                    File.Delete(filePath);
+                }
+            });
         }
 
         private async void ParseUrl()
@@ -122,7 +153,7 @@ namespace m3u8_downloader.ViewModels
                 Duration = "00:00:00",
                 TotalSize = "0 MB",
                 PercentComplete = "0%",
-                TaskState = "等待中"
+                TaskState = "连接中"
             };
             DownloadTaskSource.Add(task);
 
@@ -132,21 +163,21 @@ namespace m3u8_downloader.ViewModels
             task.TotalSegments = segments.Count;
             task.Duration = durationTime;
             task.TaskState = "下载中";
-            
+
             var outputFolder = ConfigurationManager.AppSettings["VideoFolder"];
             if (string.IsNullOrEmpty(outputFolder))
             {
                 MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            
+
             await segments.DownloadTsSegmentsAsync(outputFolder, new Progress<TaskProgress>(progress =>
                 {
                     task.TotalSize = $"{progress.TotalBytes / 1024.0 / 1024.0:N2} MB";
                     task.PercentComplete = $"{progress.PercentComplete}%";
                 }
             ));
-            
+
             task.TaskState = "合并中";
             await outputFolder.MergeTsSegmentsAsync(task.TaskName);
             await outputFolder.DeleteTsSegments();
