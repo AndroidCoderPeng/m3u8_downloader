@@ -50,6 +50,13 @@ namespace m3u8_downloader.Views
             RewindButton.Click += delegate { VideoPlayerElement.Position -= TimeSpan.FromSeconds(5); };
             PlayButton.Click += delegate { ControlVideoState(); };
             ForwardButton.Click += delegate { VideoPlayerElement.Position += TimeSpan.FromSeconds(5); };
+            //TODO 待完成
+            VoiceButton.Click += delegate { };
+            ExpendButton.Click += delegate
+            {
+                WindowState = WindowState.Maximized;
+                WindowStyle = WindowStyle.None;
+            };
         }
 
         private void ControlVideoState()
