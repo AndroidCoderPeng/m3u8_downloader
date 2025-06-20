@@ -29,7 +29,9 @@ namespace m3u8_downloader.ViewModels
         public DelegateCommand<string> PlayVideoCommand { set; get; }
         public DelegateCommand<string> DeleteTaskCommand { set; get; }
 
-        private string _m3u8Url = "https://m.dongludi.cc/x/0-1225190.html";
+        private string _m3u8Url = "https://t30.cdn2020.com/video/m3u8/2025/06/10/5b80adba/index.m3u8";
+        // private string _m3u8Url = "https://m.dongludi.cc/x/0-1225190.html";
+        // private string _m3u8Url = "https://m.dongludi.cc/x/0-1225140.html";
 
         public string M3U8Url
         {

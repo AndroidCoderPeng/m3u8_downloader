@@ -25,10 +25,9 @@ namespace m3u8_downloader.Utils
         /// <returns></returns>
         public static async Task<List<string>> ExtractM3U8Resource(this string html)
         {
-            var client = new HttpClient();
-            var content = await client.GetStringAsync(html);
+            var content = await Client.GetStringAsync(html);
             Console.WriteLine(content);
-            
+
             if (string.IsNullOrEmpty(content))
                 return new List<string>();
 
@@ -93,7 +92,6 @@ namespace m3u8_downloader.Utils
                 {
                     try
                     {
-                        Client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0");
                         var response = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
                         response.EnsureSuccessStatusCode(); // 确保状态码是 2xx
 
