@@ -5,6 +5,6 @@
         public int TotalSegments { get; set; }
         public int DownloadedSegments { get; set; }
         public long TotalBytes { get; set; }
-        public int PercentComplete { get; set; }
+        public double PercentComplete { get; set; }
     }
 }

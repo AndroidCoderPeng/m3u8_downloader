@@ -111,7 +111,7 @@ namespace m3u8_downloader.Utils
                             TotalSegments = totalSegments,
                             DownloadedSegments = currentCount,
                             TotalBytes = totalBytes,
-                            PercentComplete = (int)((double)currentCount / totalSegments * 100)
+                            PercentComplete = (double)currentCount / totalSegments * 100
                         });
 
                         break; // 成功则退出循环

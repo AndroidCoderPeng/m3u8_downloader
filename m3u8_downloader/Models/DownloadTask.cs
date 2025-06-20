@@ -32,6 +32,17 @@ namespace m3u8_downloader.Models
         }
 
         /// <summary>
+        /// 已下载ts片段数量
+        /// </summary>
+        private int _downloadedSegments;
+
+        public int DownloadedSegments
+        {
+            get => _downloadedSegments;
+            set => SetProperty(ref _downloadedSegments, value);
+        }
+
+        /// <summary>
         /// 视频时长
         /// </summary>
         private string _duration;
@@ -56,9 +67,9 @@ namespace m3u8_downloader.Models
         /// <summary>
         /// 下载进度
         /// </summary>
-        private string _percentComplete;
+        private double _percentComplete;
 
-        public string PercentComplete
+        public double PercentComplete
         {
             get => _percentComplete;
             set => SetProperty(ref _percentComplete, value);

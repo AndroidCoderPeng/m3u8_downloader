@@ -18,7 +18,7 @@ namespace m3u8_downloader.ViewModels
     public class DownloadTaskPageViewModel: BindableBase
     {
         public DelegateCommand ParseUrlCommand { set; get; }
-        public DelegateCommand<string> PlayVideoCommand { set; get; }
+        public DelegateCommand<string> MouseDoubleClickCommand { set; get; }
         public DelegateCommand<string> DeleteTaskCommand { set; get; }
         
         private string _m3u8Url = "https://t30.cdn2020.com/video/m3u8/2025/06/10/5b80adba/index.m3u8";
@@ -51,7 +51,7 @@ namespace m3u8_downloader.ViewModels
         {
             ParseUrlCommand = new DelegateCommand(ParseUrl);
 
-            PlayVideoCommand = new DelegateCommand<string>(name =>
+            MouseDoubleClickCommand = new DelegateCommand<string>(name =>
             {
                 var filePath = name.IsVideoExists();
                 if (filePath == string.Empty)
@@ -117,7 +117,7 @@ namespace m3u8_downloader.ViewModels
                 TotalSegments = 0,
                 Duration = "00:00:00",
                 TotalSize = "0 MB",
-                PercentComplete = "0%",
+                PercentComplete = 0.0,
                 TaskState = "连接中"
             };
             DownloadTaskSource.Add(task);
@@ -128,21 +128,22 @@ namespace m3u8_downloader.ViewModels
             task.TotalSegments = segments.Count;
             task.Duration = durationTime;
             task.TaskState = "下载中";
-
+            
             var outputFolder = ConfigurationManager.AppSettings["VideoFolder"];
             if (string.IsNullOrEmpty(outputFolder))
             {
                 MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-
+            
             await segments.DownloadTsSegmentsAsync(outputFolder, new Progress<TaskProgress>(progress =>
                 {
                     task.TotalSize = $"{progress.TotalBytes / 1024.0 / 1024.0:N2} MB";
-                    task.PercentComplete = $"{progress.PercentComplete}%";
+                    task.DownloadedSegments = progress.DownloadedSegments;
+                    task.PercentComplete = progress.PercentComplete;
                 }
             ));
-
+            
             task.TaskState = "合并中";
             await outputFolder.MergeTsSegmentsAsync(task.TaskName);
             await outputFolder.DeleteTsSegments();
