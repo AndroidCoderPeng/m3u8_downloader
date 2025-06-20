@@ -48,33 +48,35 @@ namespace m3u8_downloader.Views
             }
 
             RewindButton.Click += delegate { VideoPlayerElement.Position -= TimeSpan.FromSeconds(5); };
-            PlayButton.Click += delegate
+            PlayButton.Click += delegate { ControlVideoState(); };
+            ForwardButton.Click += delegate { VideoPlayerElement.Position += TimeSpan.FromSeconds(5); };
+        }
+
+        private void ControlVideoState()
+        {
+            if (_isCompleted)
             {
-                if (_isCompleted)
+                VideoPlayerElement.Position = TimeSpan.Zero;
+                VideoPlayerElement.Play();
+                PlayButton.Content = new TextBlock { Text = "\ue6fc" };
+                _isPlaying = true;
+                _isCompleted = false;
+            }
+            else
+            {
+                if (_isPlaying)
                 {
-                    VideoPlayerElement.Position = TimeSpan.Zero;
-                    VideoPlayerElement.Play();
-                    PlayButton.Content = new TextBlock { Text = "\ue6fc" };
-                    _isPlaying = true;
-                    _isCompleted = false;
+                    VideoPlayerElement.Pause();
+                    PlayButton.Content = new TextBlock { Text = "\ue6c2" };
+                    _isPlaying = false;
                 }
                 else
                 {
-                    if (_isPlaying)
-                    {
-                        VideoPlayerElement.Pause();
-                        PlayButton.Content = new TextBlock { Text = "\ue6c2" };
-                        _isPlaying = false;
-                    }
-                    else
-                    {
-                        VideoPlayerElement.Play();
-                        PlayButton.Content = new TextBlock { Text = "\ue6fc" };
-                        _isPlaying = true;
-                    } 
+                    VideoPlayerElement.Play();
+                    PlayButton.Content = new TextBlock { Text = "\ue6fc" };
+                    _isPlaying = true;
                 }
-            };
-            ForwardButton.Click += delegate { VideoPlayerElement.Position += TimeSpan.FromSeconds(5); };
+            }
         }
 
         private void ControllerTimer_Tick(object sender, EventArgs e)
@@ -161,6 +163,40 @@ namespace m3u8_downloader.Views
             PlayButton.Content = new TextBlock { Text = "\ue6c2" };
             _isPlaying = false;
             _isCompleted = true;
+        }
+
+        private void PlayVideoWindow_OnKeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Left:
+                    VideoPlayerElement.Position -= TimeSpan.FromSeconds(5);
+                    break;
+                case Key.Right:
+                    VideoPlayerElement.Position += TimeSpan.FromSeconds(5);
+                    break;
+                case Key.Space:
+                    ControlVideoState();
+                    break;
+                case Key.Escape:
+                    if (WindowState == WindowState.Maximized)
+                    {
+                        WindowState = WindowState.Normal;
+                        WindowStyle = WindowStyle.SingleBorderWindow;
+                    }
+                    else
+                    {
+                        Close();
+                    }
+
+                    break;
+                case Key.F11:
+                    WindowState = WindowState.Maximized;
+                    WindowStyle = WindowStyle.None;
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }

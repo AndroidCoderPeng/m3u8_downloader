@@ -6,6 +6,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     x:Name="PlayerRootWindow"
     d:DesignHeight="300"
+    KeyDown="PlayVideoWindow_OnKeyDown"
     d:DesignWidth="400"
     ShowInTaskbar="False"
     WindowStartupLocation="CenterOwner"
