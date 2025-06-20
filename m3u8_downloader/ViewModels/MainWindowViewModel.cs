@@ -36,7 +36,7 @@ namespace m3u8_downloader.ViewModels
                         region.RequestNavigate("FinishedTaskPage");
                         break;
                     case 2:
-                        // region.RequestNavigate("SoftwareSettingsPage");
+                        region.RequestNavigate("SoftwareSettingPage");
                         break;
                     case 3:
                         region.RequestNavigate("AboutSoftwarePage");
