@@ -7,7 +7,7 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:prism="http://prismlibrary.com/"
     xmlns:vm="clr-namespace:m3u8_downloader.ViewModels"
-    Title="M3U8视频下载器"
+    Title="M3U8资源下载器"
     Width="800"
     Height="600"
     d:DataContext="{d:DesignInstance Type=vm:MainWindowViewModel}"
