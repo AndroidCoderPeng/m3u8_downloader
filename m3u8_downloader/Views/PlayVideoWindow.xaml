@@ -108,6 +108,8 @@
                     Grid.Column="1"
                     Margin="5,0"
                     Minimum="0"
+                    Thumb.DragCompleted="DurationSlider_DragCompleted"
+                    Thumb.DragStarted="DurationSlider_DragStarted"
                     Value="0" />
 
                 <TextBlock

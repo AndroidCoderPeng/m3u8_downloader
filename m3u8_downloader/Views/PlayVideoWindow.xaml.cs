@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
@@ -108,6 +109,17 @@ namespace m3u8_downloader.Views
                 PlayButton.Content = new TextBlock { Text = "\ue6fc" };
                 DurationTextBlock.Text = $"{VideoPlayerElement.NaturalDuration}";
             }
+        }
+
+        private void DurationSlider_DragStarted(object sender, DragStartedEventArgs e)
+        {
+            _isDraggingProgress = true;
+        }
+
+        private void DurationSlider_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            _isDraggingProgress = false;
+            VideoPlayerElement.Position = TimeSpan.FromSeconds(DurationSlider.Value);
         }
 
         private void VideoPlayerElement_MediaEnded(object sender, RoutedEventArgs e)
