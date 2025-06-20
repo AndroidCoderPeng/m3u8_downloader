@@ -54,10 +54,11 @@ namespace m3u8_downloader.Views
                 Console.WriteLine(VideoPlayerElement.Volume);
                 if (VideoPlayerElement.Volume == 0)
                 {
-                    
+                    VoiceSlider.Value = _lastVolume;
                 }
                 else
                 {
+                    _lastVolume = VideoPlayerElement.Volume;
                     VoiceSlider.Value = 0;
                 }
             };
@@ -225,7 +226,6 @@ namespace m3u8_downloader.Views
                     {
                         Close();
                     }
-
                     break;
                 case Key.F11:
                     WindowState = WindowState.Maximized;
