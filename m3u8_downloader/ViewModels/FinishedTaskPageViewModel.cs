@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Configuration;
+using System.Linq;
+using System.Windows;
 using m3u8_downloader.Models;
 using m3u8_downloader.Utils;
 using Newtonsoft.Json;
@@ -22,43 +23,78 @@ namespace m3u8_downloader.ViewModels
             }
         }
 
-        private bool _isLoadingCompleted;
+        private Visibility _isLoadingVisible = Visibility.Visible;
 
-        public bool IsLoadingCompleted
+        public Visibility IsLoadingVisible
         {
-            get => _isLoadingCompleted;
+            get => _isLoadingVisible;
             set
             {
-                _isLoadingCompleted = value;
+                _isLoadingVisible = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private Visibility _isVideoListBoxVisible = Visibility.Collapsed;
+
+        public Visibility IsVideoListBoxVisible
+        {
+            get => _isVideoListBoxVisible;
+            set
+            {
+                _isVideoListBoxVisible = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private Visibility _isEmptyImageVisible = Visibility.Collapsed;
+
+        public Visibility IsEmptyImageVisible
+        {
+            get => _isEmptyImageVisible;
+            set
+            {
+                _isEmptyImageVisible = value;
                 RaisePropertyChanged();
             }
         }
 
         private readonly VideoManager _videoManager;
-        
+
         public FinishedTaskPageViewModel()
         {
-            var folder = ConfigurationManager.AppSettings["VideoFolder"];
+            var folder = @"C:\Users\Administrator\Desktop\文件\temp";
+            // var folder = ConfigurationManager.AppSettings["VideoFolder"];
             if (string.IsNullOrEmpty(folder))
             {
-                IsLoadingCompleted = true;
+                IsLoadingVisible = Visibility.Collapsed;
                 return;
             }
-            
+
             _videoManager = new VideoManager(folder);
             LoadVideosAsync();
         }
-        
+
         private async void LoadVideosAsync()
         {
             var videos = await _videoManager.GetVideosAsync();
+            IsLoadingVisible = Visibility.Collapsed;
+            if (videos.Any())
+            {
+                IsVideoListBoxVisible = Visibility.Visible;
+                IsEmptyImageVisible = Visibility.Collapsed;
+            }
+            else
+            {
+                IsEmptyImageVisible = Visibility.Visible;
+                IsVideoListBoxVisible = Visibility.Collapsed;
+            }
+
             foreach (var video in videos)
             {
                 Console.WriteLine(JsonConvert.SerializeObject(video));
                 Videos.Add(video);
             }
-
-            IsLoadingCompleted = true;
         }
     }
 }

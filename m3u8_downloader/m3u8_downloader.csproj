@@ -107,9 +107,6 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Converters\ContentViewConverter.cs" />
-    <Compile Include="Converters\EmptyViewConverter.cs" />
-    <Compile Include="Converters\LoadingStateConverter.cs" />
     <Compile Include="Models\VideoFile.cs" />
     <Compile Include="Pages\AboutSoftwarePage.xaml.cs">
       <DependentUpon>AboutSoftwarePage.xaml</DependentUpon>
@@ -178,6 +175,9 @@
   <ItemGroup>
     <Content Include=".gitignore" />
     <Resource Include="Images\empty_image.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Converters\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
