@@ -15,6 +15,7 @@ namespace m3u8_downloader.Views
         private DispatcherTimer _controllerTimer;
         private bool _isDraggingProgress;
         private bool _isPlaying;
+        private bool _isCompleted;
 
         public PlayVideoWindow(string videoPath)
         {
@@ -49,17 +50,28 @@ namespace m3u8_downloader.Views
             RewindButton.Click += delegate { VideoPlayerElement.Position -= TimeSpan.FromSeconds(5); };
             PlayButton.Click += delegate
             {
-                if (_isPlaying)
+                if (_isCompleted)
                 {
-                    VideoPlayerElement.Pause();
-                    PlayButton.Content = new TextBlock { Text = "\ue6c2" };
-                    _isPlaying = false;
-                }
-                else
-                {
+                    VideoPlayerElement.Position = TimeSpan.Zero;
                     VideoPlayerElement.Play();
                     PlayButton.Content = new TextBlock { Text = "\ue6fc" };
                     _isPlaying = true;
+                    _isCompleted = false;
+                }
+                else
+                {
+                    if (_isPlaying)
+                    {
+                        VideoPlayerElement.Pause();
+                        PlayButton.Content = new TextBlock { Text = "\ue6c2" };
+                        _isPlaying = false;
+                    }
+                    else
+                    {
+                        VideoPlayerElement.Play();
+                        PlayButton.Content = new TextBlock { Text = "\ue6fc" };
+                        _isPlaying = true;
+                    } 
                 }
             };
             ForwardButton.Click += delegate { VideoPlayerElement.Position += TimeSpan.FromSeconds(5); };
@@ -146,7 +158,9 @@ namespace m3u8_downloader.Views
         private void VideoPlayerElement_MediaEnded(object sender, RoutedEventArgs e)
         {
             Console.WriteLine(@"视频播放结束");
+            PlayButton.Content = new TextBlock { Text = "\ue6c2" };
             _isPlaying = false;
+            _isCompleted = true;
         }
     }
 }
