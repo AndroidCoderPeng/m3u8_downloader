@@ -15,12 +15,13 @@ using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace m3u8_downloader.ViewModels
 {
-    public class DownloadTaskPageViewModel: BindableBase
+    public class DownloadTaskPageViewModel : BindableBase
     {
         public DelegateCommand ParseUrlCommand { set; get; }
         public DelegateCommand<string> MouseDoubleClickCommand { set; get; }
+        public DelegateCommand EditTaskCommand { set; get; }
         public DelegateCommand<string> DeleteTaskCommand { set; get; }
-        
+
         private string _m3u8Url = "https://t30.cdn2020.com/video/m3u8/2025/06/10/5b80adba/index.m3u8";
         // private string _m3u8Url = "https://m.dongludi.cc/x/0-1225190.html";
         // private string _m3u8Url = "https://m.dongludi.cc/x/0-1225140.html";
@@ -63,6 +64,8 @@ namespace m3u8_downloader.ViewModels
                 new PlayVideoWindow(filePath) { Owner = Application.Current.MainWindow }.ShowDialog();
             });
 
+            EditTaskCommand = new DelegateCommand(() => { Console.WriteLine("EditTaskCommand"); });
+
             DeleteTaskCommand = new DelegateCommand<string>(url =>
             {
                 var dialogResult = MessageBox.Show(
@@ -79,7 +82,7 @@ namespace m3u8_downloader.ViewModels
                 }
             });
         }
-        
+
         private async void ParseUrl()
         {
             if (_m3u8Url.EndsWith(".html"))

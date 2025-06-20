@@ -114,6 +114,7 @@
                                     HorizontalAlignment="Right"
                                     Background="Transparent"
                                     BorderThickness="0"
+                                    Command="{Binding DataContext.EditTaskCommand, ElementName=DownloadTaskListBox}"
                                     Content="&#xe6af;"
                                     FontFamily="/m3u8_downloader;component/#iconfont" />
                             </Grid>
@@ -134,10 +135,12 @@
                                     Grid.Column="1"
                                     Margin="10,0,0,0"
                                     HorizontalAlignment="Center">
-                                    <MultiBinding StringFormat="已下载 {0}/{1} 片段">
-                                        <Binding Path="DownloadedSegments" />
-                                        <Binding Path="TotalSegments" />
-                                    </MultiBinding>
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="已下载 {0}/{1} 片段">
+                                            <Binding Path="DownloadedSegments" />
+                                            <Binding Path="TotalSegments" />
+                                        </MultiBinding>
+                                    </TextBlock.Text>
                                 </TextBlock>
                             </Grid>
 
