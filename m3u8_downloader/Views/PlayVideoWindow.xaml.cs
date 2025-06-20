@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
@@ -16,6 +15,7 @@ namespace m3u8_downloader.Views
         private bool _isDraggingProgress;
         private bool _isPlaying;
         private bool _isCompleted;
+        private double _lastVolume = 0.5;
 
         public PlayVideoWindow(string videoPath)
         {
@@ -36,7 +36,6 @@ namespace m3u8_downloader.Views
                 VideoPlayerElement.Source = new Uri(videoPath);
                 VideoPlayerElement.Play();
                 _isPlaying = true;
-                Console.WriteLine($@"当前视频音量：{VideoPlayerElement.Volume}");
 
                 var durationTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
                 durationTimer.Tick += DurationTimer_Tick;
@@ -50,12 +49,24 @@ namespace m3u8_downloader.Views
             RewindButton.Click += delegate { VideoPlayerElement.Position -= TimeSpan.FromSeconds(5); };
             PlayButton.Click += delegate { ControlVideoState(); };
             ForwardButton.Click += delegate { VideoPlayerElement.Position += TimeSpan.FromSeconds(5); };
-            //TODO 待完成
-            VoiceButton.Click += delegate { };
+            VoiceButton.Click += delegate
+            {
+                Console.WriteLine(VideoPlayerElement.Volume);
+                if (VideoPlayerElement.Volume == 0)
+                {
+                    
+                }
+                else
+                {
+                    VoiceSlider.Value = 0;
+                }
+            };
+            VoiceSlider.ValueChanged += VoiceSlider_ValueChanged;
             ExpendButton.Click += delegate
             {
                 WindowState = WindowState.Maximized;
                 WindowStyle = WindowStyle.None;
+                ExpendButton.Content = "\ue683";
             };
         }
 
@@ -65,7 +76,7 @@ namespace m3u8_downloader.Views
             {
                 VideoPlayerElement.Position = TimeSpan.Zero;
                 VideoPlayerElement.Play();
-                PlayButton.Content = new TextBlock { Text = "\ue6fc" };
+                PlayButton.Content = "\ue6fc";
                 _isPlaying = true;
                 _isCompleted = false;
             }
@@ -74,18 +85,36 @@ namespace m3u8_downloader.Views
                 if (_isPlaying)
                 {
                     VideoPlayerElement.Pause();
-                    PlayButton.Content = new TextBlock { Text = "\ue6c2" };
+                    PlayButton.Content = "\ue6c2";
                     _isPlaying = false;
                 }
                 else
                 {
                     VideoPlayerElement.Play();
-                    PlayButton.Content = new TextBlock { Text = "\ue6fc" };
+                    PlayButton.Content = "\ue6fc";
                     _isPlaying = true;
                 }
             }
         }
 
+        private void VoiceSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            if (e.NewValue == 0)
+            {
+                VoiceButton.Content = "\ue6d8";
+            }
+            else if (e.NewValue > 0 && e.NewValue < 0.5)
+            {
+                VoiceButton.Content = "\ue71d";
+            }
+            else
+            {
+                VoiceButton.Content = "\ue71e";
+            }
+
+            VideoPlayerElement.Volume = e.NewValue;
+        }
+        
         private void ControllerTimer_Tick(object sender, EventArgs e)
         {
             _controllerTimer.Tick -= ControllerTimer_Tick;
@@ -134,7 +163,6 @@ namespace m3u8_downloader.Views
             _isControllerVisible = !_isControllerVisible;
         }
 
-
         /// <summary>
         /// 视频加载完成时的处理
         /// </summary>
@@ -148,8 +176,9 @@ namespace m3u8_downloader.Views
             PlayerRootWindow.SizeToContent = videoWidth > videoHeight ? SizeToContent.Height : SizeToContent.Width;
             if (VideoPlayerElement.NaturalDuration.HasTimeSpan)
             {
-                PlayButton.Content = new TextBlock { Text = "\ue6fc" };
+                PlayButton.Content = "\ue6fc";
                 DurationTextBlock.Text = $"{VideoPlayerElement.NaturalDuration}";
+                VoiceSlider.Value = VideoPlayerElement.Volume;
             }
         }
 
@@ -167,7 +196,7 @@ namespace m3u8_downloader.Views
         private void VideoPlayerElement_MediaEnded(object sender, RoutedEventArgs e)
         {
             Console.WriteLine(@"视频播放结束");
-            PlayButton.Content = new TextBlock { Text = "\ue6c2" };
+            PlayButton.Content = "\ue6c2";
             _isPlaying = false;
             _isCompleted = true;
         }
@@ -190,6 +219,7 @@ namespace m3u8_downloader.Views
                     {
                         WindowState = WindowState.Normal;
                         WindowStyle = WindowStyle.SingleBorderWindow;
+                        ExpendButton.Content = "\ue60c";
                     }
                     else
                     {
@@ -200,6 +230,7 @@ namespace m3u8_downloader.Views
                 case Key.F11:
                     WindowState = WindowState.Maximized;
                     WindowStyle = WindowStyle.None;
+                    ExpendButton.Content = "\ue683";
                     break;
                 default:
                     throw new ArgumentOutOfRangeException();
