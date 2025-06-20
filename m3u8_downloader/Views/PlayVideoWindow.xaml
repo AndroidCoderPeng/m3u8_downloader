@@ -67,7 +67,7 @@
     <Grid>
         <MediaElement
             x:Name="VideoPlayerElement"
-            LoadedBehavior="Play"
+            LoadedBehavior="Manual"
             MediaEnded="VideoPlayerElement_MediaEnded"
             MediaOpened="VideoPlayerElement_MediaOpened"
             UnloadedBehavior="Stop" />

@@ -14,6 +14,7 @@ namespace m3u8_downloader.Views
         private bool _isControllerVisible = true;
         private DispatcherTimer _controllerTimer;
         private bool _isDraggingProgress;
+        private bool _isPlaying;
 
         public PlayVideoWindow(string videoPath)
         {
@@ -30,8 +31,11 @@ namespace m3u8_downloader.Views
 
             try
             {
-                VideoPlayerElement.Source = new Uri(videoPath);
                 Title = $"{Path.GetFileName(videoPath)}";
+                VideoPlayerElement.Source = new Uri(videoPath);
+                VideoPlayerElement.Play();
+                _isPlaying = true;
+                Console.WriteLine($@"当前视频音量：{VideoPlayerElement.Volume}");
 
                 var durationTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
                 durationTimer.Tick += DurationTimer_Tick;
@@ -41,6 +45,24 @@ namespace m3u8_downloader.Views
             {
                 MessageBox.Show($"无法加载视频: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
             }
+
+            RewindButton.Click += delegate { VideoPlayerElement.Position -= TimeSpan.FromSeconds(5); };
+            PlayButton.Click += delegate
+            {
+                if (_isPlaying)
+                {
+                    VideoPlayerElement.Pause();
+                    PlayButton.Content = new TextBlock { Text = "\ue6c2" };
+                    _isPlaying = false;
+                }
+                else
+                {
+                    VideoPlayerElement.Play();
+                    PlayButton.Content = new TextBlock { Text = "\ue6fc" };
+                    _isPlaying = true;
+                }
+            };
+            ForwardButton.Click += delegate { VideoPlayerElement.Position += TimeSpan.FromSeconds(5); };
         }
 
         private void ControllerTimer_Tick(object sender, EventArgs e)
@@ -103,7 +125,6 @@ namespace m3u8_downloader.Views
             double videoWidth = VideoPlayerElement.NaturalVideoWidth;
             double videoHeight = VideoPlayerElement.NaturalVideoHeight;
             PlayerRootWindow.SizeToContent = videoWidth > videoHeight ? SizeToContent.Height : SizeToContent.Width;
-
             if (VideoPlayerElement.NaturalDuration.HasTimeSpan)
             {
                 PlayButton.Content = new TextBlock { Text = "\ue6fc" };
@@ -125,6 +146,7 @@ namespace m3u8_downloader.Views
         private void VideoPlayerElement_MediaEnded(object sender, RoutedEventArgs e)
         {
             Console.WriteLine(@"视频播放结束");
+            _isPlaying = false;
         }
     }
 }
