@@ -21,16 +21,20 @@ namespace m3u8_downloader.Views
             {
                 showStoryboard.Begin();
                 _controllerTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
-                _controllerTimer.Tick += Timer_Tick;
+                _controllerTimer.Tick += ControllerTimer_Tick;
                 _controllerTimer.Start();
             }
-            
+
             PlayerRootWindow.MouseLeftButtonDown += PlayerRootWindow_MouseDown;
-            
+
             try
             {
                 VideoPlayerElement.Source = new Uri(videoPath);
                 Title = $"{Path.GetFileName(videoPath)}";
+
+                var durationTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+                durationTimer.Tick += DurationTimer_Tick;
+                durationTimer.Start();
             }
             catch (Exception ex)
             {
@@ -38,9 +42,9 @@ namespace m3u8_downloader.Views
             }
         }
 
-        private void Timer_Tick(object sender, EventArgs e)
+        private void ControllerTimer_Tick(object sender, EventArgs e)
         {
-            _controllerTimer.Tick -= Timer_Tick;
+            _controllerTimer.Tick -= ControllerTimer_Tick;
             _controllerTimer.Stop();
             if (_isControllerVisible && FindResource("HideControllerAnimation") is Storyboard hideStoryboard)
             {
@@ -48,12 +52,24 @@ namespace m3u8_downloader.Views
                 _isControllerVisible = false;
             }
         }
-        
+
+        private void DurationTimer_Tick(object sender, EventArgs e)
+        {
+            if (VideoPlayerElement.NaturalDuration.HasTimeSpan && !_isDraggingProgress)
+            {
+                DurationSlider.Maximum = VideoPlayerElement.NaturalDuration.TimeSpan.TotalSeconds;
+
+                var position = VideoPlayerElement.Position;
+                PositionTextBlock.Text = $"{position.Hours:D2}:{position.Minutes:D2}:{position.Seconds:D2}";
+                DurationSlider.Value = position.TotalSeconds;
+            }
+        }
+
         private void PlayerRootWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (_isControllerVisible)
             {
-                _controllerTimer.Tick -= Timer_Tick;
+                _controllerTimer.Tick -= ControllerTimer_Tick;
                 _controllerTimer.Stop();
                 if (FindResource("HideControllerAnimation") is Storyboard hideStoryboard)
                 {
@@ -66,11 +82,11 @@ namespace m3u8_downloader.Views
                 {
                     showStoryboard.Begin();
                     _controllerTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
-                    _controllerTimer.Tick += Timer_Tick;
+                    _controllerTimer.Tick += ControllerTimer_Tick;
                     _controllerTimer.Start();
                 }
             }
-            
+
             _isControllerVisible = !_isControllerVisible;
         }
 
@@ -87,15 +103,15 @@ namespace m3u8_downloader.Views
             double videoHeight = VideoPlayerElement.NaturalVideoHeight;
             PlayerRootWindow.SizeToContent = videoWidth > videoHeight ? SizeToContent.Height : SizeToContent.Width;
 
-            PlayButton.Content = new TextBlock { Text = "\ue6fc" };
-            var duration = VideoPlayerElement.NaturalDuration;
-            DurationSlider.Maximum = duration.TimeSpan.Seconds;
-            DurationTextBlock.Text = $"{duration}";
+            if (VideoPlayerElement.NaturalDuration.HasTimeSpan)
+            {
+                PlayButton.Content = new TextBlock { Text = "\ue6fc" };
+                DurationTextBlock.Text = $"{VideoPlayerElement.NaturalDuration}";
+            }
         }
 
         private void VideoPlayerElement_MediaEnded(object sender, RoutedEventArgs e)
         {
-            // 视频播放结束时的处理
             Console.WriteLine(@"视频播放结束");
         }
     }

@@ -95,6 +95,7 @@
                 </Grid.ColumnDefinitions>
 
                 <TextBlock
+                    x:Name="PositionTextBlock"
                     Grid.Column="0"
                     VerticalAlignment="Center"
                     FontSize="13"
