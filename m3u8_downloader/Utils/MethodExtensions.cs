@@ -27,6 +27,7 @@ namespace m3u8_downloader.Utils
         {
             var client = new HttpClient();
             var content = await client.GetStringAsync(html);
+            Console.WriteLine(content);
             
             if (string.IsNullOrEmpty(content))
                 return new List<string>();

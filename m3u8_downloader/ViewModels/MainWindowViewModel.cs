@@ -29,7 +29,7 @@ namespace m3u8_downloader.ViewModels
         public DelegateCommand<string> PlayVideoCommand { set; get; }
         public DelegateCommand<string> DeleteTaskCommand { set; get; }
 
-        private string _m3u8Url = string.Empty;
+        private string _m3u8Url = "https://m.dongludi.cc/x/0-1225190.html";
 
         public string M3U8Url
         {
