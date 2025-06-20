@@ -1,7 +1,11 @@
 using System.Windows;
+using m3u8_downloader.Pages;
+using m3u8_downloader.Service;
+using m3u8_downloader.ViewModels;
 using m3u8_downloader.Views;
 using Prism.DryIoc;
 using Prism.Ioc;
+using Prism.Regions;
 
 namespace m3u8_downloader
 {
@@ -12,11 +16,23 @@ namespace m3u8_downloader
     {
         protected override Window CreateShell()
         {
-            return Container.Resolve<MainWindow>();
+            var mainWindow = Container.Resolve<MainWindow>();
+            mainWindow.Loaded += delegate
+            {
+                var regionManager = Container.Resolve<IRegionManager>();
+                regionManager.RequestNavigate("ContentRegion", "DownloadTaskPage");
+            };
+            return mainWindow;
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            //Data
+            containerRegistry.Register<IAppDataService, AppDataServiceImpl>();
+            
+            //Navigation
+            containerRegistry.RegisterForNavigation<DownloadTaskPage, DownloadTaskPageViewModel>();
+            containerRegistry.RegisterForNavigation<AboutSoftwarePage>();
         }
     }
 }
