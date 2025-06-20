@@ -1,4 +1,6 @@
-﻿namespace m3u8_downloader.Models
+﻿using System;
+
+namespace m3u8_downloader.Models
 {
     public class VideoFile
     {
@@ -11,6 +13,11 @@
         /// 视频名
         /// </summary>
         public string VideoName { set; get; }
+
+        /// <summary>
+        /// 文件路径
+        /// </summary>
+        public string FilePath { set; get; }
 
         /// <summary>
         /// 分辨率
@@ -26,5 +33,10 @@
         /// 时长
         /// </summary>
         public string Duration { set; get; }
+
+        /// <summary>
+        /// 文件修改时间，用于缓存有效性检查
+        /// </summary>
+        public DateTime LastModified { get; set; }
     }
 }

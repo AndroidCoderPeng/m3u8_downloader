@@ -1,7 +1,9 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.Configuration;
-using System.IO;
 using m3u8_downloader.Models;
+using m3u8_downloader.Utils;
+using Newtonsoft.Json;
 using Prism.Mvvm;
 
 namespace m3u8_downloader.ViewModels
@@ -31,6 +33,8 @@ namespace m3u8_downloader.ViewModels
                 RaisePropertyChanged();
             }
         }
+
+        private readonly VideoManager _videoManager;
         
         public FinishedTaskPageViewModel()
         {
@@ -40,14 +44,20 @@ namespace m3u8_downloader.ViewModels
                 IsLoadingCompleted = true;
                 return;
             }
-
-            var files = Directory.GetFiles(folder, "*.mp4");
-            foreach (var file in files)
+            
+            _videoManager = new VideoManager(folder);
+            LoadVideosAsync();
+        }
+        
+        private async void LoadVideosAsync()
+        {
+            var videos = await _videoManager.GetVideosAsync();
+            foreach (var video in videos)
             {
-                //采用三级缓存
-                
-                // Videos.Add(new FileInfo(file));
+                Console.WriteLine(JsonConvert.SerializeObject(video));
+                Videos.Add(video);
             }
+
             IsLoadingCompleted = true;
         }
     }

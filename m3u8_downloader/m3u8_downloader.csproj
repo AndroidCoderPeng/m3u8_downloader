@@ -126,6 +126,7 @@
     <Compile Include="Service\AppDataServiceImpl.cs" />
     <Compile Include="Service\IAppDataService.cs" />
     <Compile Include="Utils\MethodExtensions.cs" />
+    <Compile Include="Utils\VideoManager.cs" />
     <Compile Include="ViewModels\DownloadTaskPageViewModel.cs" />
     <Compile Include="ViewModels\FinishedTaskPageViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
