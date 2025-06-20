@@ -95,17 +95,7 @@ namespace m3u8_downloader.ViewModels
                 new AboutSoftwareDialog { Owner = Application.Current.MainWindow }.ShowDialog();
             });
 
-            ParseUrlCommand = new DelegateCommand(() =>
-            {
-                var filePath = "三文鱼".IsVideoExists();
-                if (filePath == string.Empty)
-                {
-                    MessageBox.Show(@"视频文件不存在，请先下载", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-
-                new PlayVideoWindow(filePath){ Owner = Application.Current.MainWindow }.ShowDialog();
-            });
+            ParseUrlCommand = new DelegateCommand(ParseUrl);
 
             PlayVideoCommand = new DelegateCommand<string>(name =>
             {
