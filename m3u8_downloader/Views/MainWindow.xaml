@@ -22,15 +22,15 @@
 
         <!--  添加顶部菜单  -->
         <Menu Grid.Row="0">
-            <MenuItem Header="_文件" SubmenuOpened="FileMenuItem_OnSubmenuOpened">
-                <MenuItem Command="{Binding OpenFileCommand}" Header="_打开" />
-                <MenuItem Command="{Binding SelectFolderCommand}" Header="_保存" />
+            <MenuItem Header="文件" SubmenuOpened="FileMenuItem_OnSubmenuOpened">
+                <MenuItem Command="{Binding OpenFileCommand}" Header="打开" />
+                <MenuItem Command="{Binding SelectFolderCommand}" Header="保存" />
                 <Separator />
-                <MenuItem Command="{Binding ExitApplicationCommand}" Header="_退出" />
+                <MenuItem Command="{Binding ExitApplicationCommand}" Header="退出" />
             </MenuItem>
-            <MenuItem Header="_帮助" SubmenuOpened="HelpMenuItem_OnSubmenuOpened">
-                <MenuItem Command="{Binding ShowDocumentCommand}" Header="_使用说明" />
-                <MenuItem Command="{Binding ShowAboutCommand}" Header="_关于" />
+            <MenuItem Header="帮助" SubmenuOpened="HelpMenuItem_OnSubmenuOpened">
+                <MenuItem Command="{Binding ShowDocumentCommand}" Header="使用说明" />
+                <MenuItem Command="{Binding ShowAboutCommand}" Header="关于" />
             </MenuItem>
         </Menu>
 

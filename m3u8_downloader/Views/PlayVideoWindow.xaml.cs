@@ -51,7 +51,6 @@ namespace m3u8_downloader.Views
             ForwardButton.Click += delegate { VideoPlayerElement.Position += TimeSpan.FromSeconds(5); };
             VoiceButton.Click += delegate
             {
-                Console.WriteLine(VideoPlayerElement.Volume);
                 if (VideoPlayerElement.Volume == 0)
                 {
                     VoiceSlider.Value = _lastVolume;

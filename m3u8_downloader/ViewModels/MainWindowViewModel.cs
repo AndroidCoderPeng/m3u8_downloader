@@ -29,7 +29,7 @@ namespace m3u8_downloader.ViewModels
         public DelegateCommand<string> PlayVideoCommand { set; get; }
         public DelegateCommand<string> DeleteTaskCommand { set; get; }
 
-        private string _m3u8Url = "https://t30.cdn2020.com/video/m3u8/2025/06/10/5b80adba/index.m3u8";
+        private string _m3u8Url = string.Empty;
 
         public string M3U8Url
         {
@@ -106,7 +106,7 @@ namespace m3u8_downloader.ViewModels
                     return;
                 }
 
-                new PlayVideoWindow(filePath){ Owner = Application.Current.MainWindow }.ShowDialog();
+                new PlayVideoWindow(filePath) { Owner = Application.Current.MainWindow }.ShowDialog();
             });
 
             DeleteTaskCommand = new DelegateCommand<string>(url =>
@@ -131,7 +131,17 @@ namespace m3u8_downloader.ViewModels
             if (_m3u8Url.EndsWith(".html"))
             {
                 // 如果是 HTML 页面，尝试提取 M3U8 资源
-                _m3u8Url = _m3u8Url.ExtractM3U8Resource();
+                var urls = await _m3u8Url.ExtractM3U8Resource();
+                if (!urls.Any())
+                {
+                    MessageBox.Show(@"无法从 HTML 页面中提取 M3U8 资源", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
+                foreach (var url in urls)
+                {
+                    Console.WriteLine(url);
+                }
             }
 
             if (!_m3u8Url.EndsWith(".m3u8"))
@@ -171,14 +181,14 @@ namespace m3u8_downloader.ViewModels
                 MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            
+
             await segments.DownloadTsSegmentsAsync(outputFolder, new Progress<TaskProgress>(progress =>
                 {
                     task.TotalSize = $"{progress.TotalBytes / 1024.0 / 1024.0:N2} MB";
                     task.PercentComplete = $"{progress.PercentComplete}%";
                 }
             ));
-            
+
             task.TaskState = "合并中";
             await outputFolder.MergeTsSegmentsAsync(task.TaskName);
             await outputFolder.DeleteTsSegments();

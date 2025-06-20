@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,16 +16,28 @@ namespace m3u8_downloader.Utils
 {
     public static class MethodExtensions
     {
+        private static readonly HttpClient Client = new HttpClient();
+
         /// <summary>
         /// 提取html里面的m3u8资源
         /// </summary>
         /// <param name="html"></param>
         /// <returns></returns>
-        public static string ExtractM3U8Resource(this string html)
+        public static async Task<List<string>> ExtractM3U8Resource(this string html)
         {
-            return "";
-        }
+            var client = new HttpClient();
+            var content = await client.GetStringAsync(html);
+            
+            if (string.IsNullOrEmpty(content))
+                return new List<string>();
 
+            var regex = new Regex(@"https?://[^\s""']+\.m3u8", RegexOptions.IgnoreCase);
+            return regex.Matches(content)
+                .OfType<Match>()
+                .Select(m => m.Value)
+                .ToList();
+        }
+        
         /// <summary>
         /// 解析m3u8基本信息
         /// </summary>
@@ -32,8 +45,7 @@ namespace m3u8_downloader.Utils
         /// <returns></returns>
         public static async Task<(List<string> Segments, double TotalDuration)> ParseVideoResourceAsync(this string url)
         {
-            var client = new HttpClient();
-            var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+            var response = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
             var reader = new StreamReader(await response.Content.ReadAsStreamAsync());
 
             var segments = new List<string>();
@@ -80,34 +92,30 @@ namespace m3u8_downloader.Utils
                 {
                     try
                     {
-                        using (var client = new HttpClient())
+                        Client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0");
+                        var response = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                        response.EnsureSuccessStatusCode(); // 确保状态码是 2xx
+
+                        var fileSize = response.Content.Headers.ContentLength ?? -1L;
+
+                        using (var stream = await response.Content.ReadAsStreamAsync())
+                        using (var fileStream = File.Create(fileName))
                         {
-                            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0");
-
-                            var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-                            response.EnsureSuccessStatusCode(); // 确保状态码是 2xx
-
-                            var fileSize = response.Content.Headers.ContentLength ?? -1L;
-
-                            using (var stream = await response.Content.ReadAsStreamAsync())
-                            using (var fileStream = File.Create(fileName))
-                            {
-                                await stream.CopyToAsync(fileStream);
-                            }
-
-                            Interlocked.Add(ref totalBytes, fileSize);
-                            var currentCount = Interlocked.Increment(ref downloadedCount);
-
-                            progress.Report(new TaskProgress
-                            {
-                                TotalSegments = totalSegments,
-                                DownloadedSegments = currentCount,
-                                TotalBytes = totalBytes,
-                                PercentComplete = (int)((double)currentCount / totalSegments * 100)
-                            });
-
-                            break; // 成功则退出循环
+                            await stream.CopyToAsync(fileStream);
                         }
+
+                        Interlocked.Add(ref totalBytes, fileSize);
+                        var currentCount = Interlocked.Increment(ref downloadedCount);
+
+                        progress.Report(new TaskProgress
+                        {
+                            TotalSegments = totalSegments,
+                            DownloadedSegments = currentCount,
+                            TotalBytes = totalBytes,
+                            PercentComplete = (int)((double)currentCount / totalSegments * 100)
+                        });
+
+                        break; // 成功则退出循环
                     }
                     catch (Exception ex) when (ex is IOException || ex is HttpRequestException)
                     {
