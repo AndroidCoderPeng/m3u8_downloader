@@ -107,6 +107,10 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Converters\ContentViewConverter.cs" />
+    <Compile Include="Converters\EmptyViewConverter.cs" />
+    <Compile Include="Converters\LoadingStateConverter.cs" />
+    <Compile Include="Models\VideoFile.cs" />
     <Compile Include="Pages\AboutSoftwarePage.xaml.cs">
       <DependentUpon>AboutSoftwarePage.xaml</DependentUpon>
     </Compile>
@@ -116,10 +120,14 @@
     <Compile Include="Pages\DownloadTaskPage.xaml.cs">
       <DependentUpon>DownloadTaskPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\FinishedTaskPage.xaml.cs">
+      <DependentUpon>FinishedTaskPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Service\AppDataServiceImpl.cs" />
     <Compile Include="Service\IAppDataService.cs" />
     <Compile Include="Utils\MethodExtensions.cs" />
     <Compile Include="ViewModels\DownloadTaskPageViewModel.cs" />
+    <Compile Include="ViewModels\FinishedTaskPageViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -155,6 +163,7 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Pages\DownloadTaskPage.xaml" />
+    <Page Include="Pages\FinishedTaskPage.xaml" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -167,6 +176,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
+    <Resource Include="Images\empty_image.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
