@@ -1,10 +1,11 @@
-﻿using System;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Linq;
 using System.Windows;
 using m3u8_downloader.Models;
 using m3u8_downloader.Utils;
-using Newtonsoft.Json;
+using m3u8_downloader.Views;
+using Prism.Commands;
 using Prism.Mvvm;
 
 namespace m3u8_downloader.ViewModels
@@ -59,20 +60,27 @@ namespace m3u8_downloader.ViewModels
             }
         }
 
+        public DelegateCommand<string> MouseDoubleClickCommand { set; get; }
         private readonly VideoManager _videoManager;
 
         public FinishedTaskPageViewModel()
         {
-            var folder = @"C:\Users\Administrator\Desktop\文件\temp";
-            // var folder = ConfigurationManager.AppSettings["VideoFolder"];
+            var folder = ConfigurationManager.AppSettings["VideoFolder"];
             if (string.IsNullOrEmpty(folder))
             {
                 IsLoadingVisible = Visibility.Collapsed;
+                IsEmptyImageVisible = Visibility.Visible;
+                IsVideoListBoxVisible = Visibility.Collapsed;
                 return;
             }
 
             _videoManager = new VideoManager(folder);
             LoadVideosAsync();
+            
+            MouseDoubleClickCommand= new DelegateCommand<string>(async filePath =>
+            {
+                new PlayVideoWindow(filePath) { Owner = Application.Current.MainWindow }.ShowDialog();
+            });
         }
 
         private async void LoadVideosAsync()
@@ -92,7 +100,6 @@ namespace m3u8_downloader.ViewModels
 
             foreach (var video in videos)
             {
-                Console.WriteLine(JsonConvert.SerializeObject(video));
                 Videos.Add(video);
             }
         }

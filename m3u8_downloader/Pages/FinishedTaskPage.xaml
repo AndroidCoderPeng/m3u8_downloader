@@ -11,6 +11,38 @@
     d:DesignWidth="600"
     mc:Ignorable="d">
 
+    <UserControl.Resources>
+        <Style x:Key="ListBoxItemStyleKey" TargetType="ListBoxItem">
+            <Setter Property="Height" Value="110" />
+            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border
+                            x:Name="ItemContainerBorder"
+                            Margin="{TemplateBinding Margin}"
+                            Padding="10,0"
+                            Background="{TemplateBinding Background}"
+                            BorderThickness="3"
+                            CornerRadius="10">
+                            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource AppMouseOverBrush}" />
+                </Trigger>
+
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource AppThemeBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
     <Grid>
         <Grid VerticalAlignment="Center" Visibility="{Binding IsLoadingVisible}">
             <Grid.RowDefinitions>
@@ -41,33 +73,64 @@
             Visibility="{Binding IsVideoListBoxVisible}">
 
             <b:Interaction.Triggers>
-                <b:EventTrigger EventName="SelectionChanged">
-                    <b:InvokeCommandAction Command="{Binding ItemSelectedCommand}" CommandParameter="{Binding ElementName=VideoListBox, Path=SelectedItem}" />
-                </b:EventTrigger>
-
                 <b:EventTrigger EventName="MouseDoubleClick">
-                    <b:InvokeCommandAction Command="{Binding MouseDoubleClickCommand}" CommandParameter="{Binding ElementName=VideoListBox, Path=SelectedItem}" />
+                    <b:InvokeCommandAction Command="{Binding MouseDoubleClickCommand}" CommandParameter="{Binding ElementName=VideoListBox, Path=SelectedItem.FilePath}" />
                 </b:EventTrigger>
             </b:Interaction.Triggers>
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+                    <DockPanel LastChildFill="True">
+                        <Border
+                            Width="120"
+                            Height="85"
+                            Background="{DynamicResource AppBackgroundBrush}"
+                            BorderBrush="{DynamicResource AppBorderBrush}"
+                            CornerRadius="5">
+                            <Grid>
+                                <Image Source="{Binding CoverImage}" Stretch="UniformToFill">
+                                    <Image.Clip>
+                                        <RectangleGeometry
+                                            RadiusX="5"
+                                            RadiusY="5"
+                                            Rect="0,0,120,85" />
+                                    </Image.Clip>
+                                </Image>
 
+                                <TextBlock
+                                    Margin="3"
+                                    Foreground="White"
+                                    Text="{Binding Resolution}" />
+                            </Grid>
+                        </Border>
 
-                        <TextBlock
-                            Grid.Column="1"
-                            Padding="0,20,20,20"
-                            VerticalAlignment="Center"
-                            FontSize="16"
-                            Text="{Binding FolderName}" />
-                    </Grid>
+                        <Grid Margin="10,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+
+                            <TextBlock
+                                Grid.Row="0"
+                                FontSize="16"
+                                Text="{Binding VideoName}" />
+
+                            <TextBlock
+                                Grid.Row="1"
+                                Margin="0,5"
+                                FontSize="14"
+                                Text="{Binding VideoSize}" />
+
+                            <TextBlock Grid.Row="2" Text="{Binding Duration}" />
+                        </Grid>
+                    </DockPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
+
+            <ListBox.ItemContainerStyle>
+                <Style BasedOn="{StaticResource ListBoxItemStyleKey}" TargetType="ListBoxItem" />
+            </ListBox.ItemContainerStyle>
         </ListBox>
 
         <Grid Visibility="{Binding IsEmptyImageVisible}">

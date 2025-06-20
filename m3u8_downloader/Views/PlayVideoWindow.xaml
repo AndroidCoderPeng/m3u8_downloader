@@ -185,7 +185,7 @@
                     Margin="5,0,0,0"
                     Padding="10,5"
                     HorizontalAlignment="Right"
-                    Content="&#xe60c;"
+                    Content="&#xe60d;"
                     Style="{DynamicResource ControllerButtonStyle}"
                     ToolTip="全屏（F11）" />
             </Grid>
