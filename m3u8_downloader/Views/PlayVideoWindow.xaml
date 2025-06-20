@@ -31,6 +31,37 @@
                 To="80"
                 Duration="0:0:0.3" />
         </Storyboard>
+
+        <Style x:Key="ControllerButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="5" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontFamily" Value="/m3u8_downloader;component/#iconfont" />
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border
+                            x:Name="TargetBorder"
+                            Padding="{TemplateBinding Padding}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
+                            <ContentPresenter
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                SnapsToDevicePixels="{TemplateBinding SnapsToDevicePixels}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="TargetBorder" Property="Background" Value="Transparent" />
+                                <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
 
     <Grid>
@@ -66,6 +97,7 @@
                 <TextBlock
                     Grid.Column="0"
                     VerticalAlignment="Center"
+                    FontSize="13"
                     Foreground="White"
                     Text="00:00:00"
                     TextWrapping="NoWrap" />
@@ -81,19 +113,20 @@
                     x:Name="DurationTextBlock"
                     Grid.Column="2"
                     VerticalAlignment="Center"
+                    FontSize="13"
                     Foreground="White"
                     Text="00:00:00"
                     TextWrapping="NoWrap" />
             </Grid>
 
-            <Grid Grid.Row="1" Margin="5,0,10,10">
+            <Grid Grid.Row="1" Margin="10,0,10,10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
 
-                <Grid Grid.Column="1">
+                <Grid Grid.Column="0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition />
@@ -101,63 +134,55 @@
                     </Grid.ColumnDefinitions>
 
                     <Button
+                        x:Name="RewindButton"
                         Grid.Column="0"
-                        Padding="5"
-                        Background="Transparent"
-                        Content="&#xe6e9;"
-                        FontFamily="/m3u8_downloader;component/#iconfont"
-                        FontSize="24"
-                        Foreground="White"
-                        Style="{x:Null}" />
+                        Content="&#xe6c8;"
+                        Style="{DynamicResource ControllerButtonStyle}"
+                        ToolTip="快退5s（←）" />
 
                     <Button
+                        x:Name="PlayButton"
                         Grid.Column="1"
-                        Padding="5"
-                        Background="Transparent"
                         Content="&#xe6c2;"
-                        FontFamily="/m3u8_downloader;component/#iconfont"
-                        FontSize="24"
-                        Foreground="White"
-                        Style="{x:Null}" />
+                        Style="{DynamicResource ControllerButtonStyle}" />
 
                     <Button
+                        x:Name="ForwardButton"
                         Grid.Column="2"
-                        Padding="5"
-                        Background="Transparent"
-                        Content="&#xe677;"
-                        FontFamily="/m3u8_downloader;component/#iconfont"
-                        FontSize="24"
-                        Foreground="White"
-                        Style="{x:Null}" />
+                        Content="&#xe678;"
+                        Style="{DynamicResource ControllerButtonStyle}"
+                        ToolTip="快进5s（→）" />
                 </Grid>
 
-                <Grid Grid.Column="2" HorizontalAlignment="Right">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-
+                <DockPanel
+                    Grid.Column="1"
+                    Width="300"
+                    HorizontalAlignment="Right"
+                    LastChildFill="True">
                     <Button
-                        Grid.Column="0"
+                        x:Name="VoiceButton"
                         Padding="10,5"
-                        Background="Transparent"
                         Content="&#xe6d7;"
-                        FontFamily="/m3u8_downloader;component/#iconfont"
-                        FontSize="24"
-                        Foreground="White"
-                        Style="{x:Null}" />
+                        Style="{DynamicResource ControllerButtonStyle}"
+                        ToolTip="音量" />
 
-                    <Button
-                        Grid.Column="1"
-                        Margin="10,0,0,0"
-                        Padding="10,5"
-                        Background="Transparent"
-                        Content="&#xe60c;"
-                        FontFamily="/m3u8_downloader;component/#iconfont"
-                        FontSize="24"
-                        Foreground="White"
-                        Style="{x:Null}" />
-                </Grid>
+                    <Slider
+                        x:Name="VoiceSlider"
+                        Margin="5,0"
+                        VerticalAlignment="Center"
+                        Minimum="0"
+                        Value="0" />
+                </DockPanel>
+
+                <Button
+                    x:Name="ExpendButton"
+                    Grid.Column="2"
+                    Margin="5,0,0,0"
+                    Padding="10,5"
+                    HorizontalAlignment="Right"
+                    Content="&#xe60c;"
+                    Style="{DynamicResource ControllerButtonStyle}"
+                    ToolTip="全屏（F11）" />
             </Grid>
         </Grid>
     </Grid>

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
@@ -23,9 +24,9 @@ namespace m3u8_downloader.Views
                 _controllerTimer.Tick += Timer_Tick;
                 _controllerTimer.Start();
             }
-
+            
             PlayerRootWindow.MouseLeftButtonDown += PlayerRootWindow_MouseDown;
-
+            
             try
             {
                 VideoPlayerElement.Source = new Uri(videoPath);
@@ -47,7 +48,7 @@ namespace m3u8_downloader.Views
                 _isControllerVisible = false;
             }
         }
-
+        
         private void PlayerRootWindow_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (_isControllerVisible)
@@ -69,7 +70,7 @@ namespace m3u8_downloader.Views
                     _controllerTimer.Start();
                 }
             }
-
+            
             _isControllerVisible = !_isControllerVisible;
         }
 
@@ -86,6 +87,7 @@ namespace m3u8_downloader.Views
             double videoHeight = VideoPlayerElement.NaturalVideoHeight;
             PlayerRootWindow.SizeToContent = videoWidth > videoHeight ? SizeToContent.Height : SizeToContent.Width;
 
+            PlayButton.Content = new TextBlock { Text = "\ue6fc" };
             var duration = VideoPlayerElement.NaturalDuration;
             DurationSlider.Maximum = duration.TimeSpan.Seconds;
             DurationTextBlock.Text = $"{duration}";
