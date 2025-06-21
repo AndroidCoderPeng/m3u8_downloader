@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Windows.Forms;
-using HandyControl.Controls;
 using m3u8_downloader.Models;
 using m3u8_downloader.Service;
 using Prism.Commands;
@@ -10,6 +8,7 @@ using Prism.Mvvm;
 using Prism.Regions;
 using DialogResult = System.Windows.Forms.DialogResult;
 using ListBox = System.Windows.Controls.ListBox;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 namespace m3u8_downloader.ViewModels
 {
@@ -53,13 +52,8 @@ namespace m3u8_downloader.ViewModels
                 };
 
                 if (folderDialog.ShowDialog() != DialogResult.OK) return;
-                var folderPath = folderDialog.SelectedPath;
-                if (string.IsNullOrEmpty(folderPath)) return;
-                var config = ConfigurationManager.OpenExeConfiguration(ConfigurationUserLevel.None);
-                config.AppSettings.Settings["VideoFolder"].Value = folderPath;
-                config.Save(ConfigurationSaveMode.Modified);
-                ConfigurationManager.RefreshSection("appSettings");
-                Growl.Success("路径设置成功");
+                dataService.PutValue("VideoFolder", folderDialog.SelectedPath);
+                MessageBox.Show(@"设置成功", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             });
         }
     }

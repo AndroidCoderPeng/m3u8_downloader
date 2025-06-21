@@ -1,8 +1,8 @@
 ﻿using System.Collections.ObjectModel;
-using System.Configuration;
 using System.Linq;
 using System.Windows;
 using m3u8_downloader.Models;
+using m3u8_downloader.Service;
 using m3u8_downloader.Utils;
 using m3u8_downloader.Views;
 using Prism.Commands;
@@ -63,9 +63,9 @@ namespace m3u8_downloader.ViewModels
         public DelegateCommand<string> MouseDoubleClickCommand { set; get; }
         private readonly VideoManager _videoManager;
 
-        public FinishedTaskPageViewModel()
+        public FinishedTaskPageViewModel(IAppDataService dataService)
         {
-            var folder = ConfigurationManager.AppSettings["VideoFolder"];
+            var folder = dataService.GetValue("VideoFolder") as string;
             if (string.IsNullOrEmpty(folder))
             {
                 IsLoadingVisible = Visibility.Collapsed;
@@ -76,8 +76,8 @@ namespace m3u8_downloader.ViewModels
 
             _videoManager = new VideoManager(folder);
             LoadVideosAsync();
-            
-            MouseDoubleClickCommand= new DelegateCommand<string>(async filePath =>
+
+            MouseDoubleClickCommand = new DelegateCommand<string>(async filePath =>
             {
                 new PlayVideoWindow(filePath) { Owner = Application.Current.MainWindow }.ShowDialog();
             });

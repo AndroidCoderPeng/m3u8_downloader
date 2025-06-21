@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Windows;
 using m3u8_downloader.Models;
 
 namespace m3u8_downloader.Service
@@ -14,6 +15,18 @@ namespace m3u8_downloader.Service
                 new NavigationMenu { Icon = "\ue6cd", Title = "设置" },
                 new NavigationMenu { Icon = "\ue646", Title = "关于" }
             };
+        }
+
+        public void PutValue(string key, object value)
+        {
+            if (string.IsNullOrWhiteSpace(key)) return;
+            Application.Current.Properties[key] = value;
+        }
+
+        public object GetValue(string key)
+        {
+            if (string.IsNullOrWhiteSpace(key)) return null;
+            return Application.Current.Properties[key];
         }
     }
 }

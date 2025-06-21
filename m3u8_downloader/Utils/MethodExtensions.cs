@@ -182,23 +182,5 @@ namespace m3u8_downloader.Utils
             var files = Directory.GetFiles(folder, "*.ts");
             await Task.Run(() => Parallel.ForEach(files, File.Delete));
         }
-
-        /// <summary>
-        /// 视频是否存在
-        /// </summary>
-        /// <param name="videoName"></param>
-        /// <returns></returns>
-        public static string IsVideoExists(this string videoName)
-        {
-            var folder = ConfigurationManager.AppSettings["VideoFolder"];
-            if (string.IsNullOrEmpty(folder))
-            {
-                MessageBox.Show(@"请先选择视频根目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return string.Empty;
-            }
-
-            var filePath = Path.Combine(folder, $"{videoName}.mp4");
-            return File.Exists(filePath) ? filePath : string.Empty;
-        }
     }
 }

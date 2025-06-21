@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Windows.Forms;
 using m3u8_downloader.Models;
+using m3u8_downloader.Service;
 using m3u8_downloader.Utils;
 using m3u8_downloader.Views;
 using Prism.Commands;
@@ -48,14 +48,23 @@ namespace m3u8_downloader.ViewModels
             get => _downloadTaskSource;
         }
 
-        public DownloadTaskPageViewModel()
+        private readonly IAppDataService _dataService;
+
+        public DownloadTaskPageViewModel(IAppDataService dataService)
         {
+            _dataService = dataService;
             ParseUrlCommand = new DelegateCommand(ParseUrl);
 
             MouseDoubleClickCommand = new DelegateCommand<string>(name =>
             {
-                var filePath = name.IsVideoExists();
-                if (filePath == string.Empty)
+                var folder = _dataService.GetValue("VideoFolder") as string;
+                if (string.IsNullOrEmpty(folder))
+                {
+                    MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+                var filePath = Path.Combine(folder, $"{name}.mp4");
+                if (File.Exists(filePath))
                 {
                     MessageBox.Show(@"视频文件不存在，请先下载", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
@@ -75,8 +84,15 @@ namespace m3u8_downloader.ViewModels
                 var task = _downloadTaskSource.FirstOrDefault(x => x.Url.Equals(url));
                 if (task == null) return;
                 DownloadTaskSource.Remove(task);
-                var filePath = task.TaskName.IsVideoExists();
-                if (filePath != string.Empty)
+                
+                var folder = _dataService.GetValue("VideoFolder") as string;
+                if (string.IsNullOrEmpty(folder))
+                {
+                    MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+                var filePath = Path.Combine(folder, $"{task.TaskName}.mp4");
+                if (File.Exists(filePath))
                 {
                     File.Delete(filePath);
                 }
@@ -131,25 +147,25 @@ namespace m3u8_downloader.ViewModels
             task.TotalSegments = segments.Count;
             task.Duration = durationTime;
             task.TaskState = "下载中";
-            
-            var outputFolder = ConfigurationManager.AppSettings["VideoFolder"];
-            if (string.IsNullOrEmpty(outputFolder))
+
+            var folder = _dataService.GetValue("VideoFolder") as string;
+            if (string.IsNullOrEmpty(folder))
             {
                 MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
-            
-            await segments.DownloadTsSegmentsAsync(outputFolder, new Progress<TaskProgress>(progress =>
+
+            await segments.DownloadTsSegmentsAsync(folder, new Progress<TaskProgress>(progress =>
                 {
                     task.TotalSize = $"{progress.TotalBytes / 1024.0 / 1024.0:N2} MB";
                     task.DownloadedSegments = progress.DownloadedSegments;
                     task.PercentComplete = progress.PercentComplete;
                 }
             ));
-            
+
             task.TaskState = "合并中";
-            await outputFolder.MergeTsSegmentsAsync(task.TaskName);
-            await outputFolder.DeleteTsSegments();
+            await folder.MergeTsSegmentsAsync(task.TaskName);
+            await folder.DeleteTsSegments();
             task.TaskState = "下载完成";
         }
     }
