@@ -96,10 +96,8 @@ namespace m3u8_downloader.ViewModels
                 }
 
                 var filePath = Path.Combine(folder, $"{task.TaskName}.mp4");
-                if (File.Exists(filePath))
-                {
-                    File.Delete(filePath);
-                }
+                if (!File.Exists(filePath)) return;
+                File.Delete(filePath);
             });
         }
 

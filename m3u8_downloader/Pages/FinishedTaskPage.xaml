@@ -6,6 +6,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:vm="clr-namespace:m3u8_downloader.ViewModels"
+    xmlns:model="clr-namespace:m3u8_downloader.Models"
     d:DataContext="{d:DesignInstance Type=vm:FinishedTaskPageViewModel}"
     d:DesignHeight="400"
     d:DesignWidth="600"
@@ -127,6 +128,16 @@
                     </DockPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
+
+            <!--  右键菜单  -->
+            <ListBox.ContextMenu>
+                <ContextMenu Width="120">
+                    <MenuItem
+                        Command="{Binding DeleteTaskCommand}"
+                        CommandParameter="{Binding Path=PlacementTarget.(ListBox.SelectedItem).(model:VideoFile.FilePath), RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                        Header="删除" />
+                </ContextMenu>
+            </ListBox.ContextMenu>
 
             <ListBox.ItemContainerStyle>
                 <Style BasedOn="{StaticResource ListBoxItemStyleKey}" TargetType="ListBoxItem" />

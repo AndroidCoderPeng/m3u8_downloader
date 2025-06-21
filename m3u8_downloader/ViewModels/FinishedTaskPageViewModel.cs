@@ -1,6 +1,8 @@
 ﻿using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Windows;
+using ImTools;
 using m3u8_downloader.Models;
 using m3u8_downloader.Service;
 using m3u8_downloader.Utils;
@@ -61,6 +63,7 @@ namespace m3u8_downloader.ViewModels
         }
 
         public DelegateCommand<string> MouseDoubleClickCommand { set; get; }
+        public DelegateCommand<string> DeleteTaskCommand { set; get; }
         private readonly VideoManager _videoManager;
 
         public FinishedTaskPageViewModel(IAppDataService dataService)
@@ -79,7 +82,16 @@ namespace m3u8_downloader.ViewModels
 
             MouseDoubleClickCommand = new DelegateCommand<string>(async filePath =>
             {
+                if (!File.Exists(filePath)) return;
                 new PlayVideoWindow(filePath) { Owner = Application.Current.MainWindow }.ShowDialog();
+            });
+
+            DeleteTaskCommand = new DelegateCommand<string>(filePath =>
+            {
+                if (!File.Exists(filePath)) return;
+                File.Delete(filePath);
+                var videoFile = _videos.FindFirst(x => x.FilePath == filePath);
+                Videos.Remove(videoFile);
             });
         }
 
