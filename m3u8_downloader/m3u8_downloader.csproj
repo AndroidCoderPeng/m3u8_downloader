@@ -177,8 +177,5 @@
     <Content Include=".gitignore" />
     <Resource Include="Images\empty_image.png" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Converters\" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
