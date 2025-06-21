@@ -23,9 +23,9 @@ namespace m3u8_downloader.ViewModels
         public DelegateCommand<DownloadTask> EditTaskCommand { set; get; }
         public DelegateCommand<string> DeleteTaskCommand { set; get; }
 
-        private string _m3u8Url = "https://t30.cdn2020.com/video/m3u8/2025/06/10/5b80adba/index.m3u8";
-        // private string _m3u8Url = "https://m.dongludi.cc/x/0-1225190.html";
-        // private string _m3u8Url = "https://m.dongludi.cc/x/0-1225140.html";
+        // private string _m3u8Url = "https://t30.cdn2020.com/video/m3u8/2025/06/10/5b80adba/index.m3u8";
+        // private string _m3u8Url = "https://hls.qzkj.tech/videos5/190685a0ddb687c902cd8307afbddfc1/190685a0ddb687c902cd8307afbddfc1.m3u8?auth_key=1750497321-685678291b7fd-0-6d345de8ebc2336083b3dc50fc316dec&v=3&time=0";
+        private string _m3u8Url = "https://t0.97img.com/a1001570/a.m3u8";
 
         public string M3U8Url
         {
@@ -52,33 +52,11 @@ namespace m3u8_downloader.ViewModels
         private readonly IAppDataService _dataService;
         private VideoManager _videoManager;
 
-        public DownloadTaskPageViewModel(IAppDataService dataService,IDialogService dialogService)
+        public DownloadTaskPageViewModel(IAppDataService dataService, IDialogService dialogService)
         {
             _dataService = dataService;
             ParseUrlCommand = new DelegateCommand(delegate
             {
-                if (_m3u8Url.EndsWith(".html"))
-                {
-                    // 如果是 HTML 页面，尝试提取 M3U8 资源
-                    // var urls = await _m3u8Url.ExtractM3U8Resource();
-                    // if (!urls.Any())
-                    // {
-                    //     MessageBox.Show(@"无法从 HTML 页面中提取 M3U8 资源", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    //     return;
-                    // }
-                    //
-                    // foreach (var url in urls)
-                    // {
-                    //     Console.WriteLine(url);
-                    // }
-                }
-
-                if (!_m3u8Url.EndsWith(".m3u8"))
-                {
-                    MessageBox.Show(@"请输入正确的 M3U8 文件地址", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-
                 if (_downloadTaskSource.Any(x => x.Url.Equals(_m3u8Url)))
                 {
                     MessageBox.Show(@"该任务已存在", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -128,10 +106,7 @@ namespace m3u8_downloader.ViewModels
                 };
                 dialogService.ShowDialog("EditTaskNameDialog", dialogParameters, delegate(IDialogResult result)
                 {
-                    if (result.Result != ButtonResult.OK)
-                    {
-                        return;
-                    }
+                    if (result.Result != ButtonResult.OK) return;
                     it.TaskName = result.Parameters.GetValue<string>("TaskName");
                 });
             });
@@ -159,7 +134,7 @@ namespace m3u8_downloader.ViewModels
             });
         }
 
-        private async void ParseResourceAsync(DownloadTask  task)
+        private async void ParseResourceAsync(DownloadTask task)
         {
             var (segments, duration) = await _m3u8Url.ParseVideoResourceAsync();
             var durationTime = TimeSpan.FromSeconds(duration).ToString(@"hh\:mm\:ss");

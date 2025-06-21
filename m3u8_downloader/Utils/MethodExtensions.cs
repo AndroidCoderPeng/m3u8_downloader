@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Configuration;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Forms;
 using m3u8_downloader.Models;
 
 namespace m3u8_downloader.Utils
@@ -17,27 +14,6 @@ namespace m3u8_downloader.Utils
     public static class MethodExtensions
     {
         private static readonly HttpClient Client = new HttpClient();
-
-        /// <summary>
-        /// 提取html里面的m3u8资源
-        /// </summary>
-        /// <param name="html"></param>
-        /// <returns></returns>
-        public static async Task<List<string>> ExtractM3U8Resource(this string html)
-        {
-            var content = await Client.GetStringAsync(html);
-            Console.WriteLine(content);
-
-            if (string.IsNullOrEmpty(content))
-                return new List<string>();
-
-            var regex = new Regex(@"https?://[^\s""']+\.m3u8", RegexOptions.IgnoreCase);
-            return regex.Matches(content)
-                .OfType<Match>()
-                .Select(m => m.Value)
-                .ToList();
-        }
-        
         /// <summary>
         /// 解析m3u8基本信息
         /// </summary>
