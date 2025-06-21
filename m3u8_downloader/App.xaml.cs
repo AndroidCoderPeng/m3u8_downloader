@@ -33,7 +33,6 @@ namespace m3u8_downloader
             //Navigation
             containerRegistry.RegisterForNavigation<DownloadTaskPage, DownloadTaskPageViewModel>();
             containerRegistry.RegisterForNavigation<FinishedTaskPage, FinishedTaskPageViewModel>();
-            containerRegistry.RegisterForNavigation<SoftwareSettingPage, SoftwareSettingPageViewModel>();
             containerRegistry.RegisterForNavigation<AboutSoftwarePage>();
         }
     }

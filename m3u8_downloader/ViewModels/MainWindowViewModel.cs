@@ -35,14 +35,11 @@ namespace m3u8_downloader.ViewModels
                         region.RequestNavigate("FinishedTaskPage");
                         break;
                     case 2:
-                        region.RequestNavigate("SoftwareSettingPage");
-                        break;
-                    case 3:
                         region.RequestNavigate("AboutSoftwarePage");
                         break;
                 }
             });
-            ///////////////////////////////////////////////////////////////////////////////
+            
             SelectFolderCommand = new DelegateCommand(() =>
             {
                 var folderDialog = new FolderBrowserDialog

@@ -64,6 +64,7 @@ namespace m3u8_downloader.ViewModels
                     return;
                 }
                 var filePath = Path.Combine(folder, $"{name}.mp4");
+                Console.WriteLine(filePath);
                 if (File.Exists(filePath))
                 {
                     MessageBox.Show(@"视频文件不存在，请先下载", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);

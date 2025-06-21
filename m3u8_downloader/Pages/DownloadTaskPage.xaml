@@ -66,8 +66,7 @@
                 Margin="10,0,0,0"
                 HorizontalAlignment="Stretch"
                 Command="{Binding ParseUrlCommand}"
-                Content="解析"
-                Style="{StaticResource ButtonPrimary}" />
+                Content="解析" />
         </Grid>
 
         <ListBox

@@ -120,9 +120,6 @@
     <Compile Include="Pages\FinishedTaskPage.xaml.cs">
       <DependentUpon>FinishedTaskPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Pages\SoftwareSettingPage.xaml.cs">
-      <DependentUpon>SoftwareSettingPage.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Service\AppDataServiceImpl.cs" />
     <Compile Include="Service\IAppDataService.cs" />
     <Compile Include="Utils\MethodExtensions.cs" />
@@ -166,7 +163,6 @@
     </Page>
     <Page Include="Pages\DownloadTaskPage.xaml" />
     <Page Include="Pages\FinishedTaskPage.xaml" />
-    <Page Include="Pages\SoftwareSettingPage.xaml" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
