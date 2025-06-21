@@ -1,4 +1,5 @@
 using System.Windows;
+using m3u8_downloader.Dialogs;
 using m3u8_downloader.Pages;
 using m3u8_downloader.Service;
 using m3u8_downloader.ViewModels;
@@ -34,6 +35,9 @@ namespace m3u8_downloader
             containerRegistry.RegisterForNavigation<DownloadTaskPage, DownloadTaskPageViewModel>();
             containerRegistry.RegisterForNavigation<FinishedTaskPage, FinishedTaskPageViewModel>();
             containerRegistry.RegisterForNavigation<AboutSoftwarePage>();
+            
+            //Dialog
+            containerRegistry.RegisterDialog<EditTaskNameDialog, EditTaskNameDialogViewModel>();
         }
     }
 }

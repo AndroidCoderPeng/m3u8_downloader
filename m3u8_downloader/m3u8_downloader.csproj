@@ -107,6 +107,9 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Dialogs\EditTaskNameDialog.xaml.cs">
+      <DependentUpon>EditTaskNameDialog.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Models\VideoFile.cs" />
     <Compile Include="Pages\AboutSoftwarePage.xaml.cs">
       <DependentUpon>AboutSoftwarePage.xaml</DependentUpon>
@@ -125,6 +128,7 @@
     <Compile Include="Utils\MethodExtensions.cs" />
     <Compile Include="Utils\VideoManager.cs" />
     <Compile Include="ViewModels\DownloadTaskPageViewModel.cs" />
+    <Compile Include="ViewModels\EditTaskNameDialogViewModel.cs" />
     <Compile Include="ViewModels\FinishedTaskPageViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\SoftwareSettingPageViewModel.cs" />
@@ -158,6 +162,7 @@
   <ItemGroup>
     <Page Include="Colors\ApplicationBrushes.xaml" />
     <Page Include="Colors\ApplicationColor.xaml" />
+    <Page Include="Dialogs\EditTaskNameDialog.xaml" />
     <Page Include="Pages\AboutSoftwarePage.xaml">
       <SubType>Designer</SubType>
     </Page>

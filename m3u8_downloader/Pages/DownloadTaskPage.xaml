@@ -114,6 +114,7 @@
                                     Background="Transparent"
                                     BorderThickness="0"
                                     Command="{Binding DataContext.EditTaskCommand, ElementName=DownloadTaskListBox}"
+                                    CommandParameter="{Binding}"
                                     Content="&#xe6af;"
                                     FontFamily="/m3u8_downloader;component/#iconfont" />
                             </Grid>
