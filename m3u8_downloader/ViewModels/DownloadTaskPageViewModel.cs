@@ -49,6 +49,7 @@ namespace m3u8_downloader.ViewModels
         }
 
         private readonly IAppDataService _dataService;
+        private VideoManager _videoManager;
 
         public DownloadTaskPageViewModel(IAppDataService dataService)
         {
@@ -63,6 +64,7 @@ namespace m3u8_downloader.ViewModels
                     MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
+
                 var filePath = Path.Combine(folder, $"{name}.mp4");
                 Console.WriteLine(filePath);
                 if (File.Exists(filePath))
@@ -85,13 +87,14 @@ namespace m3u8_downloader.ViewModels
                 var task = _downloadTaskSource.FirstOrDefault(x => x.Url.Equals(url));
                 if (task == null) return;
                 DownloadTaskSource.Remove(task);
-                
+
                 var folder = _dataService.GetValue("VideoFolder") as string;
                 if (string.IsNullOrEmpty(folder))
                 {
                     MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
+
                 var filePath = Path.Combine(folder, $"{task.TaskName}.mp4");
                 if (File.Exists(filePath))
                 {
@@ -168,6 +171,9 @@ namespace m3u8_downloader.ViewModels
             await folder.MergeTsSegmentsAsync(task.TaskName);
             await folder.DeleteTsSegments();
             task.TaskState = "下载完成";
+            // 更新视频列表
+            _videoManager = new VideoManager(folder);
+            await _videoManager.UpdateVideosAsync();
         }
     }
 }

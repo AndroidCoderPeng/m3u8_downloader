@@ -67,6 +67,20 @@ namespace m3u8_downloader.Utils
             }
         }
 
+        public async Task UpdateVideosAsync()
+        {
+            try
+            {
+                var files = Directory.GetFiles(_videoFolderPath, "*.mp4");
+                var tasks = files.Select(file => GetVideoByFileNameAsync(Path.GetFileName(file)));
+                await Task.WhenAll(tasks);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"加载视频时发生错误: {ex.Message}");
+            }
+        }
+
         public async Task<List<VideoFile>> GetVideosAsync()
         {
             try
