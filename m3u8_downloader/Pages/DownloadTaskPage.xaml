@@ -73,7 +73,8 @@
             x:Name="DownloadTaskListBox"
             Grid.Row="1"
             BorderThickness="0"
-            ItemsSource="{Binding DownloadTaskSource}">
+            ItemsSource="{Binding DownloadTaskSource}"
+            Visibility="{Binding IsDownloadTaskVisible}">
 
             <b:Interaction.Triggers>
                 <b:EventTrigger EventName="MouseDoubleClick">
@@ -174,5 +175,22 @@
                 <Style BasedOn="{StaticResource ListBoxItemStyleKey}" TargetType="ListBoxItem" />
             </ListBox.ItemContainerStyle>
         </ListBox>
+
+        <Grid Grid.Row="1" Visibility="{Binding IsEmptyImageVisible}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100" />
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="100" />
+            </Grid.RowDefinitions>
+
+            <Image Grid.Row="1" Source="/m3u8_downloader;component/Images/empty_image.png" />
+
+            <TextBlock
+                Grid.Row="2"
+                HorizontalAlignment="Center"
+                FontSize="18"
+                Text="这里什么都没有~" />
+        </Grid>
     </Grid>
 </UserControl>

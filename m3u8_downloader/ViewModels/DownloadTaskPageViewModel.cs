@@ -2,6 +2,7 @@
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Windows;
 using System.Windows.Forms;
 using m3u8_downloader.Models;
 using m3u8_downloader.Service;
@@ -49,6 +50,30 @@ namespace m3u8_downloader.ViewModels
             get => _downloadTaskSource;
         }
 
+        private Visibility _isDownloadTaskVisible = Visibility.Collapsed;
+
+        public Visibility IsDownloadTaskVisible
+        {
+            get => _isDownloadTaskVisible;
+            set
+            {
+                _isDownloadTaskVisible = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private Visibility _isEmptyImageVisible = Visibility.Visible;
+
+        public Visibility IsEmptyImageVisible
+        {
+            get => _isEmptyImageVisible;
+            set
+            {
+                _isEmptyImageVisible = value;
+                RaisePropertyChanged();
+            }
+        }
+
         private readonly IAppDataService _dataService;
         private VideoManager _videoManager;
 
@@ -74,6 +99,9 @@ namespace m3u8_downloader.ViewModels
                     TaskState = "连接中"
                 };
                 DownloadTaskSource.Add(task);
+                IsEmptyImageVisible = Visibility.Collapsed;
+                IsDownloadTaskVisible = Visibility.Visible;
+                
                 // 解析m3u8片段
                 ParseResourceAsync(task);
             });
@@ -120,6 +148,16 @@ namespace m3u8_downloader.ViewModels
                 var task = _downloadTaskSource.FirstOrDefault(x => x.Url.Equals(url));
                 if (task == null) return;
                 DownloadTaskSource.Remove(task);
+                if (_downloadTaskSource.Any())
+                {
+                    IsEmptyImageVisible = Visibility.Collapsed;
+                    IsDownloadTaskVisible = Visibility.Visible;
+                }
+                else
+                {
+                    IsEmptyImageVisible = Visibility.Visible;
+                    IsDownloadTaskVisible = Visibility.Collapsed;
+                }
 
                 var folder = _dataService.GetValue("VideoFolder") as string;
                 if (string.IsNullOrEmpty(folder))
