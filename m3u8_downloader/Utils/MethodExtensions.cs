@@ -17,6 +17,11 @@ namespace m3u8_downloader.Utils
     {
         private static readonly HttpClient Client = new HttpClient();
 
+        static MethodExtensions()
+        {
+            Client.Timeout = TimeSpan.FromMinutes(5); // 设置为 5 分钟
+        }
+
         private const string KeyPattern =
             @"#EXT-X-KEY:METHOD=(?<METHOD>[^,]*),URI=""(?<URI>[^""]*)""(?:,IV=(?<IV>[^,\s]*))?";
 
@@ -162,7 +167,7 @@ namespace m3u8_downloader.Utils
                 }
             }
         }
-        
+
         /// <summary>
         /// 下载ts片段
         /// </summary>
