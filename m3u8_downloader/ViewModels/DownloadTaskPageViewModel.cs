@@ -24,8 +24,8 @@ namespace m3u8_downloader.ViewModels
         public DelegateCommand<string> DeleteTaskCommand { set; get; }
 
         // private string _m3u8Url = "https://t30.cdn2020.com/video/m3u8/2025/06/10/5b80adba/index.m3u8";
-        // private string _m3u8Url = "https://hls.qzkj.tech/videos5/190685a0ddb687c902cd8307afbddfc1/190685a0ddb687c902cd8307afbddfc1.m3u8?auth_key=1750497321-685678291b7fd-0-6d345de8ebc2336083b3dc50fc316dec&v=3&time=0";
-        private string _m3u8Url = "https://t0.97img.com/a1001570/a.m3u8";
+        private string _m3u8Url = "https://hls.qzkj.tech/videos5/190685a0ddb687c902cd8307afbddfc1/190685a0ddb687c902cd8307afbddfc1.m3u8?auth_key=1750497321-685678291b7fd-0-6d345de8ebc2336083b3dc50fc316dec&v=3&time=0";
+        // private string _m3u8Url = "https://t0.97img.com/a1001570/a.m3u8";
 
         public string M3U8Url
         {
