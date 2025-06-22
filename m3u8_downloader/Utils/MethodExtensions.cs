@@ -15,8 +15,12 @@ namespace m3u8_downloader.Utils
     public static class MethodExtensions
     {
         private static readonly HttpClient Client = new HttpClient();
+
+        private const string KeyPattern =
+            @"#EXT-X-KEY:METHOD=(?<METHOD>[^,]*),URI=""(?<URI>[^""]*)""(?:,IV=(?<IV>[^,\s]*))?";
+
         private const string DurationPattern = @"#EXTINF:(\d+(\.\d+)?),";
-        
+
         /// <summary>
         /// 解析m3u8基本信息
         /// </summary>
@@ -25,11 +29,11 @@ namespace m3u8_downloader.Utils
         public static async Task<(List<string> Segments, double TotalDuration)> ParseVideoResourceAsync(this string url)
         {
             var response = await Client.GetStringAsync(url);
-
             var lines = response.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
-            
-            var segments = new List<string>();
+
             double totalDuration = 0;
+            var segments = new List<string>();
+            var temp = new List<string>(); //带有密钥的片段集合
 
             foreach (var line in lines)
             {
@@ -40,14 +44,40 @@ namespace m3u8_downloader.Utils
                     var durationStr = match.Groups[1].Value;
                     totalDuration += double.Parse(durationStr);
                 }
-                
+
                 //不带密钥的片段
                 if (line.EndsWith(".ts"))
                 {
                     segments.Add(new Uri(new Uri(url), line).ToString());
                 }
+
+                if (line.StartsWith("http") || line.StartsWith("https"))
+                {
+                    //带密钥的片段
+                    temp.Add(line);
+                }
             }
 
+            //带有密钥的片段不为空，说明此资源需要解密
+            if (temp.Any())
+            {
+                //提取密钥和加密方式
+                var match = Regex.Match(response, KeyPattern);
+                if (match.Success)
+                {
+                    var method = match.Groups["METHOD"].Value;
+                    var uri = match.Groups["URI"].Value;
+                    var iv = match.Groups["IV"].Success ? match.Groups["IV"].Value : null;
+
+                    foreach (var segment in temp)
+                    {
+                        Console.WriteLine(segment);
+                    }
+                }
+            }
+
+            //解密完成，删除缓存
+            temp.Clear();
             return (segments, totalDuration);
         }
 
