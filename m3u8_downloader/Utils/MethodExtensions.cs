@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -33,8 +34,6 @@ namespace m3u8_downloader.Utils
 
             double totalDuration = 0;
             var segments = new List<string>();
-            var temp = new List<string>(); //带有密钥的片段集合
-
             foreach (var line in lines)
             {
                 //解析时间
@@ -54,33 +53,102 @@ namespace m3u8_downloader.Utils
                 if (line.StartsWith("http") || line.StartsWith("https"))
                 {
                     //带密钥的片段
-                    temp.Add(line);
+                    segments.Add(line);
                 }
             }
 
-            //带有密钥的片段不为空，说明此资源需要解密
-            if (temp.Any())
+            //提取密钥和加密方式
             {
-                //提取密钥和加密方式
                 var match = Regex.Match(response, KeyPattern);
                 if (match.Success)
                 {
                     var method = match.Groups["METHOD"].Value;
                     var uri = match.Groups["URI"].Value;
                     var iv = match.Groups["IV"].Success ? match.Groups["IV"].Value : null;
-
-                    foreach (var segment in temp)
-                    {
-                        Console.WriteLine(segment);
-                    }
                 }
             }
 
-            //解密完成，删除缓存
-            temp.Clear();
             return (segments, totalDuration);
         }
 
+        /// <summary>
+        /// 下载并解密加密的ts片段
+        /// </summary>
+        /// <param name="tsUrls"></param>
+        /// <param name="key"></param>
+        /// <param name="iv"></param>
+        /// <param name="outputFolder"></param>
+        /// <param name="progress"></param>
+        public static async Task DownloadAndDecryptTsSegmentAsync(this List<string> tsUrls, byte[] key,
+            byte[] iv, string outputFolder, IProgress<TaskProgress> progress)
+        {
+            if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
+
+            var totalSegments = tsUrls.Count;
+            long totalBytes = 0;
+            var downloadedCount = 0;
+
+            var downloadTasks = tsUrls.Select(async url =>
+            {
+                var fileName = Path.Combine(outputFolder, Path.GetFileName(url).Split('?')[0]); // 去除URL参数
+                var retryCount = 3;
+
+                while (retryCount-- > 0)
+                {
+                    try
+                    {
+                        var encryptedData = await Client.GetByteArrayAsync(url);
+                        var decryptedData = encryptedData.DecryptAesCbc(key, iv);
+
+                        await File.WriteAllBytesAsync(fileName, decryptedData);
+
+                        Interlocked.Add(ref totalBytes, encryptedData.Length);
+                        var currentCount = Interlocked.Increment(ref downloadedCount);
+
+                        progress.Report(new TaskProgress
+                        {
+                            TotalSegments = totalSegments,
+                            DownloadedSegments = currentCount,
+                            TotalBytes = totalBytes,
+                            PercentComplete = (double)currentCount / totalSegments * 100
+                        });
+
+                        break;
+                    }
+                    catch (Exception ex) when (ex is IOException || ex is HttpRequestException)
+                    {
+                        Console.WriteLine($@"下载失败 {url}，剩余重试次数：{retryCount}，错误：{ex.Message}");
+                        await Task.Delay(2000);
+                    }
+                }
+            });
+
+            await Task.WhenAll(downloadTasks);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="key"></param>
+        /// <param name="iv"></param>
+        /// <returns></returns>
+        private static byte[] DecryptAesCbc(this byte[] bytes, byte[] key, byte[] iv)
+        {
+            using (var aes = Aes.Create())
+            {
+                aes.Key = key;
+                aes.IV = iv;
+                aes.Mode = CipherMode.CBC;
+                aes.Padding = PaddingMode.PKCS7;
+
+                using (var decryptor = aes.CreateDecryptor())
+                {
+                    return decryptor.TransformFinalBlock(bytes, 0, bytes.Length);
+                }
+            }
+        }
+        
         /// <summary>
         /// 下载ts片段
         /// </summary>
@@ -194,6 +262,18 @@ namespace m3u8_downloader.Utils
         {
             var files = Directory.GetFiles(folder, "*.ts");
             await Task.Run(() => Parallel.ForEach(files, File.Delete));
+        }
+
+        public static byte[] StringToByteArray(string hex)
+        {
+            var numberChars = hex.Length;
+            var bytes = new byte[numberChars / 2];
+            for (var i = 0; i < numberChars; i += 2)
+            {
+                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+            }
+
+            return bytes;
         }
     }
 }
