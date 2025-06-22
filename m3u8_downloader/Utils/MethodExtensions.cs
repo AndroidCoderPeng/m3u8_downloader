@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using m3u8_downloader.Models;
@@ -14,6 +15,8 @@ namespace m3u8_downloader.Utils
     public static class MethodExtensions
     {
         private static readonly HttpClient Client = new HttpClient();
+        private const string DurationPattern = @"#EXTINF:(\d+(\.\d+)?),";
+        
         /// <summary>
         /// 解析m3u8基本信息
         /// </summary>
@@ -21,21 +24,25 @@ namespace m3u8_downloader.Utils
         /// <returns></returns>
         public static async Task<(List<string> Segments, double TotalDuration)> ParseVideoResourceAsync(this string url)
         {
-            var response = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
-            var reader = new StreamReader(await response.Content.ReadAsStreamAsync());
+            var response = await Client.GetStringAsync(url);
 
+            var lines = response.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
+            
             var segments = new List<string>();
             double totalDuration = 0;
-            string line;
 
-            while ((line = await reader.ReadLineAsync()) != null)
+            foreach (var line in lines)
             {
-                if (line.StartsWith("#EXTINF:"))
+                //解析时间
+                var match = Regex.Match(line, DurationPattern);
+                if (match.Success)
                 {
-                    var durationStr = line.Replace("#EXTINF:", "").Split(',')[0];
+                    var durationStr = match.Groups[1].Value;
                     totalDuration += double.Parse(durationStr);
                 }
-                else if (line.EndsWith(".ts"))
+                
+                //不带密钥的片段
+                if (line.EndsWith(".ts"))
                 {
                     segments.Add(new Uri(new Uri(url), line).ToString());
                 }
