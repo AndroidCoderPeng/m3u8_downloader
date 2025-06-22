@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -27,7 +27,8 @@ namespace m3u8_downloader.Utils
         /// </summary>
         /// <param name="url"></param>
         /// <returns></returns>
-        public static async Task<(List<string> Segments, double TotalDuration)> ParseVideoResourceAsync(this string url)
+        public static async Task<(List<string> Segments, double TotalDuration, Dictionary<string, string>)>
+            ParseVideoResourceAsync(this string url)
         {
             var response = await Client.GetStringAsync(url);
             var lines = response.Split(new[] { "\r\n", "\n" }, StringSplitOptions.RemoveEmptyEntries);
@@ -58,17 +59,26 @@ namespace m3u8_downloader.Utils
             }
 
             //提取密钥和加密方式
+            var dictionary = new Dictionary<string, string>();
             {
                 var match = Regex.Match(response, KeyPattern);
                 if (match.Success)
                 {
                     var method = match.Groups["METHOD"].Value;
                     var uri = match.Groups["URI"].Value;
-                    var iv = match.Groups["IV"].Success ? match.Groups["IV"].Value : null;
+                    var iv = match.Groups["IV"].Success ? match.Groups["IV"].Value : "";
+                    if (iv.StartsWith("0x"))
+                    {
+                        iv = iv.Substring(2);
+                    }
+
+                    dictionary.Add("Method", method);
+                    dictionary.Add("URI", uri);
+                    dictionary.Add("IV", iv);
                 }
             }
 
-            return (segments, totalDuration);
+            return (segments, totalDuration, dictionary);
         }
 
         /// <summary>
@@ -100,7 +110,11 @@ namespace m3u8_downloader.Utils
                         var encryptedData = await Client.GetByteArrayAsync(url);
                         var decryptedData = encryptedData.DecryptAesCbc(key, iv);
 
-                        await File.WriteAllBytesAsync(fileName, decryptedData);
+                        using (var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write,
+                                   FileShare.None, bufferSize: 4096, useAsync: true))
+                        {
+                            await fileStream.WriteAsync(decryptedData, 0, decryptedData.Length);
+                        }
 
                         Interlocked.Add(ref totalBytes, encryptedData.Length);
                         var currentCount = Interlocked.Increment(ref downloadedCount);
@@ -264,13 +278,18 @@ namespace m3u8_downloader.Utils
             await Task.Run(() => Parallel.ForEach(files, File.Delete));
         }
 
-        public static byte[] StringToByteArray(string hex)
+        public static byte[] GetByteArray(this string keyUrl)
         {
-            var numberChars = hex.Length;
+            return Client.GetByteArrayAsync(keyUrl).Result;
+        }
+
+        public static byte[] ToByteArray(this string value)
+        {
+            var numberChars = value.Length;
             var bytes = new byte[numberChars / 2];
             for (var i = 0; i < numberChars; i += 2)
             {
-                bytes[i / 2] = Convert.ToByte(hex.Substring(i, 2), 16);
+                bytes[i / 2] = Convert.ToByte(value.Substring(i, 2), 16);
             }
 
             return bytes;

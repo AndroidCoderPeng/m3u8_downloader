@@ -24,7 +24,8 @@ namespace m3u8_downloader.ViewModels
         public DelegateCommand<string> DeleteTaskCommand { set; get; }
 
         // private string _m3u8Url = "https://t30.cdn2020.com/video/m3u8/2025/06/10/5b80adba/index.m3u8";
-        private string _m3u8Url = "https://hls.qzkj.tech/videos5/190685a0ddb687c902cd8307afbddfc1/190685a0ddb687c902cd8307afbddfc1.m3u8?auth_key=1750497321-685678291b7fd-0-6d345de8ebc2336083b3dc50fc316dec&v=3&time=0";
+        private string _m3u8Url =
+            "https://hls.qzkj.tech/videos5/190685a0ddb687c902cd8307afbddfc1/190685a0ddb687c902cd8307afbddfc1.m3u8?auth_key=1750497321-685678291b7fd-0-6d345de8ebc2336083b3dc50fc316dec&v=3&time=0";
         // private string _m3u8Url = "https://t0.97img.com/a1001570/a.m3u8";
 
         public string M3U8Url
@@ -136,7 +137,7 @@ namespace m3u8_downloader.ViewModels
 
         private async void ParseResourceAsync(DownloadTask task)
         {
-            var (segments, duration) = await _m3u8Url.ParseVideoResourceAsync();
+            var (segments, duration, dictionary) = await _m3u8Url.ParseVideoResourceAsync();
             var durationTime = TimeSpan.FromSeconds(duration).ToString(@"hh\:mm\:ss");
             task.TotalSegments = segments.Count;
             task.Duration = durationTime;
@@ -149,13 +150,30 @@ namespace m3u8_downloader.ViewModels
                 return;
             }
 
-            await segments.DownloadTsSegmentsAsync(folder, new Progress<TaskProgress>(progress =>
-                {
-                    task.TotalSize = $"{progress.TotalBytes / 1024.0 / 1024.0:N2} MB";
-                    task.DownloadedSegments = progress.DownloadedSegments;
-                    task.PercentComplete = progress.PercentComplete;
-                }
-            ));
+            if (dictionary == null)
+            {
+                await segments.DownloadTsSegmentsAsync(folder, new Progress<TaskProgress>(progress =>
+                    {
+                        task.TotalSize = $"{progress.TotalBytes / 1024.0 / 1024.0:N2} MB";
+                        task.DownloadedSegments = progress.DownloadedSegments;
+                        task.PercentComplete = progress.PercentComplete;
+                    }
+                ));
+            }
+            else
+            {
+                var key = dictionary["URI"];
+                var iv = dictionary["IV"];
+                await segments.DownloadAndDecryptTsSegmentAsync(key.GetByteArray(), iv.ToByteArray(), folder,
+                    new Progress<TaskProgress>(progress =>
+                        {
+                            task.TotalSize = $"{progress.TotalBytes / 1024.0 / 1024.0:N2} MB";
+                            task.DownloadedSegments = progress.DownloadedSegments;
+                            task.PercentComplete = progress.PercentComplete;
+                        }
+                    )
+                );
+            }
 
             task.TaskState = "合并中";
             await folder.MergeTsSegmentsAsync(task.TaskName);
