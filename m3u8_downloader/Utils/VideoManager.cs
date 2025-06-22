@@ -57,13 +57,13 @@ namespace m3u8_downloader.Utils
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"加载缓存文件失败: {ex.Message}");
+                        Console.WriteLine($@"加载缓存文件失败: {ex.Message}");
                     }
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"加载缓存文件夹失败: {ex.Message}");
+                Console.WriteLine($@"加载缓存文件夹失败: {ex.Message}");
             }
         }
 
@@ -77,7 +77,7 @@ namespace m3u8_downloader.Utils
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"加载视频时发生错误: {ex.Message}");
+                Console.WriteLine($@"加载视频时发生错误: {ex.Message}");
             }
         }
 
@@ -92,7 +92,7 @@ namespace m3u8_downloader.Utils
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"加载视频时发生错误: {ex.Message}");
+                Console.WriteLine($@"加载视频时发生错误: {ex.Message}");
                 return new List<VideoFile>();
             }
         }
@@ -140,7 +140,7 @@ namespace m3u8_downloader.Utils
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"读取缓存失败: {ex.Message}");
+                        Console.WriteLine($@"读取缓存失败: {ex.Message}");
                     }
                 }
 
@@ -161,7 +161,7 @@ namespace m3u8_downloader.Utils
                     }
                     catch (Exception ex)
                     {
-                        Debug.WriteLine($"解析视频失败: {ex.Message}");
+                        Console.WriteLine($@"解析视频失败: {ex.Message}");
                     }
                 }
 
@@ -197,7 +197,7 @@ namespace m3u8_downloader.Utils
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"解析视频元数据失败: {ex.Message}");
+                Console.WriteLine($@"解析视频元数据失败: {ex.Message}");
                 return null;
             }
         }
@@ -230,7 +230,7 @@ namespace m3u8_downloader.Utils
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"获取视频时长失败: {ex.Message}");
+                Console.WriteLine($@"获取视频时长失败: {ex.Message}");
             }
 
             return "未知";
@@ -260,7 +260,7 @@ namespace m3u8_downloader.Utils
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"获取视频分辨率失败: {ex.Message}");
+                Console.WriteLine($@"获取视频分辨率失败: {ex.Message}");
             }
             return "未知";
         }
@@ -314,7 +314,7 @@ namespace m3u8_downloader.Utils
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"保存缓存失败: {ex.Message}");
+                Console.WriteLine($@"保存缓存失败: {ex.Message}");
             }
         }
     }
