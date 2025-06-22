@@ -80,7 +80,7 @@ namespace m3u8_downloader.ViewModels
             _videoManager = new VideoManager(folder);
             LoadVideosAsync();
 
-            MouseDoubleClickCommand = new DelegateCommand<string>(async filePath =>
+            MouseDoubleClickCommand = new DelegateCommand<string>(filePath =>
             {
                 if (!File.Exists(filePath)) return;
                 new PlayVideoWindow(filePath) { Owner = Application.Current.MainWindow }.ShowDialog();
