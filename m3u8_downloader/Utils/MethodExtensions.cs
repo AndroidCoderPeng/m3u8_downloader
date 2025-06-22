@@ -17,8 +17,16 @@ namespace m3u8_downloader.Utils
     {
         private static readonly HttpClient Client = new HttpClient();
 
+        private const string Agent =
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36 Edg/136.0.0.0";
+
         static MethodExtensions()
         {
+            Client.DefaultRequestHeaders.Add("User-Agent", Agent);
+            Client.DefaultRequestHeaders.Add("Accept", "*/*");
+            Client.DefaultRequestHeaders.Add("Accept-Encoding", "gzip, deflate, br, zstd");
+            Client.DefaultRequestHeaders.Add("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8,en-GB;q=0.7,en-US;q=0.6");
+            Client.DefaultRequestHeaders.Add("Connection", "keep-alive");
             Client.Timeout = TimeSpan.FromMinutes(5); // 设置为 5 分钟
         }
 
@@ -253,6 +261,7 @@ namespace m3u8_downloader.Utils
             {
                 builder.AppendLine($"file '{file}'");
             }
+
             File.WriteAllText(fileListFile, builder.ToString());
 
             var startInfo = new ProcessStartInfo

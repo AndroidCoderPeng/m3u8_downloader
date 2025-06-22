@@ -23,7 +23,8 @@ namespace m3u8_downloader.ViewModels
         public DelegateCommand<DownloadTask> EditTaskCommand { set; get; }
         public DelegateCommand<string> DeleteTaskCommand { set; get; }
 
-        private string _m3u8Url = "https://t30.cdn2020.com/video/m3u8/2025/06/20/be401fc5/index.m3u8";
+        // private string _m3u8Url = "https://t30.cdn2020.com/video/m3u8/2025/06/20/be401fc5/index.m3u8";
+        private string _m3u8Url = "https://vip5.lbb2025.com/20250618/11qELL1u/2000kb/hls/index.m3u8";
         // private string _m3u8Url = "https://hls.qzkj.tech/videos5/190685a0ddb687c902cd8307afbddfc1/190685a0ddb687c902cd8307afbddfc1.m3u8?auth_key=1750497321-685678291b7fd-0-6d345de8ebc2336083b3dc50fc316dec&v=3&time=0";
 
         public string M3U8Url
