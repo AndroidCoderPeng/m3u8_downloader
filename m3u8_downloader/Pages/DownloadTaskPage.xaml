@@ -22,7 +22,7 @@
                         <Border
                             x:Name="ItemContainerBorder"
                             Margin="{TemplateBinding Margin}"
-                            Padding="10,0"
+                            Padding="15,3"
                             Background="{TemplateBinding Background}"
                             BorderThickness="3"
                             CornerRadius="10">
@@ -110,13 +110,16 @@
 
                                 <Button
                                     Grid.Column="1"
+                                    Padding="3,0"
                                     HorizontalAlignment="Right"
                                     Background="Transparent"
                                     BorderThickness="0"
                                     Command="{Binding DataContext.EditTaskCommand, ElementName=DownloadTaskListBox}"
                                     CommandParameter="{Binding}"
                                     Content="&#xe6af;"
-                                    FontFamily="/m3u8_downloader;component/#iconfont" />
+                                    FontFamily="/m3u8_downloader;component/#iconfont"
+                                    FontSize="14"
+                                    Style="{x:Null}" />
                             </Grid>
 
                             <Grid Grid.Row="1" Margin="0,10">
