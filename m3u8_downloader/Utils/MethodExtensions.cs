@@ -114,7 +114,7 @@ namespace m3u8_downloader.Utils
             var downloadTasks = tsUrls.Select(async url =>
             {
                 var fileName = Path.Combine(outputFolder, Path.GetFileName(url).Split('?')[0]); // 去除URL参数
-                var retryCount = 3;
+                var retryCount = 5;
 
                 while (retryCount-- > 0)
                 {
