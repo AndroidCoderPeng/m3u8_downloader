@@ -246,11 +246,13 @@ namespace m3u8_downloader.Utils
             var fileListFile = Path.Combine(folder, "filelist.txt");
             // 创建文件列表
             var builder = new StringBuilder();
-            foreach (var file in files.OrderBy(Path.GetFileName))
+            var sortedFiles = Directory.GetFiles(folder, "*.ts")
+                .OrderBy(Path.GetFileNameWithoutExtension, StringComparer.OrdinalIgnoreCase);
+
+            foreach (var file in sortedFiles)
             {
                 builder.AppendLine($"file '{file}'");
             }
-
             File.WriteAllText(fileListFile, builder.ToString());
 
             var startInfo = new ProcessStartInfo
