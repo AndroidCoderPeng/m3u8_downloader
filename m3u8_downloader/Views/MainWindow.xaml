@@ -17,7 +17,6 @@
     <Window.Resources>
         <Style x:Key="ListBoxItemStyleKey" TargetType="ListBoxItem">
             <Setter Property="Height" Value="55" />
-            <Setter Property="FontWeight" Value="Bold" />
             <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}" />
             <Setter Property="Template">
                 <Setter.Value>

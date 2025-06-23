@@ -41,11 +41,14 @@ namespace m3u8_downloader.ViewModels
                         eventAggregator.GetEvent<UpdateVideoResourceEvent>().Publish(folder);
                         break;
                     case 2:
+                        region.RequestNavigate("MergeSegmentPage");
+                        break;
+                    case 3:
                         region.RequestNavigate("AboutSoftwarePage");
                         break;
                 }
             });
-            
+
             SelectFolderCommand = new DelegateCommand(() =>
             {
                 var folderDialog = new FolderBrowserDialog

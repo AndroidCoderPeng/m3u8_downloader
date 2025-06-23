@@ -118,6 +118,9 @@
     <Compile Include="Models\DownloadTask.cs" />
     <Compile Include="Models\NavigationMenu.cs" />
     <Compile Include="Models\TaskProgress.cs" />
+    <Compile Include="Pages\MergeSegmentPage.xaml.cs">
+      <DependentUpon>MergeSegmentPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Pages\DownloadTaskPage.xaml.cs">
       <DependentUpon>DownloadTaskPage.xaml</DependentUpon>
     </Compile>
@@ -132,6 +135,7 @@
     <Compile Include="ViewModels\EditTaskNameDialogViewModel.cs" />
     <Compile Include="ViewModels\FinishedTaskPageViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\MergeSegmentPageViewModel.cs" />
     <Compile Include="ViewModels\SoftwareSettingPageViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -167,6 +171,7 @@
     <Page Include="Pages\AboutSoftwarePage.xaml">
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Pages\MergeSegmentPage.xaml" />
     <Page Include="Pages\DownloadTaskPage.xaml" />
     <Page Include="Pages\FinishedTaskPage.xaml" />
     <Page Include="Views\MainWindow.xaml">
