@@ -130,6 +130,8 @@
     </Compile>
     <Compile Include="Service\AppDataServiceImpl.cs" />
     <Compile Include="Service\IAppDataService.cs" />
+    <Compile Include="Utils\DragAdorner.cs" />
+    <Compile Include="Utils\DragDropHelper.cs" />
     <Compile Include="Utils\MethodExtensions.cs" />
     <Compile Include="Utils\SegmentManager.cs" />
     <Compile Include="Utils\VideoManager.cs" />

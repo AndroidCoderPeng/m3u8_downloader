@@ -1,17 +1,21 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using m3u8_downloader.Models;
+using m3u8_downloader.Utils;
 using m3u8_downloader.ViewModels;
 
 namespace m3u8_downloader.Pages
 {
     public partial class MergeSegmentPage : UserControl
     {
-        private Point _startPoint;
-        private bool _isDragging;
+        private Point _dragStartPoint;
+        private ListBoxItem _draggingItem;
+        private AdornerLayer _adornerLayer;
+        private DragAdorner _dragAdorner;
 
         public MergeSegmentPage()
         {
@@ -25,191 +29,171 @@ namespace m3u8_downloader.Pages
             vm?.RootPathClearedCommand.Execute();
         }
 
+        /// <summary>
+        /// 鼠标按下，确定要拖动的ListBoxItem，准备拖动
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SegmentsListBox_PreviewMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            _startPoint = e.GetPosition(null);
-            _isDragging = false;
+            _dragStartPoint = e.GetPosition(null);
+            _draggingItem = FindAncestor<ListBoxItem>((DependencyObject)e.OriginalSource);
         }
 
+        /// <summary>
+        /// 拖动过程中
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SegmentsListBox_PreviewMouseMove(object sender, MouseEventArgs e)
         {
-            if (e.LeftButton != MouseButtonState.Pressed || _isDragging) return;
+            if (_draggingItem == null) return;
 
             var mousePos = e.GetPosition(null);
-            var diff = _startPoint - mousePos;
-
-            // 当鼠标移动距离足够大时，开始拖拽
-            if (!(Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance) &&
-                !(Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance)) return;
-
-            // 找到鼠标下的 ListBoxItem
-            var listBoxItem = FindAncestor<ListBoxItem>((DependencyObject)e.OriginalSource);
-            if (listBoxItem.DataContext is SegmentFile segment)
+            var diff = _dragStartPoint - mousePos;
+            
+            if (e.LeftButton == MouseButtonState.Pressed &&
+                (Math.Abs(diff.X) > SystemParameters.MinimumHorizontalDragDistance ||
+                 Math.Abs(diff.Y) > SystemParameters.MinimumVerticalDragDistance))
             {
-                try
+                if (!(sender is ItemsControl itemsControl)) return;
+                // 创建拖动装饰器
+                _adornerLayer = AdornerLayer.GetAdornerLayer(itemsControl);
+                if (_adornerLayer != null)
                 {
-                    // 设置鼠标光标为手型
-                    SegmentsListBox.Cursor = Cursors.Hand;
-                    _isDragging = true;
-                    DragDrop.DoDragDrop(listBoxItem, segment, DragDropEffects.Move);
+                    _dragAdorner = new DragAdorner(itemsControl, _draggingItem);
+                    _adornerLayer.Add(_dragAdorner);
                 }
-                finally
+
+                DragDropHelper.SetIsDragging(_draggingItem, true);
+                DragDrop.DoDragDrop(_draggingItem, _draggingItem.DataContext, DragDropEffects.Move);
+
+                // 清理
+                if (_dragAdorner != null && _adornerLayer != null)
                 {
-                    // 恢复鼠标光标为默认形状
-                    SegmentsListBox.Cursor = Cursors.Arrow;
-                    _isDragging = false;
+                    _adornerLayer.Remove(_dragAdorner);
+                    _dragAdorner = null;
                 }
+
+                if (_draggingItem == null) return;
+                DragDropHelper.SetIsDragging(_draggingItem, false);
+                _draggingItem = null;
             }
         }
 
-        private void SegmentsListBox_Drop(object sender, DragEventArgs e)
+        /// <summary>
+        /// 拖动结束
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SegmentsListBox_PreviewMouseLeftButtonUp(object sender, MouseEventArgs e)
         {
-            if (e.Data.GetDataPresent(typeof(SegmentFile)))
-            {
-                var draggedItem = e.Data.GetData(typeof(SegmentFile)) as SegmentFile;
-                if (draggedItem == null) return;
-
-                var vm = DataContext as MergeSegmentPageViewModel;
-                if (vm == null) return;
-
-                // 获取拖拽源项目和目标项目的索引
-                var sourceIndex = vm.ResourceSegments.IndexOf(draggedItem);
-                if (sourceIndex < 0) return;
-
-                // 获取鼠标在 ListBox 中的位置
-                var dropPosition = e.GetPosition(SegmentsListBox);
-                var droppedOnItem = GetItemContainerAt(SegmentsListBox, dropPosition);
-
-                var targetIndex = -1;
-
-                if (droppedOnItem != null)
-                {
-                    if (droppedOnItem is ListBoxItem targetItem)
-                    {
-                        targetIndex = SegmentsListBox.ItemContainerGenerator.IndexFromContainer(targetItem);
-
-                        // 根据鼠标位置调整目标索引（上半部分或下半部分）
-                        var positionInItem = e.GetPosition(targetItem);
-                        if (positionInItem.Y < targetItem.ActualHeight / 2)
-                        {
-                            // 放在项目上方
-                            if (targetIndex > sourceIndex)
-                            {
-                                targetIndex--;
-                            }
-                        }
-                        else
-                        {
-                            // 放在项目下方
-                            if (targetIndex <= sourceIndex)
-                            {
-                                targetIndex++;
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // 如果没找到具体项目，拖到了列表末尾
-                    targetIndex = vm.ResourceSegments.Count;
-                }
-
-                // 验证目标索引是否在有效范围内
-                targetIndex = Math.Max(0, Math.Min(targetIndex, vm.ResourceSegments.Count));
-
-                // 调整项目位置
-                if (vm.ResourceSegments.Count > 0 && sourceIndex != targetIndex)
-                {
-                    // 防止移动后索引无效
-                    if (sourceIndex < targetIndex)
-                    {
-                        targetIndex--;
-                    }
-
-                    // 再次验证索引
-                    if (targetIndex < vm.ResourceSegments.Count)
-                    {
-                        vm.ResourceSegments.Move(sourceIndex, targetIndex);
-                    }
-                    else
-                    {
-                        // 如果索引仍然无效，改为添加到末尾
-                        vm.ResourceSegments.RemoveAt(sourceIndex);
-                        vm.ResourceSegments.Add(draggedItem);
-                    }
-                }
-            }
+            SegmentsListBox.Cursor = Cursors.Arrow;
         }
 
+        /// <summary>
+        /// 处理拖动过程中的效果
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void SegmentsListBox_DragOver(object sender, DragEventArgs e)
         {
             if (!e.Data.GetDataPresent(typeof(SegmentFile)) || sender != e.Source)
             {
                 e.Effects = DragDropEffects.None;
-                e.Handled = true;
                 return;
             }
 
-            if (sender == e.Source)
+            // 更新装饰器位置
+            if (_dragAdorner != null)
             {
-                e.Effects = DragDropEffects.Move;
-                // 确保拖拽过程中鼠标光标保持为手型
-                if (SegmentsListBox.Cursor != Cursors.Hand)
+                var currentPosition = e.GetPosition((IInputElement)_adornerLayer);
+                _dragAdorner.SetPosition(currentPosition.X, currentPosition.Y);
+            }
+
+            // 获取当前鼠标位置下的ListBoxItem
+            if (sender is ListBox listBox)
+            {
+                var targetItem = FindAncestor<ListBoxItem>((DependencyObject)e.OriginalSource);
+                if (targetItem == null) return;
+
+                // 获取目标项的位置和大小
+                var itemRect = targetItem.TransformToAncestor(listBox).TransformBounds(
+                    new Rect(0, 0, targetItem.ActualWidth, targetItem.ActualHeight)
+                );
+
+                // 计算插入位置
+                if (e.GetPosition(listBox).Y < itemRect.Top + itemRect.Height / 2)
                 {
-                    SegmentsListBox.Cursor = Cursors.Hand;
+                    e.Effects = DragDropEffects.Move;
                 }
-            }
-            else
-            {
-                e.Effects = DragDropEffects.None;
-            }
+                else
+                {
+                    e.Effects = DragDropEffects.Move;
+                }
 
-            e.Handled = true;
-        }
-
-        private void SegmentsListBox_DragLeave(object sender, DragEventArgs e)
-        {
-            if (!SegmentsListBox.IsMouseOver)
-            {
-                SegmentsListBox.Cursor = Cursors.Arrow;
+                e.Handled = true;
             }
         }
 
-        private void SegmentsListBox_MouseLeave(object sender, MouseEventArgs e)
+        /// <summary>
+        /// 处理最终拖动位置，放置拖过来的ListBoxItem，更新数据集
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void SegmentsListBox_Drop(object sender, DragEventArgs e)
         {
-            // 如果不是在拖拽过程中，恢复鼠标光标
-            if (!_isDragging)
+            if (e.Data.GetDataPresent(typeof(SegmentFile)) && sender is ListBox listBox)
             {
-                SegmentsListBox.Cursor = Cursors.Arrow;
+                var draggedItem = e.Data.GetData(typeof(SegmentFile)) as SegmentFile;
+
+                var vm = DataContext as MergeSegmentPageViewModel;
+                if (vm == null) return;
+
+                // 获取目标ListBoxItem
+                var targetItem = FindAncestor<ListBoxItem>((DependencyObject)e.OriginalSource);
+
+                if (targetItem == null) return;
+
+                // 获取源和目标索引
+                var sourceIndex = vm.ResourceSegments.IndexOf(draggedItem);
+                var targetIndex = listBox.ItemContainerGenerator.IndexFromContainer(targetItem);
+
+                // 调整目标索引（基于鼠标位置是在项目的上半部分还是下半部分）
+                var itemRect = targetItem.TransformToAncestor(listBox).TransformBounds(
+                    new Rect(0, 0, targetItem.ActualWidth, targetItem.ActualHeight)
+                );
+
+                if (e.GetPosition(listBox).Y > itemRect.Top + itemRect.Height / 2)
+                {
+                    targetIndex++;
+                }
+
+                // 移动项目
+                if (sourceIndex != -1 && sourceIndex != targetIndex)
+                {
+                    vm.ResourceSegments.RemoveAt(sourceIndex);
+                    vm.ResourceSegments.Insert(targetIndex, draggedItem);
+
+                    // 选择刚移动的项目
+                    listBox.SelectedItem = draggedItem;
+                }
             }
         }
 
         private static T FindAncestor<T>(DependencyObject current) where T : DependencyObject
         {
-            var parent = VisualTreeHelper.GetParent(current);
-            if (parent == null) return null;
-
-            if (parent is T)
+            do
             {
-                return (T)parent;
-            }
+                if (current is T dependencyObject)
+                {
+                    return dependencyObject;
+                }
 
-            return FindAncestor<T>(parent);
-        }
+                current = VisualTreeHelper.GetParent(current);
+            } while (current != null);
 
-        private UIElement GetItemContainerAt(ListBox listBox, Point position)
-        {
-            var hitTestResult = VisualTreeHelper.HitTest(listBox, position);
-            if (hitTestResult == null)
-                return null;
-
-            var hitObject = hitTestResult.VisualHit;
-            while (hitObject != null && !(hitObject is ListBoxItem))
-            {
-                hitObject = VisualTreeHelper.GetParent(hitObject);
-            }
-
-            return hitObject as UIElement;
+            return null;
         }
     }
 }
