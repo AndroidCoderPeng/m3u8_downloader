@@ -70,9 +70,11 @@ namespace m3u8_downloader.Utils
         {
             var result = new GeneralTransformGroup();
             result.Children.Add(base.GetDesiredTransform(transform) ?? throw new InvalidOperationException());
-            result.Children.Add(new TranslateTransform(
-                _offsetX - _child.DesiredSize.Width / 2,
-                _offsetY - _child.DesiredSize.Height / 2)
+            result.Children.Add(
+                new TranslateTransform(
+                    _offsetX - _child.DesiredSize.Width,
+                    _offsetY - _child.DesiredSize.Height
+                )
             );
             return result;
         }
