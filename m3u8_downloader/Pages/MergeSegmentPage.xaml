@@ -120,7 +120,6 @@
             Drop="SegmentsListBox_Drop"
             ItemsSource="{Binding ResourceSegments}"
             PreviewMouseLeftButtonDown="SegmentsListBox_PreviewMouseLeftButtonDown"
-            PreviewMouseLeftButtonUp="SegmentsListBox_PreviewMouseLeftButtonUp"
             PreviewMouseMove="SegmentsListBox_PreviewMouseMove"
             SelectionMode="Single"
             Visibility="{Binding IsSegmentsVisible}">
