@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:hc="https://handyorg.github.io/handycontrol"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:model="clr-namespace:m3u8_downloader.Models"
     xmlns:utils="clr-namespace:m3u8_downloader.Utils"
     xmlns:vm="clr-namespace:m3u8_downloader.ViewModels"
     d:DataContext="{d:DesignInstance Type=vm:MergeSegmentPageViewModel}"
@@ -69,7 +70,8 @@
         <Grid Grid.Row="0" Margin="5">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
-                <ColumnDefinition Width="100" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
 
             <hc:TextBox
@@ -82,10 +84,14 @@
 
             <Button
                 Grid.Column="1"
-                Margin="10,0,0,0"
-                HorizontalAlignment="Stretch"
+                Margin="5,0"
                 Command="{Binding SelectSegmentsCommand}"
                 Content="选择" />
+
+            <Button
+                Grid.Column="2"
+                Command="{Binding MergeSegmentsCommand}"
+                Content="合并" />
         </Grid>
 
         <Grid
@@ -161,6 +167,16 @@
                     </DockPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
+
+            <!--  右键菜单  -->
+            <ListBox.ContextMenu>
+                <ContextMenu Width="120">
+                    <MenuItem
+                        Command="{Binding DeleteSegmentCommand}"
+                        CommandParameter="{Binding Path=PlacementTarget.(ListBox.SelectedItem).(model:SegmentFile.SegmentName), RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                        Header="删除" />
+                </ContextMenu>
+            </ListBox.ContextMenu>
 
             <ListBox.ItemsPanel>
                 <ItemsPanelTemplate>

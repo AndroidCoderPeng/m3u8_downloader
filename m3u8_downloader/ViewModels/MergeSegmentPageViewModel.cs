@@ -1,12 +1,15 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Forms;
 using m3u8_downloader.Models;
 using m3u8_downloader.Utils;
+using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Mvvm;
+using MessageBox = System.Windows.MessageBox;
 
 namespace m3u8_downloader.ViewModels
 {
@@ -73,7 +76,9 @@ namespace m3u8_downloader.ViewModels
         }
 
         public DelegateCommand SelectSegmentsCommand { set; get; }
+        public DelegateCommand MergeSegmentsCommand { set; get; }
         public DelegateCommand RootPathClearedCommand { set; get; }
+        public DelegateCommand<string> DeleteSegmentCommand { set; get; }
 
         public MergeSegmentPageViewModel()
         {
@@ -103,6 +108,39 @@ namespace m3u8_downloader.ViewModels
                 IsEmptyImageVisible = Visibility.Collapsed;
                 LoadSegmentsAsync();
             });
+
+            MergeSegmentsCommand = new DelegateCommand(delegate
+            {
+                if (!_resourceSegments.Any())
+                {
+                    MessageBox.Show("请先选择要合并的片段根目录", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                var indexedSegments = new ConcurrentDictionary<int, string>();
+                for (var i = 0; i < _resourceSegments.Count; i++)
+                {
+                    indexedSegments.TryAdd(i, _resourceSegments[i].FilePath);
+                }
+
+                MergeTsSegmentsAsync(indexedSegments);
+            });
+
+            DeleteSegmentCommand = new DelegateCommand<string>(segmentName =>
+            {
+                var segment = _resourceSegments.First(x => x.SegmentName == segmentName);
+                ResourceSegments.Remove(segment);
+                if (_resourceSegments.Any())
+                {
+                    IsEmptyImageVisible = Visibility.Collapsed;
+                    IsSegmentsVisible = Visibility.Visible;
+                }
+                else
+                {
+                    IsEmptyImageVisible = Visibility.Visible;
+                    IsSegmentsVisible = Visibility.Collapsed;
+                }
+            });
         }
 
         private async void LoadSegmentsAsync()
@@ -131,6 +169,11 @@ namespace m3u8_downloader.ViewModels
                 IsEmptyImageVisible = Visibility.Visible;
                 IsSegmentsVisible = Visibility.Collapsed;
             }
+        }
+        
+        private async void MergeTsSegmentsAsync(ConcurrentDictionary<int, string> segments)
+        {
+            Console.WriteLine(JsonConvert.SerializeObject(segments));
         }
     }
 }
