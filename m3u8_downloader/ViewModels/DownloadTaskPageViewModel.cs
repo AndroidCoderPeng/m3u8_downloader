@@ -203,8 +203,7 @@ namespace m3u8_downloader.ViewModels
                 var key = dictionary["URI"];
                 var iv = dictionary["IV"];
                 indexedFiles = await segments.DownloadAndDecryptTsSegmentAsync(key.GetByteArray(), iv.ToByteArray(),
-                    folder,
-                    new Progress<TaskProgress>(progress =>
+                    folder, new Progress<TaskProgress>(progress =>
                         {
                             task.TotalSize = $"{progress.TotalBytes / 1024.0 / 1024.0:N2} MB";
                             task.DownloadedSegments = progress.DownloadedSegments;
