@@ -148,11 +148,7 @@ namespace m3u8_downloader.Pages
 
                 // 获取源和目标索引
                 var sourceIndex = vm.ResourceSegments.IndexOf(draggedItem);
-                if (sourceIndex == -1)
-                {
-                    MessageBox.Show("无法找到要移动的项目！", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                    return;
-                }
+                if (sourceIndex == -1) return;
 
                 var targetIndex = SegmentsListBox.ItemContainerGenerator.IndexFromContainer(targetItem);
 
@@ -181,16 +177,21 @@ namespace m3u8_downloader.Pages
                 {
                     try
                     {
-                        vm.ResourceSegments.RemoveAt(sourceIndex);
                         vm.ResourceSegments.Insert(targetIndex, draggedItem);
+                        if (sourceIndex < targetIndex)
+                        {
+                            vm.ResourceSegments.RemoveAt(sourceIndex);
+                        }
+                        else
+                        {
+                            vm.ResourceSegments.RemoveAt(sourceIndex + 1);
+                        }
 
-                        // 选择刚移动的项目
                         SegmentsListBox.SelectedItem = draggedItem;
                     }
                     catch (ArgumentOutOfRangeException ex)
                     {
                         MessageBox.Show($"移动项目时出错: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
-                        vm.ResourceSegments.Insert(targetIndex, draggedItem);
                     }
                 }
             }
