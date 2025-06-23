@@ -99,6 +99,8 @@ namespace m3u8_downloader.ViewModels
                 if (folderDialog.ShowDialog() != DialogResult.OK) return;
                 SegmentsRootPath = folderDialog.SelectedPath;
                 IsLoadingVisible = Visibility.Visible;
+                IsSegmentsVisible = Visibility.Collapsed;
+                IsEmptyImageVisible = Visibility.Collapsed;
                 LoadSegmentsAsync();
             });
         }
