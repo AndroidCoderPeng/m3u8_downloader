@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -102,8 +103,8 @@ namespace m3u8_downloader.Utils
         /// <param name="iv"></param>
         /// <param name="outputFolder"></param>
         /// <param name="progress"></param>
-        public static async Task DownloadAndDecryptTsSegmentAsync(this List<string> tsUrls, byte[] key,
-            byte[] iv, string outputFolder, IProgress<TaskProgress> progress)
+        public static async Task<ConcurrentDictionary<int, string>> DownloadAndDecryptTsSegmentAsync(
+            this List<string> tsUrls, byte[] key, byte[] iv, string outputFolder, IProgress<TaskProgress> progress)
         {
             if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
 
@@ -111,7 +112,10 @@ namespace m3u8_downloader.Utils
             long totalBytes = 0;
             var downloadedCount = 0;
 
-            var downloadTasks = tsUrls.Select(async url =>
+            // 使用 ConcurrentDictionary 来存储带索引的文件路径
+            var indexedFiles = new ConcurrentDictionary<int, string>();
+            
+            var downloadTasks = tsUrls.Select(async (url, index) =>
             {
                 var fileName = Path.Combine(outputFolder, Path.GetFileName(url).Split('?')[0]); // 去除URL参数
                 var retryCount = 5;
@@ -129,6 +133,9 @@ namespace m3u8_downloader.Utils
                             await fileStream.WriteAsync(decryptedData, 0, decryptedData.Length);
                         }
 
+                        // 将文件路径和索引存入 ConcurrentDictionary
+                        indexedFiles.TryAdd(index, fileName);
+                        
                         Interlocked.Add(ref totalBytes, encryptedData.Length);
                         var currentCount = Interlocked.Increment(ref downloadedCount);
 
@@ -151,6 +158,8 @@ namespace m3u8_downloader.Utils
             });
 
             await Task.WhenAll(downloadTasks);
+            
+            return indexedFiles;
         }
 
         /// <summary>
@@ -182,7 +191,8 @@ namespace m3u8_downloader.Utils
         /// <param name="tsUrls"></param>
         /// <param name="outputFolder"></param>
         /// <param name="progress"></param>
-        public static async Task DownloadTsSegmentsAsync(this List<string> tsUrls, string outputFolder,
+        public static async Task<ConcurrentDictionary<int, string>> DownloadTsSegmentsAsync(this List<string> tsUrls,
+            string outputFolder,
             IProgress<TaskProgress> progress)
         {
             if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
@@ -191,10 +201,13 @@ namespace m3u8_downloader.Utils
             long totalBytes = 0;
             var downloadedCount = 0;
 
-            var downloadTasks = tsUrls.Select(async url =>
+            // 使用 ConcurrentDictionary 来存储带索引的文件路径
+            var indexedFiles = new ConcurrentDictionary<int, string>();
+
+            var downloadTasks = tsUrls.Select(async (url, index) =>
             {
                 var fileName = Path.Combine(outputFolder, Path.GetFileName(url));
-                var retryCount = 3;
+                var retryCount = 5;
 
                 while (retryCount-- > 0)
                 {
@@ -210,6 +223,9 @@ namespace m3u8_downloader.Utils
                         {
                             await stream.CopyToAsync(fileStream);
                         }
+
+                        // 将文件路径和索引存入 ConcurrentDictionary
+                        indexedFiles.TryAdd(index, fileName);
 
                         Interlocked.Add(ref totalBytes, fileSize);
                         var currentCount = Interlocked.Increment(ref downloadedCount);
@@ -233,18 +249,22 @@ namespace m3u8_downloader.Utils
             });
 
             await Task.WhenAll(downloadTasks);
+
+            return indexedFiles;
         }
 
         /// <summary>
         /// 合并ts片段
         /// </summary>
+        /// <param name="indexedFiles"></param>
         /// <param name="folder"></param>
         /// <param name="fileName"></param>
-        public static async Task MergeTsSegmentsAsync(this string folder, string fileName)
+        public static async Task MergeTsSegmentsAsync(this ConcurrentDictionary<int, string> indexedFiles,
+            string folder, string fileName)
         {
             var ffmpeg = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg.exe");
-            var files = Directory.GetFiles(folder, "*.ts");
-            if (!files.Any())
+
+            if (!indexedFiles.Any())
             {
                 Console.WriteLine(@"没有找到任何ts文件");
                 return;
@@ -252,14 +272,12 @@ namespace m3u8_downloader.Utils
 
             var outputFile = Path.Combine(folder, $"{fileName}.mp4");
             var fileListFile = Path.Combine(folder, "filelist.txt");
-            // 创建文件列表
-            var builder = new StringBuilder();
-            var sortedFiles = Directory.GetFiles(folder, "*.ts")
-                .OrderBy(Path.GetFileNameWithoutExtension, StringComparer.OrdinalIgnoreCase);
 
-            foreach (var file in sortedFiles)
+            // 按照索引顺序生成文件列表
+            var builder = new StringBuilder();
+            foreach (var keyValuePair in indexedFiles.OrderBy(kv => kv.Key))
             {
-                builder.AppendLine($"file '{file}'");
+                builder.AppendLine($"file '{keyValuePair.Value}'");
             }
 
             File.WriteAllText(fileListFile, builder.ToString());

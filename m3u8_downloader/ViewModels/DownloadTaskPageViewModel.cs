@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
@@ -100,7 +101,7 @@ namespace m3u8_downloader.ViewModels
                 DownloadTaskSource.Add(task);
                 IsEmptyImageVisible = Visibility.Collapsed;
                 IsDownloadTaskVisible = Visibility.Visible;
-                
+
                 // 解析m3u8片段
                 ParseResourceAsync(task);
             });
@@ -186,9 +187,10 @@ namespace m3u8_downloader.ViewModels
                 return;
             }
 
+            ConcurrentDictionary<int, string> indexedFiles;
             if (!dictionary.Any())
             {
-                await segments.DownloadTsSegmentsAsync(folder, new Progress<TaskProgress>(progress =>
+                indexedFiles = await segments.DownloadTsSegmentsAsync(folder, new Progress<TaskProgress>(progress =>
                     {
                         task.TotalSize = $"{progress.TotalBytes / 1024.0 / 1024.0:N2} MB";
                         task.DownloadedSegments = progress.DownloadedSegments;
@@ -200,7 +202,8 @@ namespace m3u8_downloader.ViewModels
             {
                 var key = dictionary["URI"];
                 var iv = dictionary["IV"];
-                await segments.DownloadAndDecryptTsSegmentAsync(key.GetByteArray(), iv.ToByteArray(), folder,
+                indexedFiles = await segments.DownloadAndDecryptTsSegmentAsync(key.GetByteArray(), iv.ToByteArray(),
+                    folder,
                     new Progress<TaskProgress>(progress =>
                         {
                             task.TotalSize = $"{progress.TotalBytes / 1024.0 / 1024.0:N2} MB";
@@ -212,7 +215,7 @@ namespace m3u8_downloader.ViewModels
             }
 
             task.TaskState = "合并中";
-            await folder.MergeTsSegmentsAsync(task.TaskName);
+            await indexedFiles.MergeTsSegmentsAsync(folder, task.TaskName);
             await folder.DeleteTsSegments();
             task.TaskState = "下载完成";
         }
