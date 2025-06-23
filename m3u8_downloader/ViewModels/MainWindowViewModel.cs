@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Forms;
+using m3u8_downloader.Events;
 using m3u8_downloader.Models;
 using m3u8_downloader.Service;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 using Prism.Regions;
 using DialogResult = System.Windows.Forms.DialogResult;
@@ -19,7 +21,8 @@ namespace m3u8_downloader.ViewModels
         public DelegateCommand<ListBox> ItemSelectionChangedCommand { set; get; }
         public DelegateCommand SelectFolderCommand { set; get; }
 
-        public MainWindowViewModel(IRegionManager regionManager, IAppDataService dataService)
+        public MainWindowViewModel(IRegionManager regionManager, IAppDataService dataService,
+            IEventAggregator eventAggregator)
         {
             NavigationMenuItems = dataService.GetNavigationMenu();
 
@@ -33,6 +36,9 @@ namespace m3u8_downloader.ViewModels
                         break;
                     case 1:
                         region.RequestNavigate("FinishedTaskPage");
+                        // 更新视频列表
+                        var folder = dataService.GetValue("VideoFolder") as string;
+                        eventAggregator.GetEvent<UpdateVideoResourceEvent>().Publish(folder);
                         break;
                     case 2:
                         region.RequestNavigate("AboutSoftwarePage");
@@ -50,7 +56,7 @@ namespace m3u8_downloader.ViewModels
 
                 if (folderDialog.ShowDialog() != DialogResult.OK) return;
                 dataService.PutValue("VideoFolder", folderDialog.SelectedPath);
-                MessageBox.Show(@"设置成功", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show(@"目录设置成功", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
             });
         }
     }

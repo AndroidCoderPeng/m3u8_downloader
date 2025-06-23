@@ -110,6 +110,7 @@
     <Compile Include="Dialogs\EditTaskNameDialog.xaml.cs">
       <DependentUpon>EditTaskNameDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Events\UpdateVideoResourceEvent.cs" />
     <Compile Include="Models\VideoFile.cs" />
     <Compile Include="Pages\AboutSoftwarePage.xaml.cs">
       <DependentUpon>AboutSoftwarePage.xaml</DependentUpon>

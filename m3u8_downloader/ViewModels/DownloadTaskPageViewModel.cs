@@ -75,7 +75,6 @@ namespace m3u8_downloader.ViewModels
         }
 
         private readonly IAppDataService _dataService;
-        private VideoManager _videoManager;
 
         public DownloadTaskPageViewModel(IAppDataService dataService, IDialogService dialogService)
         {
@@ -216,9 +215,6 @@ namespace m3u8_downloader.ViewModels
             await folder.MergeTsSegmentsAsync(task.TaskName);
             await folder.DeleteTsSegments();
             task.TaskState = "下载完成";
-            // 更新视频列表
-            _videoManager = new VideoManager(folder);
-            await _videoManager.UpdateVideosAsync();
         }
     }
 }

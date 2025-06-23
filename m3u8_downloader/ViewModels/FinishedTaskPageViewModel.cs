@@ -1,13 +1,15 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Windows;
 using ImTools;
+using m3u8_downloader.Events;
 using m3u8_downloader.Models;
-using m3u8_downloader.Service;
 using m3u8_downloader.Utils;
 using m3u8_downloader.Views;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Mvvm;
 
 namespace m3u8_downloader.ViewModels
@@ -64,21 +66,10 @@ namespace m3u8_downloader.ViewModels
 
         public DelegateCommand<string> MouseDoubleClickCommand { set; get; }
         public DelegateCommand<string> DeleteTaskCommand { set; get; }
-        private readonly VideoManager _videoManager;
 
-        public FinishedTaskPageViewModel(IAppDataService dataService)
+        public FinishedTaskPageViewModel(IEventAggregator eventAggregator)
         {
-            var folder = dataService.GetValue("VideoFolder") as string;
-            if (string.IsNullOrEmpty(folder))
-            {
-                IsLoadingVisible = Visibility.Collapsed;
-                IsEmptyImageVisible = Visibility.Visible;
-                IsVideoListBoxVisible = Visibility.Collapsed;
-                return;
-            }
-
-            _videoManager = new VideoManager(folder);
-            LoadVideosAsync();
+            eventAggregator.GetEvent<UpdateVideoResourceEvent>().Subscribe(LoadVideosAsync);
 
             MouseDoubleClickCommand = new DelegateCommand<string>(filePath =>
             {
@@ -95,9 +86,28 @@ namespace m3u8_downloader.ViewModels
             });
         }
 
-        private async void LoadVideosAsync()
+        private async void LoadVideosAsync(string folder)
         {
-            var videos = await _videoManager.GetVideosAsync();
+            if (_videos.Any())
+            {
+                Videos.Clear();
+            }
+
+            if (string.IsNullOrEmpty(folder))
+            {
+                IsLoadingVisible = Visibility.Collapsed;
+                IsEmptyImageVisible = Visibility.Visible;
+                IsVideoListBoxVisible = Visibility.Collapsed;
+                return;
+            }
+
+            var videoManager = new VideoManager(folder);
+            var videos = await videoManager.GetVideosAsync();
+            foreach (var video in videos)
+            {
+                Videos.Add(video);
+            }
+
             IsLoadingVisible = Visibility.Collapsed;
             if (videos.Any())
             {
@@ -110,10 +120,7 @@ namespace m3u8_downloader.ViewModels
                 IsVideoListBoxVisible = Visibility.Collapsed;
             }
 
-            foreach (var video in videos)
-            {
-                Videos.Add(video);
-            }
+            Console.WriteLine($@"数据加载完成，一共加载 {videos.Count} 个视频");
         }
     }
 }
