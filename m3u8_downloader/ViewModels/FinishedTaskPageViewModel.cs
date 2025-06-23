@@ -83,6 +83,16 @@ namespace m3u8_downloader.ViewModels
                 File.Delete(filePath);
                 var videoFile = _videos.FindFirst(x => x.FilePath == filePath);
                 Videos.Remove(videoFile);
+                if (_videos.Any())
+                {
+                    IsEmptyImageVisible = Visibility.Collapsed;
+                    IsVideoListBoxVisible = Visibility.Visible;
+                }
+                else
+                {
+                    IsEmptyImageVisible = Visibility.Visible;
+                    IsVideoListBoxVisible = Visibility.Collapsed;
+                }
             });
         }
 
