@@ -11,6 +11,40 @@
     d:DesignWidth="600"
     mc:Ignorable="d">
 
+    <UserControl.Resources>
+        <Style x:Key="ListBoxItemStyleKey" TargetType="ListBoxItem">
+            <Setter Property="AllowDrop" Value="True" />
+            <Setter Property="Width" Value="285" />
+            <Setter Property="Margin" Value="2" />
+            <Setter Property="Foreground" Value="{DynamicResource AppTextBrush}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type ListBoxItem}">
+                        <Border
+                            x:Name="ItemContainerBorder"
+                            Margin="{TemplateBinding Margin}"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{DynamicResource AppBorderBrush}"
+                            BorderThickness="1"
+                            CornerRadius="5">
+                            <ContentPresenter HorizontalAlignment="Stretch" VerticalAlignment="Center" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource AppMouseOverBrush}" />
+                </Trigger>
+
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="{DynamicResource AppThemeBrush}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -65,36 +99,64 @@
         <ListBox
             x:Name="SegmentsListBox"
             Grid.Row="1"
+            AllowDrop="True"
             BorderThickness="0"
+            DragLeave="SegmentsListBox_DragLeave"
+            DragOver="SegmentsListBox_DragOver"
+            Drop="SegmentsListBox_Drop"
             ItemsSource="{Binding ResourceSegments}"
+            MouseLeave="SegmentsListBox_MouseLeave"
+            PreviewMouseLeftButtonDown="SegmentsListBox_PreviewMouseLeftButtonDown"
+            PreviewMouseMove="SegmentsListBox_PreviewMouseMove"
             Visibility="{Binding IsSegmentsVisible}">
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <Grid Margin="10,0,0,0">
-                        <Grid.RowDefinitions>
-                            <RowDefinition />
-                            <RowDefinition />
-                            <RowDefinition />
-                        </Grid.RowDefinitions>
+                    <DockPanel LastChildFill="True">
+                        <Border
+                            Width="110"
+                            Height="80"
+                            CornerRadius="5">
+                            <Image Source="{Binding CoverImage}" Stretch="UniformToFill">
+                                <Image.Clip>
+                                    <RectangleGeometry
+                                        RadiusX="5"
+                                        RadiusY="5"
+                                        Rect="0,0,110,80" />
+                                </Image.Clip>
+                            </Image>
+                        </Border>
 
-                        <TextBlock
-                            Grid.Row="0"
-                            Margin="0,10,0,0"
-                            VerticalAlignment="Center"
-                            FontSize="16"
-                            Text="{Binding SegmentName}" />
+                        <Grid Margin="5,0,0,0">
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
 
-                        <UniformGrid
-                            Grid.Row="2"
-                            Margin="0,0,0,10"
-                            Columns="3">
-                            <TextBlock Text="{Binding Duration, StringFormat=时长：{0}}" />
-                            <TextBlock HorizontalAlignment="Center" Text="{Binding SegmentSize, StringFormat=大小：{0}}" />
-                        </UniformGrid>
-                    </Grid>
+                            <TextBlock
+                                Grid.Row="0"
+                                FontSize="16"
+                                Text="{Binding SegmentName}"
+                                TextWrapping="Wrap" />
+
+                            <TextBlock Grid.Row="1" Text="{Binding Duration, StringFormat=时长：{0}}" />
+
+                            <TextBlock Grid.Row="2" Text="{Binding SegmentSize, StringFormat=大小：{0}}" />
+                        </Grid>
+                    </DockPanel>
                 </DataTemplate>
             </ListBox.ItemTemplate>
+
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <WrapPanel Orientation="Horizontal" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+
+            <ListBox.ItemContainerStyle>
+                <Style BasedOn="{StaticResource ListBoxItemStyleKey}" TargetType="ListBoxItem" />
+            </ListBox.ItemContainerStyle>
         </ListBox>
 
         <Grid Grid.Row="1" Visibility="{Binding IsEmptyImageVisible}">
