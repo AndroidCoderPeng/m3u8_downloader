@@ -1,9 +1,117 @@
-﻿<UserControl x:Class="m3u8_downloader.Pages.MergeSegmentPage"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             mc:Ignorable="d"
-             d:DesignHeight="300" d:DesignWidth="300">
-    <Grid />
+﻿<UserControl
+    x:Class="m3u8_downloader.Pages.MergeSegmentPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:vm="clr-namespace:m3u8_downloader.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:MergeSegmentPageViewModel}"
+    d:DesignHeight="400"
+    d:DesignWidth="600"
+    mc:Ignorable="d">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="100" />
+            </Grid.ColumnDefinitions>
+
+            <hc:TextBox
+                x:Name="RootPathTextBox"
+                Grid.Column="0"
+                hc:InfoElement.Placeholder="选择你要合并片段的根目录"
+                hc:InfoElement.ShowClearButton="True"
+                Text="{Binding SegmentsRootPath}"
+                TextChanged="RootPathTextBox_OnTextChanged" />
+
+            <Button
+                Grid.Column="1"
+                Margin="10,0,0,0"
+                HorizontalAlignment="Stretch"
+                Command="{Binding SelectSegmentsCommand}"
+                Content="选择" />
+        </Grid>
+
+        <Grid
+            Grid.Row="1"
+            VerticalAlignment="Center"
+            Visibility="{Binding IsLoadingVisible}">
+            <Grid.RowDefinitions>
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <ProgressBar
+                Grid.Row="0"
+                Width="400"
+                IsIndeterminate="True"
+                Style="{StaticResource ProgressBarPrimaryStripe}" />
+
+            <TextBlock
+                Grid.Row="1"
+                Margin="0,20"
+                HorizontalAlignment="Center"
+                FontSize="18"
+                Text="数据加载中，请稍后..." />
+        </Grid>
+
+        <ListBox
+            x:Name="SegmentsListBox"
+            Grid.Row="1"
+            BorderThickness="0"
+            ItemsSource="{Binding ResourceSegments}"
+            Visibility="{Binding IsSegmentsVisible}">
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <Grid Margin="10,0,0,0">
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+
+                        <TextBlock
+                            Grid.Row="0"
+                            Margin="0,10,0,0"
+                            VerticalAlignment="Center"
+                            FontSize="16"
+                            Text="{Binding SegmentName}" />
+
+                        <UniformGrid
+                            Grid.Row="2"
+                            Margin="0,0,0,10"
+                            Columns="3">
+                            <TextBlock Text="{Binding Duration, StringFormat=时长：{0}}" />
+                            <TextBlock HorizontalAlignment="Center" Text="{Binding SegmentSize, StringFormat=大小：{0}}" />
+                        </UniformGrid>
+                    </Grid>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Grid Grid.Row="1" Visibility="{Binding IsEmptyImageVisible}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="100" />
+                <RowDefinition />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="100" />
+            </Grid.RowDefinitions>
+
+            <Image Grid.Row="1" Source="/m3u8_downloader;component/Images/empty_image.png" />
+
+            <TextBlock
+                Grid.Row="2"
+                HorizontalAlignment="Center"
+                FontSize="18"
+                Text="这里什么都没有~" />
+        </Grid>
+    </Grid>
 </UserControl>

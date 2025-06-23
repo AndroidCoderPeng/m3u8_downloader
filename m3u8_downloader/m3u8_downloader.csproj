@@ -111,6 +111,7 @@
       <DependentUpon>EditTaskNameDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Events\UpdateVideoResourceEvent.cs" />
+    <Compile Include="Models\SegmentFile.cs" />
     <Compile Include="Models\VideoFile.cs" />
     <Compile Include="Pages\AboutSoftwarePage.xaml.cs">
       <DependentUpon>AboutSoftwarePage.xaml</DependentUpon>
@@ -130,6 +131,7 @@
     <Compile Include="Service\AppDataServiceImpl.cs" />
     <Compile Include="Service\IAppDataService.cs" />
     <Compile Include="Utils\MethodExtensions.cs" />
+    <Compile Include="Utils\SegmentManager.cs" />
     <Compile Include="Utils\VideoManager.cs" />
     <Compile Include="ViewModels\DownloadTaskPageViewModel.cs" />
     <Compile Include="ViewModels\EditTaskNameDialogViewModel.cs" />
