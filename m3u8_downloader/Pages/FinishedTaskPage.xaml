@@ -115,12 +115,12 @@
                             <TextBlock
                                 Grid.Row="0"
                                 FontSize="16"
-                                Text="{Binding VideoName}" />
+                                Text="{Binding VideoName}"
+                                TextWrapping="Wrap" />
 
                             <TextBlock
                                 Grid.Row="1"
                                 Margin="0,5"
-                                FontSize="14"
                                 Text="{Binding VideoSize}" />
 
                             <TextBlock Grid.Row="2" Text="{Binding Duration}" />
