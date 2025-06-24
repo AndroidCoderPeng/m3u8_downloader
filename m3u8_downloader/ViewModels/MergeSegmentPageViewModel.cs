@@ -2,11 +2,12 @@
 using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
 using m3u8_downloader.Models;
 using m3u8_downloader.Utils;
-using Newtonsoft.Json;
 using Prism.Commands;
 using Prism.Mvvm;
 using MessageBox = System.Windows.MessageBox;
@@ -109,7 +110,7 @@ namespace m3u8_downloader.ViewModels
                 LoadSegmentsAsync();
             });
 
-            MergeSegmentsCommand = new DelegateCommand(delegate
+            MergeSegmentsCommand = new DelegateCommand(async delegate
             {
                 if (!_resourceSegments.Any())
                 {
@@ -170,10 +171,29 @@ namespace m3u8_downloader.ViewModels
                 IsSegmentsVisible = Visibility.Collapsed;
             }
         }
-        
-        private async void MergeTsSegmentsAsync(ConcurrentDictionary<int, string> segments)
+
+        private async void MergeTsSegmentsAsync(ConcurrentDictionary<int, string> indexedSegments)
         {
-            Console.WriteLine(JsonConvert.SerializeObject(segments));
+            // 计算总时长
+            long totalDuration = 0;
+            await Task.Run(() =>
+            {
+                Parallel.ForEach(indexedSegments.Values, file =>
+                {
+                    var duration = file.GetMediaDuration();
+                    var timeSpan = TimeSpan.Parse(duration);
+                    Interlocked.Add(ref totalDuration, (long)timeSpan.TotalSeconds);
+                });
+            });
+
+            await indexedSegments.MergeTsSegmentsAsync(
+                _segmentsRootPath, Guid.NewGuid().ToString("N"), totalDuration,
+                new Progress<double>(progress =>
+                {
+                    //TODO 进度框显示
+                    Console.WriteLine($@"当前合并进度: {progress:F2}%");
+                })
+            );
         }
     }
 }

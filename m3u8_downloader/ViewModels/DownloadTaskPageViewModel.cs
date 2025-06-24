@@ -218,7 +218,7 @@ namespace m3u8_downloader.ViewModels
             await indexedFiles.MergeTsSegmentsAsync(folder, task.TaskName, timeSpan.TotalSeconds,
                 new Progress<double>(progress =>
                 {
-                    //进度框显示
+                    //TODO 进度框显示
                     Console.WriteLine($@"当前合并进度: {progress:F2}%");
                 })
             );
