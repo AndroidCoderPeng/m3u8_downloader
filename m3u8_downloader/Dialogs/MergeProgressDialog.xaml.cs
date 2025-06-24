@@ -8,27 +8,30 @@ namespace m3u8_downloader.Dialogs
 {
     public partial class MergeProgressDialog : UserControl
     {
-        private const int SegmentCount = 20;
+        private const int SegmentCount = 36;
         private const double TotalAngle = 360;
         private const double GapAngle = 2;
-        private const double Radius = 100;
-        private const double CenterX = 100;
-        private const double CenterY = 100;
-        
+
         public MergeProgressDialog()
         {
             InitializeComponent();
 
+            var radius = CirclePathCanvas.Width / 2;
+            var centerX = CirclePathCanvas.Width / 2;
+            var centerY = CirclePathCanvas.Width / 2;
+
+            //实际的圆弧段对应的的圆心角角度
+            const double segmentAngle = TotalAngle / SegmentCount - GapAngle;
             for (var i = 0; i < SegmentCount; i++)
             {
-                var startAngle = i * (TotalAngle / SegmentCount) + GapAngle * i;
-                var endAngle = (i + 1) * (TotalAngle / SegmentCount) - GapAngle * (i + 1);
+                var startAngle = i * (TotalAngle / SegmentCount) + i * GapAngle;
+                var endAngle = startAngle + segmentAngle;
 
-                var path = CreateArcSegment(CenterX, CenterY, Radius, startAngle, endAngle);
+                var path = CreateArcSegment(centerX, centerY, radius, startAngle, endAngle);
                 CirclePathCanvas.Children.Add(path);
             }
         }
-        
+
         private Path CreateArcSegment(double centerX, double centerY, double radius, double startAngle, double endAngle)
         {
             var path = new Path();
@@ -46,19 +49,19 @@ namespace m3u8_downloader.Dialogs
                 Point = GetPointOnCircle(centerX, centerY, radius, endAngle),
                 Size = new Size(radius, radius),
                 SweepDirection = SweepDirection.Clockwise,
-                IsLargeArc = (endAngle - startAngle) > 180
+                IsLargeArc = endAngle - startAngle > 180
             };
             pathFigure.Segments.Add(arcSegment);
 
             // 设置路径的样式
-            path.Stroke = Brushes.Black;
+            path.Stroke = (Brush)FindResource("AppBorderBrush");
             path.StrokeThickness = 10;
             path.Data = pathGeometry;
 
             return path;
         }
 
-        private Point GetPointOnCircle(double centerX, double centerY, double radius, double angle)
+        private static Point GetPointOnCircle(double centerX, double centerY, double radius, double angle)
         {
             var angleInRadians = angle * Math.PI / 180.0;
             var x = centerX + radius * Math.Cos(angleInRadians);
