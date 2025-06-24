@@ -12,7 +12,6 @@ namespace m3u8_downloader.Utils
 {
     public class VideoManager
     {
-        private readonly string _ffprobe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffprobe.exe");
         private readonly string _ffmpeg = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg.exe");
         private readonly string _videoFolderPath;
         private readonly string _cacheFolderPath;
@@ -163,7 +162,7 @@ namespace m3u8_downloader.Utils
 
                 // 并行执行获取时长和分辨率的任务
                 var durationTask = Task.Run(filePath.GetMediaDuration);
-                var resolutionTask = Task.Run(() => GetVideoResolution(filePath));
+                var resolutionTask = Task.Run(filePath.GetVideoResolution);
 
                 Task.WaitAll(durationTask, resolutionTask);
 
@@ -185,35 +184,6 @@ namespace m3u8_downloader.Utils
                 Console.WriteLine($@"解析视频元数据失败: {ex.Message}");
                 return null;
             }
-        }
-
-        // 获取视频分辨率
-        private string GetVideoResolution(string filePath)
-        {
-            try
-            {
-                using (var process = new Process())
-                {
-                    process.StartInfo = new ProcessStartInfo
-                    {
-                        FileName = _ffprobe,
-                        Arguments = $"-v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 \"{filePath}\"",
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        CreateNoWindow = true
-                    };
-                    process.Start();
-                    var output = process.StandardOutput.ReadToEnd();
-                    process.WaitForExit();
-                
-                    return !string.IsNullOrWhiteSpace(output) ? output.Trim() : "未知";
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($@"获取视频分辨率失败: {ex.Message}");
-            }
-            return "未知";
         }
 
         // 生成视频封面图

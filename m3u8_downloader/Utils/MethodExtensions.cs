@@ -352,6 +352,39 @@ namespace m3u8_downloader.Utils
         }
         
         /// <summary>
+        /// 获取视频分辨率
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static string GetVideoResolution(this string filePath)
+        {
+            try
+            {
+                using (var process = new Process())
+                {
+                    process.StartInfo = new ProcessStartInfo
+                    {
+                        FileName = _ffprobe,
+                        Arguments = $"-v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 \"{filePath}\"",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    };
+                    process.Start();
+                    var output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();
+                
+                    return !string.IsNullOrWhiteSpace(output) ? output.Trim() : "未知";
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($@"获取视频分辨率失败: {ex.Message}");
+            }
+            return "未知";
+        }
+        
+        /// <summary>
         /// 删除文件夹下面所有的ts文件
         /// </summary>
         /// <param name="folder"></param>
