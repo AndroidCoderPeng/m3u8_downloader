@@ -39,6 +39,7 @@ namespace m3u8_downloader
             
             //Dialog
             containerRegistry.RegisterDialog<EditTaskNameDialog, EditTaskNameDialogViewModel>();
+            containerRegistry.RegisterDialog<MergeProgressDialog, MergeProgressDialogViewModel>();
         }
     }
 }

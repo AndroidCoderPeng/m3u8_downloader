@@ -10,7 +10,8 @@ using m3u8_downloader.Models;
 using m3u8_downloader.Utils;
 using Prism.Commands;
 using Prism.Mvvm;
-using MessageBox = System.Windows.MessageBox;
+using Prism.Services.Dialogs;
+using DialogResult = System.Windows.Forms.DialogResult;
 
 namespace m3u8_downloader.ViewModels
 {
@@ -81,8 +82,12 @@ namespace m3u8_downloader.ViewModels
         public DelegateCommand RootPathClearedCommand { set; get; }
         public DelegateCommand<string> DeleteSegmentCommand { set; get; }
 
-        public MergeSegmentPageViewModel()
+        private readonly IDialogService _dialogService;
+        
+        public MergeSegmentPageViewModel(IDialogService dialogService)
         {
+            _dialogService = dialogService;
+            
             RootPathClearedCommand = new DelegateCommand(delegate
             {
                 if (ResourceSegments.Any())
@@ -112,19 +117,21 @@ namespace m3u8_downloader.ViewModels
 
             MergeSegmentsCommand = new DelegateCommand(async delegate
             {
-                if (!_resourceSegments.Any())
-                {
-                    MessageBox.Show("请先选择要合并的片段根目录", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
-                    return;
-                }
-
-                var indexedSegments = new ConcurrentDictionary<int, string>();
-                for (var i = 0; i < _resourceSegments.Count; i++)
-                {
-                    indexedSegments.TryAdd(i, _resourceSegments[i].FilePath);
-                }
-
-                MergeTsSegmentsAsync(indexedSegments);
+                // if (!_resourceSegments.Any())
+                // {
+                //     MessageBox.Show("请先选择要合并的片段根目录", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                //     return;
+                // }
+                //
+                // var indexedSegments = new ConcurrentDictionary<int, string>();
+                // for (var i = 0; i < _resourceSegments.Count; i++)
+                // {
+                //     indexedSegments.TryAdd(i, _resourceSegments[i].FilePath);
+                // }
+                //
+                // MergeTsSegmentsAsync(indexedSegments);
+                
+                _dialogService.ShowDialog("MergeProgressDialog");
             });
 
             DeleteSegmentCommand = new DelegateCommand<string>(segmentName =>
@@ -186,12 +193,13 @@ namespace m3u8_downloader.ViewModels
                 });
             });
 
+            _dialogService.ShowDialog("MergeProgressDialog");
             await indexedSegments.MergeTsSegmentsAsync(
                 _segmentsRootPath, Guid.NewGuid().ToString("N"), totalDuration,
                 new Progress<double>(progress =>
                 {
-                    //TODO 进度框显示
-                    Console.WriteLine($@"当前合并进度: {progress:F2}%");
+                    // TODO
+                    // view.UpdateProgress(progress);
                 })
             );
         }
