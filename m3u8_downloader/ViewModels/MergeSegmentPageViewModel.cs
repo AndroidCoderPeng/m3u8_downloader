@@ -8,9 +8,10 @@ using System.Windows;
 using System.Windows.Forms;
 using m3u8_downloader.Models;
 using m3u8_downloader.Utils;
+using m3u8_downloader.Views;
 using Prism.Commands;
 using Prism.Mvvm;
-using Prism.Services.Dialogs;
+using Application = System.Windows.Application;
 using DialogResult = System.Windows.Forms.DialogResult;
 
 namespace m3u8_downloader.ViewModels
@@ -82,12 +83,8 @@ namespace m3u8_downloader.ViewModels
         public DelegateCommand RootPathClearedCommand { set; get; }
         public DelegateCommand<string> DeleteSegmentCommand { set; get; }
 
-        private readonly IDialogService _dialogService;
-        
-        public MergeSegmentPageViewModel(IDialogService dialogService)
+        public MergeSegmentPageViewModel()
         {
-            _dialogService = dialogService;
-            
             RootPathClearedCommand = new DelegateCommand(delegate
             {
                 if (ResourceSegments.Any())
@@ -130,8 +127,8 @@ namespace m3u8_downloader.ViewModels
                 // }
                 //
                 // MergeTsSegmentsAsync(indexedSegments);
-                
-                _dialogService.ShowDialog("MergeProgressDialog");
+
+                new MergeProgressView { Owner = Application.Current.MainWindow }.ShowDialog();
             });
 
             DeleteSegmentCommand = new DelegateCommand<string>(segmentName =>
@@ -193,7 +190,8 @@ namespace m3u8_downloader.ViewModels
                 });
             });
 
-            _dialogService.ShowDialog("MergeProgressDialog");
+            var view = new MergeProgressView { Owner = Application.Current.MainWindow };
+            view.ShowDialog();
             await indexedSegments.MergeTsSegmentsAsync(
                 _segmentsRootPath, Guid.NewGuid().ToString("N"), totalDuration,
                 new Progress<double>(progress =>

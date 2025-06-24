@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
-namespace m3u8_downloader.Dialogs
+namespace m3u8_downloader.Views
 {
-    public partial class MergeProgressDialog : UserControl
+    public partial class MergeProgressView 
     {
         private const int SegmentCount = 36;
         private const double TotalAngle = 360;
         private const double GapAngle = 2;
 
-        public MergeProgressDialog()
+        public MergeProgressView()
         {
             InitializeComponent();
 
@@ -67,6 +66,21 @@ namespace m3u8_downloader.Dialogs
             var x = centerX + radius * Math.Cos(angleInRadians);
             var y = centerY + radius * Math.Sin(angleInRadians);
             return new Point(x, y);
+        }
+        
+        public void UpdateProgress(double value)
+        {
+            ProgressTextBlock.Text = $@"{value:F2}%";
+            var angle = 360 * (value / 100);
+            Console.WriteLine(angle);
+            var x = 1 * Math.Cos(Math.PI * (angle / 180 - 90) / 180 * Math.PI);
+            var y = 1 * Math.Sin(Math.PI * (angle / 180 - 90) / 180 * Math.PI);
+            ArcSegment.Point = new Point(x, y);
+            ArcSegment.IsLargeArc = angle > 180;
+            if (value >= 100)
+            {
+                Close();
+            }
         }
     }
 }

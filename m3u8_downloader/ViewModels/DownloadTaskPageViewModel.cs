@@ -76,12 +76,10 @@ namespace m3u8_downloader.ViewModels
         }
 
         private readonly IAppDataService _dataService;
-        private readonly IDialogService _dialogService;
 
         public DownloadTaskPageViewModel(IAppDataService dataService, IDialogService dialogService)
         {
             _dataService = dataService;
-            _dialogService = dialogService;
 
             ParseUrlCommand = new DelegateCommand(delegate
             {
@@ -218,7 +216,8 @@ namespace m3u8_downloader.ViewModels
 
             task.TaskState = "合并中";
             var timeSpan = TimeSpan.Parse(task.Duration);
-            _dialogService.ShowDialog("MergeProgressDialog");
+            var view = new MergeProgressView { Owner = Application.Current.MainWindow };
+            view.ShowDialog();
             await indexedFiles.MergeTsSegmentsAsync(folder, task.TaskName, timeSpan.TotalSeconds,
                 new Progress<double>(progress =>
                 {

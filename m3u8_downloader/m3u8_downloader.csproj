@@ -110,9 +110,6 @@
     <Compile Include="Dialogs\EditTaskNameDialog.xaml.cs">
       <DependentUpon>EditTaskNameDialog.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Dialogs\MergeProgressDialog.xaml.cs">
-      <DependentUpon>MergeProgressDialog.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Events\UpdateVideoResourceEvent.cs" />
     <Compile Include="Models\SegmentFile.cs" />
     <Compile Include="Models\VideoFile.cs" />
@@ -142,12 +139,14 @@
     <Compile Include="ViewModels\EditTaskNameDialogViewModel.cs" />
     <Compile Include="ViewModels\FinishedTaskPageViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
-    <Compile Include="ViewModels\MergeProgressDialogViewModel.cs" />
     <Compile Include="ViewModels\MergeSegmentPageViewModel.cs" />
     <Compile Include="ViewModels\SoftwareSettingPageViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Views\MergeProgressView.xaml.cs">
+      <DependentUpon>MergeProgressView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\PlayVideoWindow.xaml.cs">
       <DependentUpon>PlayVideoWindow.xaml</DependentUpon>
@@ -176,7 +175,6 @@
     <Page Include="Colors\ApplicationBrushes.xaml" />
     <Page Include="Colors\ApplicationColor.xaml" />
     <Page Include="Dialogs\EditTaskNameDialog.xaml" />
-    <Page Include="Dialogs\MergeProgressDialog.xaml" />
     <Page Include="Pages\AboutSoftwarePage.xaml">
       <SubType>Designer</SubType>
     </Page>
@@ -187,6 +185,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Views\MergeProgressView.xaml" />
     <Page Include="Views\PlayVideoWindow.xaml" />
   </ItemGroup>
   <ItemGroup>
