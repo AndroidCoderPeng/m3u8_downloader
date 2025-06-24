@@ -214,7 +214,14 @@ namespace m3u8_downloader.ViewModels
             }
 
             task.TaskState = "合并中";
-            await indexedFiles.MergeTsSegmentsAsync(folder, task.TaskName);
+            var timeSpan = TimeSpan.Parse(task.Duration);
+            await indexedFiles.MergeTsSegmentsAsync(folder, task.TaskName, timeSpan.TotalSeconds,
+                new Progress<double>(progress =>
+                {
+                    //进度框显示
+                    Console.WriteLine($@"当前合并进度: {progress:F2}%");
+                })
+            );
             await folder.DeleteTsSegments();
             task.TaskState = "下载完成";
         }

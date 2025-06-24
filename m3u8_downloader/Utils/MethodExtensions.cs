@@ -255,16 +255,15 @@ namespace m3u8_downloader.Utils
         }
 
         /// <summary>
-        /// 合并ts片段  , IProgress<double> progress
+        /// 合并ts片段  
         /// </summary>
         /// <param name="indexedFiles"></param>
         /// <param name="folder"></param>
         /// <param name="fileName"></param>
+        /// <param name="totalDuration"></param>
         public static async Task MergeTsSegmentsAsync(this ConcurrentDictionary<int, string> indexedFiles,
-            string folder, string fileName)
+            string folder, string fileName, double totalDuration, IProgress<double> progress)
         {
-            var ffmpeg = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg.exe");
-
             if (!indexedFiles.Any())
             {
                 Console.WriteLine(@"没有找到任何ts文件");
@@ -283,18 +282,11 @@ namespace m3u8_downloader.Utils
 
             File.WriteAllText(fileListFile, builder.ToString());
 
-            // 计算总时长（单位：秒）
-            // double totalDuration = 0;
-            // foreach (var file in indexedFiles.Values)
-            // {
-            //     var duration = file.GetMediaDuration();
-            //     totalDuration += duration;
-            // }
-
             var startInfo = new ProcessStartInfo
             {
-                FileName = ffmpeg,
-                Arguments = $"-f concat -safe 0 -i \"{fileListFile}\" -c copy \"{outputFile}\" -progress pipe:1",
+                FileName = _ffmpeg,
+                Arguments =
+                    $"-hide_banner -nostats -loglevel warning -f concat -safe 0 -i \"{fileListFile}\" -c copy \"{outputFile}\" -progress pipe:1",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -304,14 +296,34 @@ namespace m3u8_downloader.Utils
             {
                 process.StartInfo = startInfo;
                 process.Start();
+
                 // 读取进度输出
-                // await ReadProgressAsync(process.StandardError, totalDuration, progress);
+                await ReadProgressAsync(process.StandardOutput, totalDuration, progress);
                 await Task.Run(() => process.WaitForExit());
             }
 
             // 删除临时文件列表
             File.Delete(fileListFile);
-            // progress.Report(100);
+        }
+
+        private static async Task ReadProgressAsync(StreamReader reader, double totalDuration,
+            IProgress<double> progress)
+        {
+            string line;
+            while ((line = await reader.ReadLineAsync()) != null)
+            {
+                if (line.StartsWith("out_time="))
+                {
+                    var timeString = line.Replace("out_time=", "").Trim();
+                    if (!timeString.StartsWith("-")) //去掉ffmpeg开始处理时的占位时间
+                    {
+                        var timeSpan = TimeSpan.Parse(timeString);
+                        var currentDuration = (int)timeSpan.TotalSeconds;
+                        var percent = Math.Min(100.0, currentDuration / totalDuration * 100.0);
+                        progress.Report(percent);
+                    }
+                }
+            }
         }
 
         /// <summary>
