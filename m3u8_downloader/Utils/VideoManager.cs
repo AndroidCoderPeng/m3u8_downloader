@@ -162,7 +162,7 @@ namespace m3u8_downloader.Utils
                 var fileInfo = new FileInfo(filePath);
 
                 // 并行执行获取时长和分辨率的任务
-                var durationTask = Task.Run(() => GetVideoDuration(filePath));
+                var durationTask = Task.Run(filePath.GetMediaDuration);
                 var resolutionTask = Task.Run(() => GetVideoResolution(filePath));
 
                 Task.WaitAll(durationTask, resolutionTask);
@@ -185,40 +185,6 @@ namespace m3u8_downloader.Utils
                 Console.WriteLine($@"解析视频元数据失败: {ex.Message}");
                 return null;
             }
-        }
-
-        // 获取视频时长
-        private string GetVideoDuration(string filePath)
-        {
-            try
-            {
-                using (var process = new Process())
-                {
-                    process.StartInfo = new ProcessStartInfo
-                    {
-                        FileName = _ffprobe,
-                        Arguments =
-                            $"-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"{filePath}\"",
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        CreateNoWindow = true
-                    };
-                    process.Start();
-                    var output = process.StandardOutput.ReadToEnd();
-                    process.WaitForExit();
-
-                    if (double.TryParse(output.Trim(), out var durationSeconds))
-                    {
-                        return TimeSpan.FromSeconds(durationSeconds).ToString(@"hh\:mm\:ss");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($@"获取视频时长失败: {ex.Message}");
-            }
-
-            return "未知";
         }
 
         // 获取视频分辨率

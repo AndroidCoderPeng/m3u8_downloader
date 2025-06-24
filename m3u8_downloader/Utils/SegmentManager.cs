@@ -12,7 +12,6 @@ namespace m3u8_downloader.Utils
 {
     public class SegmentManager
     {
-        private readonly string _ffprobe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffprobe.exe");
         private readonly string _ffmpeg = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg.exe");
         private readonly string _segmentFolderPath;
         private readonly string _cacheFolderPath;
@@ -66,7 +65,7 @@ namespace m3u8_downloader.Utils
                 Console.WriteLine($@"加载缓存文件夹失败: {ex.Message}");
             }
         }
-        
+
         public async Task<List<SegmentFile>> GetSegmentsAsync()
         {
             try
@@ -93,10 +92,11 @@ namespace m3u8_downloader.Utils
                     return segmentFile;
                 }
             }
-            
+
             return await Task.Run(() =>
             {
-                var cacheFilePath = Path.Combine(_cacheFolderPath, $"{Path.GetFileNameWithoutExtension(fileName)}.json");
+                var cacheFilePath =
+                    Path.Combine(_cacheFolderPath, $"{Path.GetFileNameWithoutExtension(fileName)}.json");
                 if (File.Exists(cacheFilePath))
                 {
                     try
@@ -155,7 +155,7 @@ namespace m3u8_downloader.Utils
                 var fileInfo = new FileInfo(filePath);
 
                 // 并行执行获取时长和分辨率的任务
-                var durationTask = Task.Run(() => GetSegmentDuration(filePath));
+                var durationTask = Task.Run(filePath.GetMediaDuration);
 
                 Task.WaitAll(durationTask);
 
@@ -177,40 +177,7 @@ namespace m3u8_downloader.Utils
                 return null;
             }
         }
-        
-        private string GetSegmentDuration(string filePath)
-        {
-            try
-            {
-                using (var process = new Process())
-                {
-                    process.StartInfo = new ProcessStartInfo
-                    {
-                        FileName = _ffprobe,
-                        Arguments =
-                            $"-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"{filePath}\"",
-                        UseShellExecute = false,
-                        RedirectStandardOutput = true,
-                        CreateNoWindow = true
-                    };
-                    process.Start();
-                    var output = process.StandardOutput.ReadToEnd();
-                    process.WaitForExit();
 
-                    if (double.TryParse(output.Trim(), out var durationSeconds))
-                    {
-                        return TimeSpan.FromSeconds(durationSeconds).ToString(@"hh\:mm\:ss");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($@"获取视频片段时长失败: {ex.Message}");
-            }
-
-            return "未知";
-        }
-        
         private string GenerateCoverImage(string filePath)
         {
             try
@@ -239,15 +206,17 @@ namespace m3u8_downloader.Utils
                 return null;
             }
         }
-        
+
         private async void SaveToCacheAsync(SegmentFile segmentFile)
         {
             try
             {
                 var json = JsonConvert.SerializeObject(segmentFile);
-                var cacheFilePath = Path.Combine(_cacheFolderPath, $"{Path.GetFileNameWithoutExtension(segmentFile.SegmentName)}.json");
-            
-                using (var stream = new FileStream(cacheFilePath, FileMode.Create, FileAccess.Write, FileShare.None, 4096, true))
+                var cacheFilePath = Path.Combine(_cacheFolderPath,
+                    $"{Path.GetFileNameWithoutExtension(segmentFile.SegmentName)}.json");
+
+                using (var stream = new FileStream(cacheFilePath, FileMode.Create, FileAccess.Write, FileShare.None,
+                           4096, true))
                 using (var writer = new StreamWriter(stream))
                 {
                     await writer.WriteAsync(json);

@@ -16,6 +16,7 @@ namespace m3u8_downloader.Utils
 {
     public static class MethodExtensions
     {
+        private static readonly string _ffprobe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffprobe.exe");
         private static readonly HttpClient Client = new HttpClient();
 
         private const string Agent =
@@ -114,7 +115,7 @@ namespace m3u8_downloader.Utils
 
             // 使用 ConcurrentDictionary 来存储带索引的文件路径
             var indexedFiles = new ConcurrentDictionary<int, string>();
-            
+
             var downloadTasks = tsUrls.Select(async (url, index) =>
             {
                 var fileName = Path.Combine(outputFolder, Path.GetFileName(url).Split('?')[0]); // 去除URL参数
@@ -135,7 +136,7 @@ namespace m3u8_downloader.Utils
 
                         // 将文件路径和索引存入 ConcurrentDictionary
                         indexedFiles.TryAdd(index, fileName);
-                        
+
                         Interlocked.Add(ref totalBytes, encryptedData.Length);
                         var currentCount = Interlocked.Increment(ref downloadedCount);
 
@@ -158,7 +159,7 @@ namespace m3u8_downloader.Utils
             });
 
             await Task.WhenAll(downloadTasks);
-            
+
             return indexedFiles;
         }
 
@@ -192,8 +193,7 @@ namespace m3u8_downloader.Utils
         /// <param name="outputFolder"></param>
         /// <param name="progress"></param>
         public static async Task<ConcurrentDictionary<int, string>> DownloadTsSegmentsAsync(this List<string> tsUrls,
-            string outputFolder,
-            IProgress<TaskProgress> progress)
+            string outputFolder, IProgress<TaskProgress> progress)
         {
             if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
 
@@ -254,7 +254,7 @@ namespace m3u8_downloader.Utils
         }
 
         /// <summary>
-        /// 合并ts片段
+        /// 合并ts片段  , IProgress<double> progress
         /// </summary>
         /// <param name="indexedFiles"></param>
         /// <param name="folder"></param>
@@ -282,10 +282,18 @@ namespace m3u8_downloader.Utils
 
             File.WriteAllText(fileListFile, builder.ToString());
 
+            // 计算总时长（单位：秒）
+            // double totalDuration = 0;
+            // foreach (var file in indexedFiles.Values)
+            // {
+            //     var duration = file.GetMediaDuration();
+            //     totalDuration += duration;
+            // }
+            
             var startInfo = new ProcessStartInfo
             {
                 FileName = ffmpeg,
-                Arguments = $"-f concat -safe 0 -i \"{fileListFile}\" -c copy \"{outputFile}\"",
+                Arguments = $"-f concat -safe 0 -i \"{fileListFile}\" -c copy \"{outputFile}\" -progress pipe:1",
                 RedirectStandardOutput = true,
                 RedirectStandardError = true,
                 UseShellExecute = false,
@@ -295,13 +303,54 @@ namespace m3u8_downloader.Utils
             {
                 process.StartInfo = startInfo;
                 process.Start();
+                // 读取进度输出
+                // await ReadProgressAsync(process.StandardError, totalDuration, progress);
                 await Task.Run(() => process.WaitForExit());
             }
 
             // 删除临时文件列表
             File.Delete(fileListFile);
+            // progress.Report(100);
         }
 
+        /// <summary>
+        /// 获取时长
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static string GetMediaDuration(this string filePath)
+        {
+            try
+            {
+                using (var process = new Process())
+                {
+                    process.StartInfo = new ProcessStartInfo
+                    {
+                        FileName = _ffprobe,
+                        Arguments =
+                            $"-v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 \"{filePath}\"",
+                        UseShellExecute = false,
+                        RedirectStandardOutput = true,
+                        CreateNoWindow = true
+                    };
+                    process.Start();
+                    var output = process.StandardOutput.ReadToEnd();
+                    process.WaitForExit();
+
+                    if (double.TryParse(output.Trim(), out var durationSeconds))
+                    {
+                        return TimeSpan.FromSeconds(durationSeconds).ToString(@"hh\:mm\:ss");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($@"获取视频片段时长失败: {ex.Message}");
+            }
+
+            return "未知";
+        }
+        
         /// <summary>
         /// 删除文件夹下面所有的ts文件
         /// </summary>
