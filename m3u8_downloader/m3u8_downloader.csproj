@@ -114,7 +114,6 @@
       <DependentUpon>MergeProgressDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Events\UpdateVideoResourceEvent.cs" />
-    <Compile Include="Models\ArcLineSegment.cs" />
     <Compile Include="Models\SegmentFile.cs" />
     <Compile Include="Models\VideoFile.cs" />
     <Compile Include="Pages\AboutSoftwarePage.xaml.cs">

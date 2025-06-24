@@ -20,40 +20,12 @@
         </Style>
     </prism:Dialog.WindowStyle>
 
-    <Grid Width="200" Height="200">
-        <!--  背景圆环  -->
-        <Canvas>
-            <!--  动态生成10个弧形段  -->
-            <ItemsControl ItemsSource="{Binding Path=Segments}">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <Canvas Width="200" Height="200" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Path
-                            Stretch="Uniform"
-                            Stroke="{DynamicResource AppBorderBrush}"
-                            StrokeEndLineCap="Round"
-                            StrokeStartLineCap="Round"
-                            StrokeThickness="5">
-                            <Path.Data>
-                                <PathGeometry>
-                                    <PathFigure StartPoint="{Binding StartPoint}">
-                                        <ArcSegment
-                                            IsLargeArc="{Binding IsLargeArc}"
-                                            Point="{Binding EndPoint}"
-                                            Size="100,100"
-                                            SweepDirection="Clockwise" />
-                                    </PathFigure>
-                                </PathGeometry>
-                            </Path.Data>
-                        </Path>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </Canvas>
+    <Grid>
+        <!--  背景圆环画布  -->
+        <Canvas
+            x:Name="CirclePathCanvas"
+            Width="200"
+            Height="200" />
 
         <!--  进度显示圆环  -->
         <Path

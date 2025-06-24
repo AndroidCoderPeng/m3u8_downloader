@@ -1,12 +1,69 @@
-﻿using System.Windows.Controls;
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Shapes;
 
 namespace m3u8_downloader.Dialogs
 {
     public partial class MergeProgressDialog : UserControl
     {
+        private const int SegmentCount = 20;
+        private const double TotalAngle = 360;
+        private const double GapAngle = 2;
+        private const double Radius = 100;
+        private const double CenterX = 100;
+        private const double CenterY = 100;
+        
         public MergeProgressDialog()
         {
             InitializeComponent();
+
+            for (var i = 0; i < SegmentCount; i++)
+            {
+                var startAngle = i * (TotalAngle / SegmentCount) + GapAngle * i;
+                var endAngle = (i + 1) * (TotalAngle / SegmentCount) - GapAngle * (i + 1);
+
+                var path = CreateArcSegment(CenterX, CenterY, Radius, startAngle, endAngle);
+                CirclePathCanvas.Children.Add(path);
+            }
+        }
+        
+        private Path CreateArcSegment(double centerX, double centerY, double radius, double startAngle, double endAngle)
+        {
+            var path = new Path();
+            var pathGeometry = new PathGeometry();
+            var pathFigure = new PathFigure();
+            pathGeometry.Figures.Add(pathFigure);
+
+            // 起始点
+            var startPoint = GetPointOnCircle(centerX, centerY, radius, startAngle);
+            pathFigure.StartPoint = startPoint;
+
+            // 圆弧段
+            var arcSegment = new ArcSegment
+            {
+                Point = GetPointOnCircle(centerX, centerY, radius, endAngle),
+                Size = new Size(radius, radius),
+                SweepDirection = SweepDirection.Clockwise,
+                IsLargeArc = (endAngle - startAngle) > 180
+            };
+            pathFigure.Segments.Add(arcSegment);
+
+            // 设置路径的样式
+            path.Stroke = Brushes.Black;
+            path.StrokeThickness = 10;
+            path.Data = pathGeometry;
+
+            return path;
+        }
+
+        private Point GetPointOnCircle(double centerX, double centerY, double radius, double angle)
+        {
+            var angleInRadians = angle * Math.PI / 180.0;
+            var x = centerX + radius * Math.Cos(angleInRadians);
+            var y = centerY + radius * Math.Sin(angleInRadians);
+            return new Point(x, y);
         }
     }
 }
