@@ -20,26 +20,11 @@
             Height="200" />
 
         <!--  进度显示圆环  -->
-        <Path
-            x:Name="ProgressPath"
-            Stretch="Uniform"
-            Stroke="{DynamicResource AppThemeBrush}"
-            StrokeEndLineCap="Round"
-            StrokeStartLineCap="Round"
-            StrokeThickness="15"
-            Visibility="Collapsed">
-            <Path.Data>
-                <PathGeometry>
-                    <PathFigure StartPoint="100 0">
-                        <ArcSegment
-                            x:Name="ArcSegment"
-                            IsLargeArc="True"
-                            Size="100 100"
-                            SweepDirection="Clockwise" />
-                    </PathFigure>
-                </PathGeometry>
-            </Path.Data>
-        </Path>
+        <Canvas
+            x:Name="ProgressPathCanvas"
+            Width="200"
+            Height="200" />
+
 
         <!--  中间显示文字  -->
         <TextBlock
@@ -47,6 +32,7 @@
             HorizontalAlignment="Center"
             VerticalAlignment="Center"
             FontSize="24"
+            Foreground="{DynamicResource AppThemeBrush}"
             Text="0%" />
     </Grid>
 </Window>

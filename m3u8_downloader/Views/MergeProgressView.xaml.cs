@@ -9,8 +9,9 @@ namespace m3u8_downloader.Views
     {
         private const int SegmentCount = 36;
         private const double TotalAngle = 360;
-        private const double GapAngle = 2;
-
+        private const double GapAngle = 1;
+        private readonly Path _progressPath = new Path();
+        
         public MergeProgressView()
         {
             InitializeComponent();
@@ -29,6 +30,9 @@ namespace m3u8_downloader.Views
                 var path = CreateArcSegment(centerX, centerY, radius, startAngle, endAngle);
                 CirclePathCanvas.Children.Add(path);
             }
+            
+            _progressPath.Stroke = (Brush)FindResource("AppThemeBrush");
+            _progressPath.StrokeThickness = 15;
         }
 
         private Path CreateArcSegment(double centerX, double centerY, double radius, double startAngle, double endAngle)
@@ -54,7 +58,7 @@ namespace m3u8_downloader.Views
 
             // 设置路径的样式
             path.Stroke = (Brush)FindResource("AppBorderBrush");
-            path.StrokeThickness = 10;
+            path.StrokeThickness = 15;
             path.Data = pathGeometry;
 
             return path;
@@ -71,12 +75,10 @@ namespace m3u8_downloader.Views
         public void UpdateProgress(double value)
         {
             ProgressTextBlock.Text = $@"{value:F2}%";
-            var angle = 360 * (value / 100);
-            Console.WriteLine(angle);
-            var x = 1 * Math.Cos(Math.PI * (angle / 180 - 90) / 180 * Math.PI);
-            var y = 1 * Math.Sin(Math.PI * (angle / 180 - 90) / 180 * Math.PI);
-            ArcSegment.Point = new Point(x, y);
-            ArcSegment.IsLargeArc = angle > 180;
+            
+            //更新弧度
+            
+            
             if (value >= 100)
             {
                 Close();
