@@ -145,9 +145,6 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Views\MergeProgressView.xaml.cs">
-      <DependentUpon>MergeProgressView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\PlayVideoWindow.xaml.cs">
       <DependentUpon>PlayVideoWindow.xaml</DependentUpon>
     </Compile>
@@ -185,7 +182,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\MergeProgressView.xaml" />
     <Page Include="Views\PlayVideoWindow.xaml" />
   </ItemGroup>
   <ItemGroup>

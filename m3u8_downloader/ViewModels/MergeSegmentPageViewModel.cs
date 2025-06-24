@@ -8,11 +8,10 @@ using System.Windows;
 using System.Windows.Forms;
 using m3u8_downloader.Models;
 using m3u8_downloader.Utils;
-using m3u8_downloader.Views;
 using Prism.Commands;
 using Prism.Mvvm;
-using Application = System.Windows.Application;
 using DialogResult = System.Windows.Forms.DialogResult;
+using MessageBox = System.Windows.MessageBox;
 
 namespace m3u8_downloader.ViewModels
 {
@@ -78,6 +77,18 @@ namespace m3u8_downloader.ViewModels
             }
         }
 
+        private double _mergeProgressValue;
+
+        public double MergeProgressValue
+        {
+            get => _mergeProgressValue;
+            set
+            {
+                _mergeProgressValue = value;
+                RaisePropertyChanged();
+            }
+        }
+
         public DelegateCommand SelectSegmentsCommand { set; get; }
         public DelegateCommand MergeSegmentsCommand { set; get; }
         public DelegateCommand RootPathClearedCommand { set; get; }
@@ -112,23 +123,21 @@ namespace m3u8_downloader.ViewModels
                 LoadSegmentsAsync();
             });
 
-            MergeSegmentsCommand = new DelegateCommand(async delegate
+            MergeSegmentsCommand = new DelegateCommand(delegate
             {
-                // if (!_resourceSegments.Any())
-                // {
-                //     MessageBox.Show("请先选择要合并的片段根目录", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
-                //     return;
-                // }
-                //
-                // var indexedSegments = new ConcurrentDictionary<int, string>();
-                // for (var i = 0; i < _resourceSegments.Count; i++)
-                // {
-                //     indexedSegments.TryAdd(i, _resourceSegments[i].FilePath);
-                // }
-                //
-                // MergeTsSegmentsAsync(indexedSegments);
+                if (!_resourceSegments.Any())
+                {
+                    MessageBox.Show("请先选择要合并的片段根目录", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
 
-                new MergeProgressView { Owner = Application.Current.MainWindow }.ShowDialog();
+                var indexedSegments = new ConcurrentDictionary<int, string>();
+                for (var i = 0; i < _resourceSegments.Count; i++)
+                {
+                    indexedSegments.TryAdd(i, _resourceSegments[i].FilePath);
+                }
+
+                MergeTsSegmentsAsync(indexedSegments);
             });
 
             DeleteSegmentCommand = new DelegateCommand<string>(segmentName =>
@@ -190,15 +199,9 @@ namespace m3u8_downloader.ViewModels
                 });
             });
 
-            var view = new MergeProgressView { Owner = Application.Current.MainWindow };
-            view.ShowDialog();
             await indexedSegments.MergeTsSegmentsAsync(
                 _segmentsRootPath, Guid.NewGuid().ToString("N"), totalDuration,
-                new Progress<double>(progress =>
-                {
-                    // TODO
-                    // view.UpdateProgress(progress);
-                })
+                new Progress<double>(progress => { MergeProgressValue = progress; })
             );
         }
     }

@@ -64,6 +64,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition />
         </Grid.RowDefinitions>
 
@@ -84,18 +85,41 @@
 
             <Button
                 Grid.Column="1"
-                Margin="5,0"
+                Width="100"
+                Margin="5,0,0,0"
                 Command="{Binding SelectSegmentsCommand}"
                 Content="选择" />
+        </Grid>
+
+        <Grid Grid.Row="1" Margin="5,0,5,5">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock
+                Grid.Column="0"
+                VerticalAlignment="Center"
+                FontSize="14"
+                Text="合并进度" />
+
+            <ProgressBar
+                Grid.Column="1"
+                Height="12"
+                Margin="5,0"
+                Style="{DynamicResource ProgressBarInfo}"
+                Value="{Binding MergeProgressValue}" />
 
             <Button
                 Grid.Column="2"
+                Width="100"
                 Command="{Binding MergeSegmentsCommand}"
                 Content="合并" />
         </Grid>
 
         <Grid
-            Grid.Row="1"
+            Grid.Row="2"
             VerticalAlignment="Center"
             Visibility="{Binding IsLoadingVisible}">
             <Grid.RowDefinitions>
@@ -119,7 +143,7 @@
 
         <ListBox
             x:Name="SegmentsListBox"
-            Grid.Row="1"
+            Grid.Row="2"
             AllowDrop="True"
             BorderThickness="0"
             DragOver="SegmentsListBox_DragOver"
@@ -189,7 +213,7 @@
             </ListBox.ItemContainerStyle>
         </ListBox>
 
-        <Grid Grid.Row="1" Visibility="{Binding IsEmptyImageVisible}">
+        <Grid Grid.Row="2" Visibility="{Binding IsEmptyImageVisible}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="100" />
                 <RowDefinition />
