@@ -17,6 +17,7 @@ namespace m3u8_downloader.Utils
     public static class MethodExtensions
     {
         private static readonly string _ffprobe = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffprobe.exe");
+        private static readonly string _ffmpeg = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg.exe");
         private static readonly HttpClient Client = new HttpClient();
 
         private const string Agent =
@@ -289,7 +290,7 @@ namespace m3u8_downloader.Utils
             //     var duration = file.GetMediaDuration();
             //     totalDuration += duration;
             // }
-            
+
             var startInfo = new ProcessStartInfo
             {
                 FileName = ffmpeg,
@@ -350,7 +351,7 @@ namespace m3u8_downloader.Utils
 
             return "未知";
         }
-        
+
         /// <summary>
         /// 获取视频分辨率
         /// </summary>
@@ -365,7 +366,8 @@ namespace m3u8_downloader.Utils
                     process.StartInfo = new ProcessStartInfo
                     {
                         FileName = _ffprobe,
-                        Arguments = $"-v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 \"{filePath}\"",
+                        Arguments =
+                            $"-v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 \"{filePath}\"",
                         UseShellExecute = false,
                         RedirectStandardOutput = true,
                         CreateNoWindow = true
@@ -373,7 +375,7 @@ namespace m3u8_downloader.Utils
                     process.Start();
                     var output = process.StandardOutput.ReadToEnd();
                     process.WaitForExit();
-                
+
                     return !string.IsNullOrWhiteSpace(output) ? output.Trim() : "未知";
                 }
             }
@@ -381,9 +383,49 @@ namespace m3u8_downloader.Utils
             {
                 Console.WriteLine($@"获取视频分辨率失败: {ex.Message}");
             }
+
             return "未知";
         }
-        
+
+        /// <summary>
+        /// 生成视频封面图
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="cacheFolderPath"></param>
+        /// <returns></returns>
+        public static string GenerateCoverImage(this string filePath, string cacheFolderPath)
+        {
+            try
+            {
+                var fileName = Path.GetFileNameWithoutExtension(filePath);
+                var coverPath = Path.Combine(cacheFolderPath, $"{fileName}.jpg");
+                if (File.Exists(coverPath))
+                {
+                    return coverPath;
+                }
+
+                var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo
+                    {
+                        FileName = _ffmpeg,
+                        Arguments = $"-i \"{filePath}\" -ss 00:00:01.000 -vframes 1 \"{coverPath}\"",
+                        UseShellExecute = false,
+                        CreateNoWindow = true
+                    }
+                };
+
+                process.Start();
+                process.WaitForExit();
+
+                return File.Exists(coverPath) ? coverPath : null;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
         /// <summary>
         /// 删除文件夹下面所有的ts文件
         /// </summary>

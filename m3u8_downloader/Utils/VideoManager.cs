@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -12,7 +11,6 @@ namespace m3u8_downloader.Utils
 {
     public class VideoManager
     {
-        private readonly string _ffmpeg = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "ffmpeg.exe");
         private readonly string _videoFolderPath;
         private readonly string _cacheFolderPath;
         private readonly ConcurrentDictionary<string, VideoFile> _memoryCache;
@@ -153,7 +151,7 @@ namespace m3u8_downloader.Utils
             });
         }
 
-        // 使用FFprobe解析视频元数据
+        // 解析视频元数据
         private VideoFile ParseVideoMetadata(string filePath)
         {
             try
@@ -166,7 +164,7 @@ namespace m3u8_downloader.Utils
 
                 Task.WaitAll(durationTask, resolutionTask);
 
-                var coverImagePath = GenerateCoverImage(filePath);
+                var coverImagePath = filePath.GenerateCoverImage(_cacheFolderPath);
 
                 return new VideoFile
                 {
@@ -182,39 +180,6 @@ namespace m3u8_downloader.Utils
             catch (Exception ex)
             {
                 Console.WriteLine($@"解析视频元数据失败: {ex.Message}");
-                return null;
-            }
-        }
-
-        // 生成视频封面图
-        private string GenerateCoverImage(string filePath)
-        {
-            try
-            {
-                var fileName = Path.GetFileNameWithoutExtension(filePath);
-                var coverPath = Path.Combine(_cacheFolderPath, $"{fileName}.jpg");
-
-                if (File.Exists(coverPath))
-                    return coverPath;
-
-                var process = new Process
-                {
-                    StartInfo = new ProcessStartInfo
-                    {
-                        FileName = _ffmpeg,
-                        Arguments = $"-i \"{filePath}\" -ss 00:00:01.000 -vframes 1 \"{coverPath}\"",
-                        UseShellExecute = false,
-                        CreateNoWindow = true
-                    }
-                };
-
-                process.Start();
-                process.WaitForExit();
-
-                return File.Exists(coverPath) ? coverPath : null;
-            }
-            catch (Exception)
-            {
                 return null;
             }
         }
