@@ -193,8 +193,9 @@ namespace m3u8_downloader.Utils
         /// <param name="tsUrls"></param>
         /// <param name="outputFolder"></param>
         /// <param name="progress"></param>
-        public static async Task<ConcurrentDictionary<int, string>> DownloadTsSegmentsAsync(this List<string> tsUrls,
-            string outputFolder, IProgress<TaskProgress> progress)
+        /// <param name="token"></param>
+        public static async Task<ConcurrentDictionary<int, string>> DownloadTsSegmentsAsync(
+            this List<string> tsUrls, string outputFolder, IProgress<TaskProgress> progress, CancellationToken token)
         {
             if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
 
@@ -207,14 +208,20 @@ namespace m3u8_downloader.Utils
 
             var downloadTasks = tsUrls.Select(async (url, index) =>
             {
+                // 检查是否已取消
+                if (token.IsCancellationRequested) return;
+
                 var fileName = Path.Combine(outputFolder, Path.GetFileName(url));
                 var retryCount = 5;
 
                 while (retryCount-- > 0)
                 {
+                    // 再次检查是否取消
+                    if (token.IsCancellationRequested) return;
+
                     try
                     {
-                        var response = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
+                        var response = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token);
                         response.EnsureSuccessStatusCode(); // 确保状态码是 2xx
 
                         var fileSize = response.Content.Headers.ContentLength ?? -1L;
@@ -241,10 +248,15 @@ namespace m3u8_downloader.Utils
 
                         break; // 成功则退出循环
                     }
+                    catch (OperationCanceledException) when (token.IsCancellationRequested)
+                    {
+                        Console.WriteLine(@"下载已取消");
+                        return;
+                    }
                     catch (Exception ex) when (ex is IOException || ex is HttpRequestException)
                     {
                         Console.WriteLine($@"下载失败 {url}，剩余重试次数：{retryCount}，错误：{ex.Message}");
-                        await Task.Delay(2000); // 等待后重试
+                        await Task.Delay(2000, token); // 等待后重试
                     }
                 }
             });

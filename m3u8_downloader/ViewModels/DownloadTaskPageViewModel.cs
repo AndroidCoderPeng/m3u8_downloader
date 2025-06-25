@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
+using System.Threading;
 using System.Windows;
 using System.Windows.Forms;
 using m3u8_downloader.Models;
@@ -75,6 +76,8 @@ namespace m3u8_downloader.ViewModels
             }
         }
 
+        private CancellationTokenSource _tokenSource;
+
         public DownloadTaskPageViewModel(IAppDataService dataService, IDialogService dialogService)
         {
             ParseUrlCommand = new DelegateCommand(delegate
@@ -105,6 +108,8 @@ namespace m3u8_downloader.ViewModels
                 DownloadTaskSource.Add(task);
                 IsEmptyImageVisible = Visibility.Collapsed;
                 IsDownloadTaskVisible = Visibility.Visible;
+
+                _tokenSource = new CancellationTokenSource();
 
                 // 解析m3u8片段
                 ParseResourceAsync(task, folder);
@@ -152,6 +157,7 @@ namespace m3u8_downloader.ViewModels
                 var task = _downloadTaskSource.FirstOrDefault(x => x.Url.Equals(url));
                 if (task == null) return;
                 DownloadTaskSource.Remove(task);
+                _tokenSource.Cancel();
                 if (_downloadTaskSource.Any())
                 {
                     IsEmptyImageVisible = Visibility.Collapsed;
@@ -193,7 +199,7 @@ namespace m3u8_downloader.ViewModels
                         task.DownloadedSegments = progress.DownloadedSegments;
                         task.PercentComplete = progress.PercentComplete;
                     }
-                ));
+                ), _tokenSource.Token);
             }
             else
             {
