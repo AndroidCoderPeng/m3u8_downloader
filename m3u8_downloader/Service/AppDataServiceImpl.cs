@@ -11,11 +11,13 @@ namespace m3u8_downloader.Service
         private readonly string _filePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "application.json");
         private readonly Dictionary<string, object> _data = new Dictionary<string, object>();
 
-        public AppDataServiceImpl() {
+        public AppDataServiceImpl()
+        {
             if (File.Exists(_filePath))
             {
                 var json = File.ReadAllText(_filePath);
-                _data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json) ?? new Dictionary<string, object>();
+                _data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json) ??
+                        new Dictionary<string, object>();
             }
         }
 
@@ -40,6 +42,17 @@ namespace m3u8_downloader.Service
         public object GetValue(string key)
         {
             if (string.IsNullOrWhiteSpace(key)) return null;
+
+            if (!File.Exists(_filePath)) return null;
+            var json = File.ReadAllText(_filePath);
+            var newData = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+            if (newData == null) return null;
+            _data.Clear();
+            foreach (var kvp in newData)
+            {
+                _data[kvp.Key] = kvp.Value;
+            }
+
             _data.TryGetValue(key, out var value);
             return value;
         }
