@@ -131,6 +131,7 @@ namespace m3u8_downloader.ViewModels
                     return;
                 }
 
+                MergeProgressValue = 0;
                 var indexedSegments = new ConcurrentDictionary<int, string>();
                 for (var i = 0; i < _resourceSegments.Count; i++)
                 {
