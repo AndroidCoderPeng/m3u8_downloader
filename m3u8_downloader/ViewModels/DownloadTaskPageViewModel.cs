@@ -75,14 +75,17 @@ namespace m3u8_downloader.ViewModels
             }
         }
 
-        private readonly IAppDataService _dataService;
-
         public DownloadTaskPageViewModel(IAppDataService dataService, IDialogService dialogService)
         {
-            _dataService = dataService;
-
             ParseUrlCommand = new DelegateCommand(delegate
             {
+                var folder = dataService.GetValue("VideoFolder") as string;
+                if (string.IsNullOrEmpty(folder))
+                {
+                    MessageBox.Show(@"请先设置资源保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    return;
+                }
+
                 if (_downloadTaskSource.Any(x => x.Url.Equals(_m3u8Url)))
                 {
                     MessageBox.Show(@"该任务已存在", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -104,12 +107,12 @@ namespace m3u8_downloader.ViewModels
                 IsDownloadTaskVisible = Visibility.Visible;
 
                 // 解析m3u8片段
-                ParseResourceAsync(task);
+                ParseResourceAsync(task, folder);
             });
 
             MouseDoubleClickCommand = new DelegateCommand<string>(name =>
             {
-                var folder = _dataService.GetValue("VideoFolder") as string;
+                var folder = dataService.GetValue("VideoFolder") as string;
                 if (string.IsNullOrEmpty(folder))
                 {
                     MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -160,7 +163,7 @@ namespace m3u8_downloader.ViewModels
                     IsDownloadTaskVisible = Visibility.Collapsed;
                 }
 
-                var folder = _dataService.GetValue("VideoFolder") as string;
+                var folder = dataService.GetValue("VideoFolder") as string;
                 if (string.IsNullOrEmpty(folder))
                 {
                     MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -173,15 +176,8 @@ namespace m3u8_downloader.ViewModels
             });
         }
 
-        private async void ParseResourceAsync(DownloadTask task)
+        private async void ParseResourceAsync(DownloadTask task, string folder)
         {
-            var folder = _dataService.GetValue("VideoFolder") as string;
-            if (string.IsNullOrEmpty(folder))
-            {
-                MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            
             var (segments, duration, dictionary) = await _m3u8Url.ParseVideoResourceAsync();
             var durationTime = TimeSpan.FromSeconds(duration).ToString(@"hh\:mm\:ss");
             task.TotalSegments = segments.Count;
