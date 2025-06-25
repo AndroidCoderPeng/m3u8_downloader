@@ -212,8 +212,7 @@ namespace m3u8_downloader.ViewModels
                             task.DownloadedSegments = progress.DownloadedSegments;
                             task.PercentComplete = progress.PercentComplete;
                         }
-                    )
-                );
+                    ), _tokenSource.Token);
             }
 
             var timeSpan = TimeSpan.Parse(task.Duration);

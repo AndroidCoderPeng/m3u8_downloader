@@ -105,8 +105,10 @@ namespace m3u8_downloader.Utils
         /// <param name="iv"></param>
         /// <param name="outputFolder"></param>
         /// <param name="progress"></param>
+        /// <param name="token"></param>
         public static async Task<ConcurrentDictionary<int, string>> DownloadAndDecryptTsSegmentAsync(
-            this List<string> tsUrls, byte[] key, byte[] iv, string outputFolder, IProgress<TaskProgress> progress)
+            this List<string> tsUrls, byte[] key, byte[] iv, string outputFolder, IProgress<TaskProgress> progress,
+            CancellationToken token)
         {
             if (!Directory.Exists(outputFolder)) Directory.CreateDirectory(outputFolder);
 
@@ -119,20 +121,26 @@ namespace m3u8_downloader.Utils
 
             var downloadTasks = tsUrls.Select(async (url, index) =>
             {
+                // 检查是否已取消
+                if (token.IsCancellationRequested) return;
+
                 var fileName = Path.Combine(outputFolder, Path.GetFileName(url).Split('?')[0]); // 去除URL参数
                 var retryCount = 5;
 
                 while (retryCount-- > 0)
                 {
+                    // 再次检查是否取消
+                    if (token.IsCancellationRequested) return;
+
                     try
                     {
-                        var encryptedData = await Client.GetByteArrayAsync(url);
+                        var encryptedData = await Client.GetByteArrayAsync(url, token);
                         var decryptedData = encryptedData.DecryptAesCbc(key, iv);
 
                         using (var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write,
                                    FileShare.None, bufferSize: 4096, useAsync: true))
                         {
-                            await fileStream.WriteAsync(decryptedData, 0, decryptedData.Length);
+                            await fileStream.WriteAsync(decryptedData, 0, decryptedData.Length, token);
                         }
 
                         // 将文件路径和索引存入 ConcurrentDictionary
@@ -151,10 +159,15 @@ namespace m3u8_downloader.Utils
 
                         break;
                     }
+                    catch (OperationCanceledException) when (token.IsCancellationRequested)
+                    {
+                        Console.WriteLine(@"下载已取消");
+                        return;
+                    }
                     catch (Exception ex) when (ex is IOException || ex is HttpRequestException)
                     {
                         Console.WriteLine($@"下载失败 {url}，剩余重试次数：{retryCount}，错误：{ex.Message}");
-                        await Task.Delay(2000);
+                        await Task.Delay(2000, token);
                     }
                 }
             });
