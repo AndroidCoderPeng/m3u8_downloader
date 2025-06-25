@@ -175,18 +175,18 @@ namespace m3u8_downloader.ViewModels
 
         private async void ParseResourceAsync(DownloadTask task)
         {
-            var (segments, duration, dictionary) = await _m3u8Url.ParseVideoResourceAsync();
-            var durationTime = TimeSpan.FromSeconds(duration).ToString(@"hh\:mm\:ss");
-            task.TotalSegments = segments.Count;
-            task.Duration = durationTime;
-            task.TaskState = "下载中";
-
             var folder = _dataService.GetValue("VideoFolder") as string;
             if (string.IsNullOrEmpty(folder))
             {
                 MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
+            
+            var (segments, duration, dictionary) = await _m3u8Url.ParseVideoResourceAsync();
+            var durationTime = TimeSpan.FromSeconds(duration).ToString(@"hh\:mm\:ss");
+            task.TotalSegments = segments.Count;
+            task.Duration = durationTime;
+            task.TaskState = "下载中";
 
             ConcurrentDictionary<int, string> indexedFiles;
             if (!dictionary.Any())
