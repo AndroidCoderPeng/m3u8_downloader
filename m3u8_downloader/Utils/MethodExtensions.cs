@@ -301,6 +301,7 @@ namespace m3u8_downloader.Utils
         /// <param name="folder"></param>
         /// <param name="fileName"></param>
         /// <param name="totalDuration"></param>
+        /// <param name="progress"></param>
         public static async Task MergeTsSegmentsAsync(this ConcurrentDictionary<int, string> indexedFiles,
             string folder, string fileName, double totalDuration, IProgress<double> progress)
         {
