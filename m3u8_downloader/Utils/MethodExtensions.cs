@@ -134,7 +134,22 @@ namespace m3u8_downloader.Utils
 
                     try
                     {
-                        var encryptedData = await Client.GetByteArrayAsync(url, token);
+                        var response = await Client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, token);
+                        response.EnsureSuccessStatusCode();
+                        byte[] encryptedData;
+                        using (var stream = await response.Content.ReadAsStreamAsync())
+                        using (var memoryStream = new MemoryStream())
+                        {
+                            var buffer = new byte[4096];
+                            int bytesRead;
+                            while ((bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length, token)) > 0)
+                            {
+                                await memoryStream.WriteAsync(buffer, 0, bytesRead, token);
+                            }
+
+                            encryptedData = memoryStream.ToArray();
+                        }
+
                         var decryptedData = encryptedData.DecryptAesCbc(key, iv);
 
                         using (var fileStream = new FileStream(fileName, FileMode.Create, FileAccess.Write,
