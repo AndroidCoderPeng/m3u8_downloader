@@ -76,13 +76,15 @@ namespace m3u8_downloader.ViewModels
             }
         }
 
+        private readonly IAppDataService _dataService;
         private CancellationTokenSource _tokenSource;
 
         public DownloadTaskPageViewModel(IAppDataService dataService, IDialogService dialogService)
         {
+            _dataService = dataService;
             ParseUrlCommand = new DelegateCommand(delegate
             {
-                var folder = dataService.GetValue("VideoFolder") as string;
+                var folder = _dataService.GetValue("VideoFolder") as string;
                 if (string.IsNullOrEmpty(folder))
                 {
                     MessageBox.Show(@"请先设置资源保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -117,7 +119,7 @@ namespace m3u8_downloader.ViewModels
 
             MouseDoubleClickCommand = new DelegateCommand<string>(name =>
             {
-                var folder = dataService.GetValue("VideoFolder") as string;
+                var folder = _dataService.GetValue("VideoFolder") as string;
                 if (string.IsNullOrEmpty(folder))
                 {
                     MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -169,16 +171,7 @@ namespace m3u8_downloader.ViewModels
                     IsDownloadTaskVisible = Visibility.Collapsed;
                 }
 
-                var folder = dataService.GetValue("VideoFolder") as string;
-                if (string.IsNullOrEmpty(folder))
-                {
-                    MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    return;
-                }
-
-                var filePath = Path.Combine(folder, $"{task.TaskName}.mp4");
-                if (!File.Exists(filePath)) return;
-                File.Delete(filePath);
+                DeleteTempFile(task.TaskName);
             });
         }
 
@@ -221,6 +214,21 @@ namespace m3u8_downloader.ViewModels
             );
             await folder.DeleteTsSegments();
             task.TaskState = "下载完成";
+        }
+
+        private async void DeleteTempFile(string taskName)
+        {
+            var folder = _dataService.GetValue("VideoFolder") as string;
+            if (string.IsNullOrEmpty(folder))
+            {
+                MessageBox.Show(@"请先设置保存目录", @"提示", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            var filePath = Path.Combine(folder, $"{taskName}.mp4");
+            if (!File.Exists(filePath)) return;
+            File.Delete(filePath);
+            await folder.DeleteTsSegments();
         }
     }
 }
