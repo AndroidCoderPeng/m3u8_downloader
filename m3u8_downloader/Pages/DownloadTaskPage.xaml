@@ -58,6 +58,7 @@
 
             <hc:TextBox
                 Grid.Column="0"
+                hc:InfoElement.Placeholder="请填入M3U8资源地址"
                 hc:InfoElement.ShowClearButton="True"
                 Text="{Binding M3U8Url}" />
 

@@ -112,11 +112,22 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <TextBlock
-                                Grid.Row="0"
-                                FontSize="16"
-                                Text="{Binding VideoName}"
-                                TextWrapping="Wrap" />
+                            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                                <TextBlock
+                                    FontSize="16"
+                                    Text="{Binding VideoName}"
+                                    TextWrapping="Wrap" />
+
+                                <Button
+                                    Margin="10,0,0,0"
+                                    VerticalAlignment="Top"
+                                    BorderThickness="0"
+                                    Command="{Binding DataContext.EditTaskCommand, ElementName=VideoListBox}"
+                                    CommandParameter="{Binding}"
+                                    Content="重命名"
+                                    FontSize="11"
+                                    Style="{StaticResource ButtonPrimary.Small}" />
+                            </StackPanel>
 
                             <TextBlock
                                 Grid.Row="1"

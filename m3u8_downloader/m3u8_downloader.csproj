@@ -107,8 +107,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="Dialogs\EditTaskNameDialog.xaml.cs">
-      <DependentUpon>EditTaskNameDialog.xaml</DependentUpon>
+    <Compile Include="Dialogs\EditFileNameDialog.xaml.cs">
+      <DependentUpon>EditFileNameDialog.xaml</DependentUpon>
     </Compile>
     <Compile Include="Events\UpdateVideoResourceEvent.cs" />
     <Compile Include="Models\SegmentFile.cs" />
@@ -136,7 +136,7 @@
     <Compile Include="Utils\SegmentManager.cs" />
     <Compile Include="Utils\VideoManager.cs" />
     <Compile Include="ViewModels\DownloadTaskPageViewModel.cs" />
-    <Compile Include="ViewModels\EditTaskNameDialogViewModel.cs" />
+    <Compile Include="ViewModels\EditFileNameDialogViewModel.cs" />
     <Compile Include="ViewModels\FinishedTaskPageViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
     <Compile Include="ViewModels\MergeSegmentPageViewModel.cs" />
@@ -171,7 +171,7 @@
   <ItemGroup>
     <Page Include="Colors\ApplicationBrushes.xaml" />
     <Page Include="Colors\ApplicationColor.xaml" />
-    <Page Include="Dialogs\EditTaskNameDialog.xaml" />
+    <Page Include="Dialogs\EditFileNameDialog.xaml" />
     <Page Include="Pages\AboutSoftwarePage.xaml">
       <SubType>Designer</SubType>
     </Page>

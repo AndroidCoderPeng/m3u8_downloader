@@ -2,9 +2,9 @@
 
 namespace m3u8_downloader.Dialogs
 {
-    public partial class EditTaskNameDialog : UserControl
+    public partial class EditFileNameDialog : UserControl
     {
-        public EditTaskNameDialog()
+        public EditFileNameDialog()
         {
             InitializeComponent();
         }

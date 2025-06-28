@@ -5,34 +5,34 @@ using Prism.Services.Dialogs;
 
 namespace m3u8_downloader.ViewModels
 {
-    public class EditTaskNameDialogViewModel : BindableBase, IDialogAware
+    public class EditFileNameDialogViewModel : BindableBase, IDialogAware
     {
-        public string Title => "修改下载任务标题";
+        public string Title => "修改下载文件标题";
 
         public event Action<IDialogResult> RequestClose;
 
-        private string _taskName = string.Empty;
+        private string _fileName = string.Empty;
 
-        public string TaskName
+        public string FileName
         {
             set
             {
-                _taskName = value;
+                _fileName = value;
                 RaisePropertyChanged();
             }
-            get => _taskName;
+            get => _fileName;
         }
 
         public DelegateCommand DialogUpdateCommand { set; get; }
         public DelegateCommand DialogCancelCommand { set; get; }
 
-        public EditTaskNameDialogViewModel()
+        public EditFileNameDialogViewModel()
         {
             DialogUpdateCommand = new DelegateCommand(delegate
             {
                 var dialogParameters = new DialogParameters
                 {
-                    { "TaskName", _taskName }
+                    { "FileName", _fileName }
                 };
                 RequestClose?.Invoke(new DialogResult(ButtonResult.OK, dialogParameters));
             });
@@ -54,7 +54,7 @@ namespace m3u8_downloader.ViewModels
 
         public void OnDialogOpened(IDialogParameters parameters)
         {
-            TaskName = parameters.GetValue<string>("TaskName");
+            FileName = parameters.GetValue<string>("FileName");
         }
     }
 }

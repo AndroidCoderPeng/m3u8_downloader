@@ -1,8 +1,9 @@
 ﻿using System;
+using Prism.Mvvm;
 
 namespace m3u8_downloader.Models
 {
-    public class VideoFile
+    public class VideoFile : BindableBase
     {
         /// <summary>
         /// 封面
@@ -12,7 +13,13 @@ namespace m3u8_downloader.Models
         /// <summary>
         /// 视频名
         /// </summary>
-        public string VideoName { set; get; }
+        private string _videoName;
+
+        public string VideoName
+        {
+            get => _videoName;
+            set => SetProperty(ref _videoName, value);
+        }
 
         /// <summary>
         /// 文件路径

@@ -11,6 +11,7 @@ using m3u8_downloader.Views;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Mvvm;
+using Prism.Services.Dialogs;
 
 namespace m3u8_downloader.ViewModels
 {
@@ -65,9 +66,10 @@ namespace m3u8_downloader.ViewModels
         }
 
         public DelegateCommand<string> MouseDoubleClickCommand { set; get; }
+        public DelegateCommand<VideoFile> EditTaskCommand { set; get; }
         public DelegateCommand<string> DeleteTaskCommand { set; get; }
 
-        public FinishedTaskPageViewModel(IEventAggregator eventAggregator)
+        public FinishedTaskPageViewModel(IEventAggregator eventAggregator, IDialogService dialogService)
         {
             eventAggregator.GetEvent<UpdateVideoResourceEvent>().Subscribe(LoadVideosAsync);
 
@@ -75,6 +77,20 @@ namespace m3u8_downloader.ViewModels
             {
                 if (!File.Exists(filePath)) return;
                 new PlayVideoWindow(filePath) { Owner = Application.Current.MainWindow }.ShowDialog();
+            });
+
+            EditTaskCommand = new DelegateCommand<VideoFile>(file =>
+            {
+                var dialogParameters = new DialogParameters
+                {
+                    { "FileName", file.VideoName }
+                };
+                dialogService.ShowDialog("EditFileNameDialog", dialogParameters, delegate(IDialogResult result)
+                {
+                    if (result.Result != ButtonResult.OK) return;
+                    file.VideoName = result.Parameters.GetValue<string>("FileName");
+                    // TODO 修改文件名
+                });
             });
 
             DeleteTaskCommand = new DelegateCommand<string>(filePath =>
