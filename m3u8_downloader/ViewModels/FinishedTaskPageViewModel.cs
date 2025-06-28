@@ -89,7 +89,13 @@ namespace m3u8_downloader.ViewModels
                 {
                     if (result.Result != ButtonResult.OK) return;
                     file.VideoName = result.Parameters.GetValue<string>("FileName");
-                    // TODO 修改文件名
+                    // 修改文件名
+                    var oldFilePath = file.FilePath;
+                    var directory = Path.GetDirectoryName(oldFilePath);
+                    if (directory == null) return;
+                    var newFilePath = Path.Combine(directory, file.VideoName);
+                    File.Move(oldFilePath, newFilePath);
+                    file.FilePath = newFilePath;
                 });
             });
 

@@ -24,7 +24,13 @@ namespace m3u8_downloader.Models
         /// <summary>
         /// 文件路径
         /// </summary>
-        public string FilePath { set; get; }
+        private string _filePath;
+
+        public string FilePath
+        {
+            get => _filePath;
+            set => SetProperty(ref _filePath, value);
+        }
 
         /// <summary>
         /// 分辨率
