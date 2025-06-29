@@ -112,13 +112,20 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
 
-                            <StackPanel Grid.Row="0" Orientation="Horizontal">
+                            <Grid Grid.Row="0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
                                 <TextBlock
+                                    Grid.Column="0"
                                     FontSize="16"
                                     Text="{Binding VideoName}"
                                     TextWrapping="Wrap" />
 
                                 <Button
+                                    Grid.Column="1"
                                     Margin="10,0,0,0"
                                     VerticalAlignment="Top"
                                     BorderThickness="0"
@@ -127,7 +134,7 @@
                                     Content="重命名"
                                     FontSize="11"
                                     Style="{StaticResource ButtonPrimary.Small}" />
-                            </StackPanel>
+                            </Grid>
 
                             <TextBlock
                                 Grid.Row="1"
