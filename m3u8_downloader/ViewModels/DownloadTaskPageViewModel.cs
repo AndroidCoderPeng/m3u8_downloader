@@ -28,8 +28,9 @@ namespace m3u8_downloader.ViewModels
 
         // private string _m3u8Url = "https://t30.cdn2020.com/video/m3u8/2025/06/20/be401fc5/index.m3u8";
         // private string _m3u8Url = "https://vip5.lbb2025.com/20250618/11qELL1u/2000kb/hls/index.m3u8";
-        // private string _m3u8Url = "https://hls.qzkj.tech/videos5/5e7eefaa1bbf114dc2ce51399d437890/5e7eefaa1bbf114dc2ce51399d437890.m3u8?auth_key=1751084600-685f6e386a0bc-0-0ed441b561788ab194c54f5778ac694d&v=3&time=0";
-        private string _m3u8Url = string.Empty;
+        private string _m3u8Url =
+            "https://hls.qzkj.tech/videos5/5e7eefaa1bbf114dc2ce51399d437890/5e7eefaa1bbf114dc2ce51399d437890.m3u8?auth_key=1751084600-685f6e386a0bc-0-0ed441b561788ab194c54f5778ac694d&v=3&time=0";
+        // private string _m3u8Url = string.Empty;
 
         public string M3U8Url
         {
