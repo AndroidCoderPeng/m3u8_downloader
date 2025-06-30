@@ -13,6 +13,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
   String? _saveFileType;
   bool _isSwitchEnabled = true;
   String? _retryTimesValue;
+  bool _isSwitchOn = true;
 
   List<DropdownMenuItem<String>>? getFileTypeDropdowntems() {
     return ['ts', 'mp4']
@@ -38,14 +39,23 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
       setState(() {
         _saveFileType = prefs.getString("save_file_type");
         _retryTimesValue = prefs.getString("retry_times_value");
+        String? autoEncodeValue = prefs.getString('auto_encode');
+        if (autoEncodeValue == null || autoEncodeValue == '1') {
+          _isSwitchOn = true;
+        } else {
+          _isSwitchOn = false;
+        }
       });
     });
   }
 
-  bool _isSwitchOn = false;
-
   void onSwitchChanged(bool value) {
     setState(() {
+      if (value) {
+        prefs.setString('auto_encode', '1');
+      } else {
+        prefs.setString('auto_encode', '0');
+      }
       _isSwitchOn = value;
     });
   }
@@ -81,7 +91,17 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
                   onChanged: (String? newValue) {
                     if (newValue == null) return;
                     prefs.setString('save_file_type', newValue);
-                    _isSwitchEnabled = _saveFileType == 'mp4';
+                    if (newValue == 'mp4') {
+                      _isSwitchEnabled = true;
+                      setState(() {
+                        _isSwitchOn = true;
+                      });
+                    } else {
+                      _isSwitchEnabled = false;
+                      setState(() {
+                        _isSwitchOn = false;
+                      });
+                    }
                     setState(() {
                       _saveFileType = newValue;
                     });

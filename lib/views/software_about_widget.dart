@@ -27,9 +27,27 @@ class _SoftwareAboutWidgetState extends State<SoftwareAboutWidget> {
           ),
           child: Column(
             children: [
+              Expanded(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        children: [
+                          Image.asset('images/application.png'),
+                          Text(
+                            '软件名称：M3U8 Downloader',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          Text('软件版本：v1.0.0.0', style: TextStyle(fontSize: 16)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               Text(
-                '关于',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                'Copyright © CoderPeng 2025 All rights reserved.',
+                style: TextStyle(fontSize: 16),
               ),
             ],
           ),
