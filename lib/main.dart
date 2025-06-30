@@ -24,6 +24,7 @@ Future<void> initDesktopWindow() async {
     size: const Size(800, 600),
     center: true,
     skipTaskbar: false,
+    alwaysOnTop: true,
   );
 
   await windowManager.waitUntilReadyToShow(windowOptions, () async {

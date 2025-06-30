@@ -1,6 +1,7 @@
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:m3u8_downloader/utils/fogger.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SoftwareSettingWidget extends StatefulWidget {
   const SoftwareSettingWidget({super.key});
@@ -10,23 +11,11 @@ class SoftwareSettingWidget extends StatefulWidget {
 }
 
 class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
-  void selectOutputDirectory() async {
-    // 选择输出目录
-    try {
-      String? directoryPath = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: '选择保存目录',
-        lockParentWindow: true,
-      );
-
-      if (directoryPath != null) {
-        Fogger.d('选择的目录: $directoryPath');
-      }
-    } catch (e) {
-      Fogger.d('选择目录时出错: $e');
-    }
-  }
-
-  String? _selectedFileTypeValue = 'mp4';
+  late SharedPreferences prefs;
+  String? _selectedFolderPath;
+  String? _saveFileType;
+  bool _isSwitchEnabled = true;
+  String? _retryTimesValue;
 
   List<DropdownMenuItem<String>>? getFileTypeDropdowntems() {
     return ['ts', 'mp4']
@@ -36,8 +25,6 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
         .toList();
   }
 
-  String? _selectedRetryTimesValue = '5';
-
   List<DropdownMenuItem<String>>? getRetryTimesDropdownItems() {
     return ['3', '4', '5', '6', '7', '8', '9', '10']
         .map(
@@ -46,9 +33,40 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
         .toList();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    Future.microtask(() async {
+      prefs = await SharedPreferences.getInstance();
+      setState(() {
+        _selectedFolderPath = prefs.getString("selected_folder_path");
+        _saveFileType = prefs.getString("save_file_type");
+        _retryTimesValue = prefs.getString("retry_times_value");
+      });
+    });
+  }
+
+  void selectOutputDirectory() async {
+    // 选择输出目录
+    try {
+      String? directoryPath = await FilePicker.platform.getDirectoryPath(
+        dialogTitle: '选择保存目录',
+        lockParentWindow: true,
+      );
+
+      if (directoryPath == null) return;
+      prefs.setString('selected_folder_path', directoryPath);
+      setState(() {
+        _selectedFolderPath = directoryPath;
+      });
+    } catch (e) {
+      Fogger.d('选择目录时出错: $e');
+    }
+  }
+
   bool _isSwitchOn = false;
 
-  void onSwitchChanged(BuildContext context, bool value) {
+  void onSwitchChanged(bool value) {
     setState(() {
       _isSwitchOn = value;
     });
@@ -76,12 +94,29 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
               ),
             ),
 
-            Divider(height: 20, color: Colors.grey[100]),
+            createDivider(),
 
             ListTile(
               iconColor: Colors.amberAccent,
               leading: Icon(Icons.folder),
-              title: Text('保存目录', style: TextStyle(fontSize: 16)),
+              title: Container(
+                alignment: Alignment.topLeft,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: Text('保存目录', style: TextStyle(fontSize: 16)),
+                    ),
+                    SizedBox(
+                      width: double.infinity,
+                      child: Text(
+                        _selectedFolderPath ?? '未选择',
+                        style: TextStyle(fontSize: 12),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               trailing: ElevatedButton(
                 onPressed: selectOutputDirectory,
                 style: ElevatedButton.styleFrom(
@@ -98,7 +133,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
               ),
             ),
 
-            Divider(height: 20, color: Colors.grey[100]),
+            createDivider(),
 
             ListTile(
               iconColor: Colors.blue,
@@ -106,18 +141,22 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
               title: Text('保存格式', style: TextStyle(fontSize: 16)),
               trailing: DropdownButton(
                 alignment: Alignment.center,
-                value: _selectedFileTypeValue,
+                value: _saveFileType ?? 'mp4',
                 hint: const Text('请选择'),
+                underline: Container(height: 2, color: Colors.grey[300]),
                 onChanged: (String? newValue) {
+                  if (newValue == null) return;
+                  prefs.setString('save_file_type', newValue);
+                  _isSwitchEnabled = _saveFileType == 'mp4';
                   setState(() {
-                    _selectedFileTypeValue = newValue;
+                    _saveFileType = newValue;
                   });
                 },
                 items: getFileTypeDropdowntems(),
               ),
             ),
 
-            Divider(height: 20, color: Colors.grey[100]),
+            createDivider(),
 
             ListTile(
               iconColor: Colors.green,
@@ -125,22 +164,24 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
               title: Text('下载重试次数', style: TextStyle(fontSize: 16)),
               trailing: DropdownButton(
                 alignment: Alignment.center,
-                value: _selectedRetryTimesValue,
+                value: _retryTimesValue ?? '5',
                 hint: const Text('请选择'),
+                underline: Container(height: 2, color: Colors.grey[300]),
                 onChanged: (String? newValue) {
+                  if (newValue == null) return;
+                  prefs.setString('retry_times_value', newValue);
                   setState(() {
-                    _selectedRetryTimesValue = newValue;
-                    Fogger.d('重试次数：$_selectedRetryTimesValue');
+                    _retryTimesValue = newValue;
                   });
                 },
                 items: getRetryTimesDropdownItems(),
               ),
             ),
 
-            Divider(height: 20, color: Colors.grey[100]),
+            createDivider(),
 
             ListTile(
-              iconColor: Colors.red,
+              iconColor: Colors.purple,
               leading: Icon(Icons.change_circle),
               title: Text('自动转码', style: TextStyle(fontSize: 16)),
               trailing: Transform.scale(
@@ -151,13 +192,25 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
                   activeColor: Colors.green,
                   inactiveTrackColor: Colors.grey[300],
                   thumbColor: WidgetStatePropertyAll(Colors.white),
-                  onChanged: (value) => onSwitchChanged(context, value),
+                  onChanged:
+                      _isSwitchEnabled
+                          ? (value) => onSwitchChanged(value)
+                          : null,
                 ),
               ),
             ),
           ],
         ),
       ),
+    );
+  }
+
+  Widget createDivider() {
+    return Divider(
+      height: 20,
+      indent: 15,
+      endIndent: 15,
+      color: Colors.grey[100],
     );
   }
 }
