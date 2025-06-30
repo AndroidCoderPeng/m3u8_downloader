@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:m3u8_downloader/views/phone/download_finished_widget.dart';
+import 'package:m3u8_downloader/views/phone/download_segment_widget.dart';
+import 'package:m3u8_downloader/views/phone/software_setting_widget.dart';
+import 'package:m3u8_downloader/views/software_about_widget.dart';
 
 class MobilePlatformWidget extends StatelessWidget {
   const MobilePlatformWidget({super.key});
@@ -38,9 +42,10 @@ class _ApplicationHomePageState extends State<ApplicationHomePage> {
   int _selectedIndex = 0;
 
   static const List<Widget> _pages = [
-    Center(child: Text('下载中')),
-    Center(child: Text('已下载')),
-    Center(child: Text('关于')),
+    DownloadSegmentWidget(),
+    DownloadFinishedWidget(),
+    SoftwareSettingWidget(),
+    SoftwareAboutWidget(),
   ];
 
   void _onItemTapped(int index) {
@@ -61,6 +66,7 @@ class _ApplicationHomePageState extends State<ApplicationHomePage> {
             icon: Icon(Icons.download_done),
             label: '已下载',
           ),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: '设置'),
           BottomNavigationBarItem(icon: Icon(Icons.info), label: '关于'),
         ],
         currentIndex: _selectedIndex,
