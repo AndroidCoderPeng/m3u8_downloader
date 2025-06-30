@@ -35,10 +35,20 @@ class _SoftwareAboutWidgetState extends State<SoftwareAboutWidget> {
                         children: [
                           Image.asset('images/application.png'),
                           Text(
-                            '软件名称：M3U8 Downloader',
-                            style: TextStyle(fontSize: 16),
+                            'M3U8资源下载器',
+                            style: TextStyle(
+                              fontSize: 36,
+                              fontWeight: FontWeight.bold,
+                              color: LinearGradient(colors: []),
+                            ),
                           ),
-                          Text('软件版本：v1.0.0.0', style: TextStyle(fontSize: 16)),
+                          Text(
+                            '软件版本：v1.0.0.0',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
                         ],
                       ),
                     ),
