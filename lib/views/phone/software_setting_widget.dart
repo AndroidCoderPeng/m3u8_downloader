@@ -1,6 +1,4 @@
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
-import 'package:m3u8_downloader/utils/fogger.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SoftwareSettingWidget extends StatefulWidget {
@@ -74,7 +72,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
               ListTile(
                 iconColor: Colors.blue,
                 leading: Icon(Icons.movie),
-                title: Text('保存格式', style: TextStyle(fontSize: 16)),
+                title: Text('资源保存格式', style: TextStyle(fontSize: 16)),
                 trailing: DropdownButton(
                   alignment: Alignment.center,
                   value: _saveFileType ?? 'mp4',

@@ -138,7 +138,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
             ListTile(
               iconColor: Colors.blue,
               leading: Icon(Icons.movie),
-              title: Text('保存格式', style: TextStyle(fontSize: 16)),
+              title: Text('资源保存格式', style: TextStyle(fontSize: 16)),
               trailing: DropdownButton(
                 alignment: Alignment.center,
                 value: _saveFileType ?? 'mp4',
