@@ -44,7 +44,6 @@ class _DownloadFinishedWidgetState extends State<DownloadFinishedWidget> {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.grey[100],
-      //纵向布局，不是常规理解的列，其实是行
       child: Container(
         width: double.infinity,
         height: double.infinity,

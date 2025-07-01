@@ -67,7 +67,6 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
       appBar: AppBar(title: Text('软件设置', style: TextStyle(fontSize: 18))),
       body: Container(
         color: Colors.grey[100],
-        //纵向布局，不是常规理解的列，其实是行
         child: Container(
           width: double.infinity,
           height: double.infinity,
