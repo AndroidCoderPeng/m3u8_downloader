@@ -20,44 +20,42 @@ class _SoftwareAboutWidgetState extends State<SoftwareAboutWidget> {
           width: double.infinity,
           height: double.infinity,
           margin: EdgeInsets.all(10),
-          padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(5),
           ),
           child: Column(
             children: [
+              ListTile(
+                title: Text(
+                  '关于',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+
+              Divider(
+                height: 20,
+                indent: 15,
+                endIndent: 15,
+                color: Colors.grey[100],
+              ),
+
               Expanded(
-                child: Row(
+                child: Column(
                   children: [
-                    Expanded(
-                      child: Column(
-                        children: [
-                          Image.asset('images/application.png'),
-                          Text(
-                            'M3U8资源下载器',
-                            style: TextStyle(
-                              fontSize: 36,
-                              fontWeight: FontWeight.bold,
-                              color: LinearGradient(colors: []),
-                            ),
-                          ),
-                          Text(
-                            '软件版本：v1.0.0.0',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    Image.asset('images/application.png'),
+                    renderGradientText('M3U8资源下载器', 36),
+                    renderGradientText('软件版本：v1.0.0.0', 20),
                   ],
                 ),
               ),
-              Text(
-                'Copyright © CoderPeng 2025 All rights reserved.',
-                style: TextStyle(fontSize: 16),
+
+              Container(
+                padding: EdgeInsets.all(10),
+                child: Text(
+                  'Copyright © CoderPeng 2025 All rights reserved.',
+                  style: TextStyle(fontSize: 16),
+                ),
               ),
             ],
           ),
@@ -85,5 +83,22 @@ class _SoftwareAboutWidgetState extends State<SoftwareAboutWidget> {
         ),
       );
     }
+  }
+
+  Widget renderGradientText(String text, double fontSize) {
+    return ShaderMask(
+      shaderCallback: (Rect rect) {
+        return LinearGradient(
+          colors: [Colors.blue, Colors.purple],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ).createShader(rect);
+      },
+      blendMode: BlendMode.srcIn,
+      child: Text(
+        text,
+        style: TextStyle(fontSize: fontSize, fontWeight: FontWeight.bold),
+      ),
+    );
   }
 }
