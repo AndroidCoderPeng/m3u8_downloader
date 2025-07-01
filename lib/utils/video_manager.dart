@@ -130,7 +130,12 @@ class VideoManager {
     }
 
     // 3. 实时获取（使用ffmpeg）
-    final videoFile = await _fetchVideoFile(videoPath);
+    VideoFile? videoFile;
+    if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
+      videoFile = await _fetchVideoFileOnPhone(videoPath);
+    } else {
+      videoFile = await _fetchVideoFileOnDesktop(videoPath);
+    }
     if (videoFile != null) {
       _memoryCache[videoPath] = videoFile;
       await _saveToDiskCache(videoFile);
@@ -187,7 +192,7 @@ class VideoManager {
   }
 
   // 使用ffmpeg实时获取视频信息
-  static Future<VideoFile?> _fetchVideoFile(String videoPath) async {
+  static Future<VideoFile?> _fetchVideoFileOnDesktop(String videoPath) async {
     try {
       final file = File(videoPath);
       if (!await file.exists()) return null;
@@ -199,28 +204,8 @@ class VideoManager {
         return null;
       }
 
-      String? output = await _executeFFmpegCommand([
-        '-i',
-        videoPath,
-        '-f',
-        'null',
-        '-',
-      ]);
-
-      String resolution = '未知';
-      String duration = '未知';
-
-      final resolutionRegExp = RegExp(r'(\d+)x(\d+)');
-      final resolutionMatch = resolutionRegExp.firstMatch(output ?? '');
-      if (resolutionMatch != null) {
-        resolution = '${resolutionMatch.group(1)}x${resolutionMatch.group(2)}';
-      }
-
-      final durationRegExp = RegExp(r'Duration: (\d+:\d+:\d+)');
-      final durationMatch = durationRegExp.firstMatch(output ?? '');
-      if (durationMatch != null) {
-        duration = durationMatch.group(1) ?? '未知';
-      }
+      String resolution = await _getVideoResolution(videoPath) ?? '未知';
+      String duration = await _getMediaDuration(videoPath) ?? '未知';
 
       String? coverImagePath;
       try {
@@ -252,25 +237,111 @@ class VideoManager {
     }
   }
 
+  static Future<String?> _getVideoResolution(String videoPath) async {
+    final result = await Process.run('ffprobe', [
+      '-v',
+      'error',
+      '-select_streams',
+      'v:0',
+      '-show_entries',
+      'stream=width,height',
+      '-of',
+      'csv=s=x:p=0',
+      videoPath,
+    ]);
+  }
+
+  static Future<String?> _getMediaDuration(String videoPath) async {
+    final result = await Process.run('ffprobe', [
+      '-v',
+      'error',
+      '-show_entries',
+      'stream=duration',
+      '-of',
+      'default=noprint_wrappers=1:nokey=1',
+      videoPath,
+    ]);
+    String? session = result.stdout;
+    if (session == null) return null;
+    final lines = session.split('\n');
+    double? totalSeconds = 0;
+    for (final line in lines) {
+      totalSeconds = double.tryParse(line.trim());
+      if (totalSeconds != null) {
+        break;
+      }
+    }
+    final durationObj = Duration(seconds: totalSeconds!.round());
+    final hours = durationObj.inHours;
+    final minutes = durationObj.inMinutes.remainder(60);
+    final seconds = durationObj.inSeconds.remainder(60);
+    if (hours > 0) {
+      return '${hours.toString().padLeft(2, '0')}:'
+          '${minutes.toString().padLeft(2, '0')}:'
+          '${seconds.toString().padLeft(2, '0')}';
+    } else {
+      return '${minutes.toString().padLeft(2, '0')}:'
+          '${seconds.toString().padLeft(2, '0')}';
+    }
+  }
+
+  // TODO 使用ffmpegKit实时获取视频信息
+  static Future<VideoFile?> _fetchVideoFileOnPhone(String videoPath) async {
+    try {
+      final file = File(videoPath);
+      if (!await file.exists()) return null;
+
+      final stat = await file.stat();
+      final extension = path.extension(videoPath).toLowerCase();
+
+      if (!['.mp4'].contains(extension)) {
+        return null;
+      }
+
+      String resolution = '未知';
+      String duration = '未知';
+
+      String? coverImagePath;
+      try {
+        final tempDir = await Directory.systemTemp.createTemp();
+        coverImagePath = await VideoThumbnail.thumbnailFile(
+          video: videoPath,
+          thumbnailPath: tempDir.path,
+          imageFormat: ImageFormat.PNG,
+          maxHeight: 240,
+          quality: 75,
+        );
+        await tempDir.delete(recursive: true);
+      } catch (e) {
+        Fogger.d('生成缩略图失败: $e');
+      }
+
+      return VideoFile(
+        coverImage: coverImagePath ?? '',
+        videoName: path.basename(videoPath),
+        filePath: videoPath,
+        resolution: resolution,
+        videoSize: _formatFileSize(stat.size),
+        duration: duration,
+        lastModified: stat.modified,
+      );
+    } catch (e) {
+      Fogger.d('获取视频信息失败: $e');
+      return null;
+    }
+  }
+
+  // TODO 使用ffmpegKit实时获取视频信息
   static Future<String?> _executeFFmpegCommand(List<String> arguments) async {
     try {
-      if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
-        // 移动平台使用插件
-        final session = await FFmpegKit.executeAsync(arguments.join(' '));
-        final returnCode = await session.getReturnCode();
-        if (returnCode != null && ReturnCode.isSuccess(returnCode)) {
-          return await session.getOutput();
-        } else {
-          final failStackTrace = await session.getFailStackTrace();
-          throw Exception('FFmpeg执行失败: $failStackTrace');
-        }
+      // 移动平台使用插件
+      final session = await FFmpegKit.executeAsync(arguments.join(' '));
+      final returnCode = await session.getReturnCode();
+      if (returnCode != null && ReturnCode.isSuccess(returnCode)) {
+        return await session.getOutput();
       } else {
-        // Windows/Linux/直接调用系统命令
-        final result = await Process.run('ffmpeg', arguments);
-        if (result.exitCode != 0) {
-          throw Exception('FFmpeg执行失败: ${result.stderr}');
-        }
-        return result.stdout;
+        final failStackTrace = await session.getFailStackTrace();
+        throw Exception('FFmpeg执行失败: $failStackTrace');
       }
     } catch (e) {
       Fogger.d('执行FFmpeg命令失败: $e');
