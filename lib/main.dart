@@ -1,9 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:m3u8_downloader/utils/video_manager.dart';
+import 'package:m3u8_downloader/utils/desktop_video_manager.dart';
 import 'package:m3u8_downloader/views/computer_platform_widget.dart';
 import 'package:m3u8_downloader/views/mobile_platform_widget.dart';
 import 'package:window_manager/window_manager.dart';
-import 'dart:io';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -46,7 +47,7 @@ class CrossPlatformApp extends StatelessWidget {
   // 根据平台返回对应组件
   Widget _getPlatformWidget() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-      VideoManager.initialize();
+      DesktopVideoManager.initialize();
       return const ComputerPlatformWidget();
     } else {
       return const MobilePlatformWidget();

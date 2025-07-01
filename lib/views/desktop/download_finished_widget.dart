@@ -1,8 +1,9 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:m3u8_downloader/models/video_file.dart';
+import 'package:m3u8_downloader/utils/desktop_video_manager.dart';
 import 'package:m3u8_downloader/utils/fogger.dart';
-import 'package:m3u8_downloader/utils/video_manager.dart';
 import 'package:m3u8_downloader/views/divider_widget.dart';
 import 'package:m3u8_downloader/views/download_finished_item_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,7 +33,9 @@ class _DownloadFinishedWidgetState extends State<DownloadFinishedWidget> {
               .map((e) => e.path)
               .toList();
 
-      List<VideoFile> videos = await VideoManager.getVideoFilesAsync(result);
+      List<VideoFile> videos = await DesktopVideoManager.getVideoFilesAsync(
+        result,
+      );
 
       setState(() {
         downloadFiles = videos;

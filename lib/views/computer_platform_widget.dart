@@ -11,7 +11,8 @@ class ComputerPlatformWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       theme: ThemeData(
-        primarySwatch: Colors.blue, // 设置主色调
+        primarySwatch: Colors.blue,
+        // 设置主色调
         colorScheme: ColorScheme.fromSwatch(
           primarySwatch: Colors.blue, // 主色调
           accentColor: Colors.green, // 强调色 (Flutter 2.x 之前的 accentColor)
