@@ -206,24 +206,10 @@ class VideoManager {
 
       String resolution = await _getVideoResolution(videoPath) ?? '未知';
       String duration = await _getMediaDuration(videoPath) ?? '未知';
-
-      String? coverImagePath;
-      try {
-        final tempDir = await Directory.systemTemp.createTemp();
-        coverImagePath = await VideoThumbnail.thumbnailFile(
-          video: videoPath,
-          thumbnailPath: tempDir.path,
-          imageFormat: ImageFormat.PNG,
-          maxHeight: 240,
-          quality: 75,
-        );
-        await tempDir.delete(recursive: true);
-      } catch (e) {
-        Fogger.d('生成缩略图失败: $e');
-      }
+      String imagePath = await _generateCoverImage(videoPath) ?? '';
 
       return VideoFile(
-        coverImage: coverImagePath ?? '',
+        coverImage: imagePath,
         videoName: path.basename(videoPath),
         filePath: videoPath,
         resolution: resolution,
@@ -293,6 +279,21 @@ class VideoManager {
       return '${minutes.toString().padLeft(2, '0')}:'
           '${seconds.toString().padLeft(2, '0')}';
     }
+  }
+
+  static Future<String?> _generateCoverImage(String videoPath) async {
+    final fileName = path.basenameWithoutExtension(videoPath);
+    final imagePath = path.join(_cacheDirectory!, '$fileName.jpg');
+    await Process.run('ffmpeg', [
+      '-i',
+      videoPath,
+      '-ss',
+      '00:00:01.000',
+      '-vframes',
+      '1',
+      imagePath,
+    ]);
+    return imagePath;
   }
 
   // TODO 使用ffmpegKit实时获取视频信息
