@@ -1,6 +1,11 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:m3u8_downloader/utils/file_util.dart';
 import 'package:m3u8_downloader/utils/fogger.dart';
 import 'package:m3u8_downloader/views/divider_widget.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SoftwareSettingWidget extends StatefulWidget {
@@ -16,6 +21,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
   bool _isSwitchEnabled = true;
   String? _retryTimesValue;
   bool _isSwitchOn = true;
+  String _cacheSize = '0.00 MB';
 
   List<DropdownMenuItem<String>>? _getFileTypeDropdownItems() {
     return ['ts', 'mp4']
@@ -50,6 +56,25 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
           _isSwitchOn = false;
         });
       }
+
+      // final directory = await getApplicationDocumentsDirectory();
+      final cacheDir = Directory(path.join(directory.path, 'VideoCache'));
+      if (!cacheDir.existsSync()) {
+        setState(() {
+          _cacheSize = '0.00 MB';
+        });
+      } else {
+        int totalSize = 0;
+        await for (var entity in cacheDir.list()) {
+          if (entity is File) {
+            var stat = await entity.stat();
+            totalSize += stat.size;
+          }
+        }
+        setState(() {
+          _cacheSize = FileUtil.formatFileSize(totalSize);
+        });
+      }
     });
   }
 
@@ -64,25 +89,44 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
     });
   }
 
-  void _clearCache() {
-    showDialog(
+  void _clearCache() async {
+    // final directory = await getApplicationDocumentsDirectory();
+    final cacheDir = Directory(path.join(directory.path, 'VideoCache'));
+
+    if (!cacheDir.existsSync()) {
+      Fogger.d('缓存目录不存在');
+      return;
+    }
+
+    if (!mounted) return;
+
+    final bool? isConfirmed = await showDialog<bool>(
       context: context,
       builder:
           (context) => AlertDialog(
-            title: Text('提示'),
-            content: Text('确定清除缓存吗？'),
+            title: const Text('提示'),
+            content: const Text('确定清除缓存吗？'),
             actions: [
               TextButton(
                 onPressed: Navigator.of(context).pop,
-                child: Text('取消'),
+                child: const Text('取消'),
               ),
               TextButton(
-                onPressed: () => {Fogger.d('_clearCache')},
-                child: Text('确定'),
+                onPressed: () => Navigator.of(context).pop(true),
+                child: const Text('确定'),
               ),
             ],
           ),
     );
+
+    if (isConfirmed == true) {
+      await cacheDir.delete(recursive: true);
+      if (mounted) {
+        setState(() {
+          _cacheSize = '0.00 MB';
+        });
+      }
+    }
   }
 
   @override
@@ -192,6 +236,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
                     child: Text('清除缓存', style: TextStyle(fontSize: 16)),
                   ),
                 ),
+                trailing: Text(_cacheSize, style: TextStyle(fontSize: 16)),
                 onTap: _clearCache,
               ),
             ],
