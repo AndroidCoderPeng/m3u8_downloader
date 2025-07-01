@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:m3u8_downloader/utils/fogger.dart';
 import 'package:m3u8_downloader/views/divider_widget.dart';
 import 'package:m3u8_downloader/views/download_finished_item_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -64,8 +65,14 @@ class _DownloadFinishedWidgetState extends State<DownloadFinishedWidget> {
               physics: NeverScrollableScrollPhysics(),
               itemCount: downloadFiles.length,
               itemBuilder: (context, index) {
-                return DownloadFinishedItemWidget(
-                  filePath: downloadFiles[index],
+                final file = downloadFiles[index];
+                return Material(
+                  child: InkWell(
+                    onTap: () {
+                      Fogger.d('点击了第 $index 项');
+                    },
+                    child: DownloadFinishedItemWidget(filePath: file),
+                  ),
                 );
               },
             ),
