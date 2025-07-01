@@ -75,10 +75,26 @@ class _SoftwareAboutWidgetState extends State<SoftwareAboutWidget> {
               color: Colors.white,
               borderRadius: BorderRadius.circular(5),
             ),
-            child: Column(children: [
-              
-            ],
-          ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Column(
+                    children: [
+                      Image.asset('images/application.png'),
+                      renderGradientText('M3U8资源下载器', 30),
+                      renderGradientText('软件版本：v1.0.0.0', 18),
+                    ],
+                  ),
+                ),
+
+                Container(
+                  padding: EdgeInsets.all(5),
+                  child: Text(
+                    'Copyright © CoderPeng 2025 All rights reserved.',
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       );
