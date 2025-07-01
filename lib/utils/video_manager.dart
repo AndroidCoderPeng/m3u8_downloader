@@ -21,8 +21,13 @@ class VideoManager {
   // 初始化方法 - 新增
   static Future<void> initialize() async {
     try {
-      // 初始化FFmpegKit
-      await _initializeFFmpegKit();
+      if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
+        // 初始化FFmpeg
+        await _initializeFFmpeg();
+      } else {
+        // 使用ffmpge编译好了的工具
+        await _checkSystemFFmpeg();
+      }
 
       // 初始化缓存目录
       await _initCacheDirectory();
@@ -32,7 +37,48 @@ class VideoManager {
     }
   }
 
-  static Future<void> _initializeFFmpegKit() async {}
+  static Future<void> _initializeFFmpeg() async {
+    try {
+      // 设置日志回调
+      FFmpegKitConfig.enableLogCallback((Log log) {
+        if (log.getLevel() <= Level.avLogWarning) {
+          Fogger.d('FFmpeg日志[${log.getLevel()}]: ${log.getMessage()}');
+        }
+      });
+
+      // 设置统计回调（可选）
+      FFmpegKitConfig.enableStatisticsCallback((Statistics statistics) {
+        // 处理进度统计
+      });
+
+      // 设置日志级别
+      await FFmpegKitConfig.setLogLevel(Level.avLogWarning);
+
+      // 测试FFmpeg是否正常工作
+      final session = await FFmpegKit.execute('-version');
+      final returnCode = await session.getReturnCode();
+      if (returnCode == null || !ReturnCode.isSuccess(returnCode)) {
+        final failStackTrace = await session.getFailStackTrace();
+        throw Exception('FFmpeg版本检查失败: $failStackTrace');
+      }
+      Fogger.d('FFmpeg初始化成功，版本: ${await session.getOutput()}');
+    } catch (e) {
+      Fogger.d('FFmpeg初始化失败: $e');
+      rethrow;
+    }
+  }
+
+  static Future<void> _checkSystemFFmpeg() async {
+    try {
+      final result = await Process.run('ffmpeg', ['-version']);
+      if (result.exitCode != 0) {
+        throw Exception('未找到系统FFmpeg: ${result.stderr}');
+      }
+    } catch (e) {
+      Fogger.d('检查系统FFmpeg失败: $e');
+      rethrow;
+    }
+  }
 
   static Future<void> _initCacheDirectory() async {
     try {
@@ -153,30 +199,27 @@ class VideoManager {
         return null;
       }
 
+      String? output = await _executeFFmpegCommand([
+        '-i',
+        videoPath,
+        '-f',
+        'null',
+        '-',
+      ]);
+
       String resolution = '未知';
       String duration = '未知';
 
-      // 使用ffmpeg_kit_flutter_new获取元数据
-      final session = await FFmpegKit.executeAsync('-i "$videoPath"');
-      final returnCode = await session.getReturnCode();
+      final resolutionRegExp = RegExp(r'(\d+)x(\d+)');
+      final resolutionMatch = resolutionRegExp.firstMatch(output ?? '');
+      if (resolutionMatch != null) {
+        resolution = '${resolutionMatch.group(1)}x${resolutionMatch.group(2)}';
+      }
 
-      if (returnCode != null && ReturnCode.isSuccess(returnCode)) {
-        final output = await session.getOutput();
-
-        final resolutionRegExp = RegExp(r'(\d+)x(\d+)');
-        final resolutionMatch = resolutionRegExp.firstMatch(output ?? '');
-        if (resolutionMatch != null) {
-          resolution =
-              '${resolutionMatch.group(1)}x${resolutionMatch.group(2)}';
-        }
-
-        final durationRegExp = RegExp(r'Duration: (\d+:\d+:\d+)');
-        final durationMatch = durationRegExp.firstMatch(output ?? '');
-        if (durationMatch != null) {
-          duration = durationMatch.group(1) ?? '未知';
-        }
-      } else {
-        Fogger.d('FFmpeg执行失败: ${returnCode?.toString()}');
+      final durationRegExp = RegExp(r'Duration: (\d+:\d+:\d+)');
+      final durationMatch = durationRegExp.firstMatch(output ?? '');
+      if (durationMatch != null) {
+        duration = durationMatch.group(1) ?? '未知';
       }
 
       String? coverImagePath;
@@ -196,7 +239,7 @@ class VideoManager {
 
       return VideoFile(
         coverImage: coverImagePath ?? '',
-        videoName: path.basenameWithoutExtension(videoPath),
+        videoName: path.basename(videoPath),
         filePath: videoPath,
         resolution: resolution,
         videoSize: _formatFileSize(stat.size),
@@ -205,6 +248,32 @@ class VideoManager {
       );
     } catch (e) {
       Fogger.d('获取视频信息失败: $e');
+      return null;
+    }
+  }
+
+  static Future<String?> _executeFFmpegCommand(List<String> arguments) async {
+    try {
+      if (Platform.isAndroid || Platform.isIOS || Platform.isMacOS) {
+        // 移动平台使用插件
+        final session = await FFmpegKit.executeAsync(arguments.join(' '));
+        final returnCode = await session.getReturnCode();
+        if (returnCode != null && ReturnCode.isSuccess(returnCode)) {
+          return await session.getOutput();
+        } else {
+          final failStackTrace = await session.getFailStackTrace();
+          throw Exception('FFmpeg执行失败: $failStackTrace');
+        }
+      } else {
+        // Windows/Linux/直接调用系统命令
+        final result = await Process.run('ffmpeg', arguments);
+        if (result.exitCode != 0) {
+          throw Exception('FFmpeg执行失败: ${result.stderr}');
+        }
+        return result.stdout;
+      }
+    } catch (e) {
+      Fogger.d('执行FFmpeg命令失败: $e');
       return null;
     }
   }

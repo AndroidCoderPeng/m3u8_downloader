@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:m3u8_downloader/models/video_file.dart';
 
@@ -5,6 +7,22 @@ class DownloadFinishedItemWidget extends StatelessWidget {
   const DownloadFinishedItemWidget({super.key, required this.file});
 
   final VideoFile file;
+
+  Widget _renderCoverImage(String? path) {
+    if (path != null && path.isNotEmpty) {
+      return Image.file(
+        File(path),
+        width: 120,
+        height: 85,
+        fit: BoxFit.cover, // 控制图片填充方式
+        errorBuilder: (context, error, stackTrace) {
+          return const Icon(Icons.error);
+        },
+      );
+    } else {
+      return Image.asset('images/application.png');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,14 +39,14 @@ class DownloadFinishedItemWidget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(5),
                   color: Colors.grey[200],
                 ),
-                child: Image.asset('images/application.ico'),
+                child: _renderCoverImage(file.coverImage),
               ),
 
               Positioned(
                 top: 0,
                 left: 3,
                 child: Text(
-                  '1080 x 1920',
+                  file.resolution,
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.white,
@@ -74,8 +92,8 @@ class DownloadFinishedItemWidget extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('60.20 MB', style: TextStyle(fontSize: 12)),
-                        Text('00:01:09', style: TextStyle(fontSize: 12)),
+                        Text(file.videoSize, style: TextStyle(fontSize: 12)),
+                        Text(file.duration, style: TextStyle(fontSize: 12)),
                       ],
                     ),
                   ),
