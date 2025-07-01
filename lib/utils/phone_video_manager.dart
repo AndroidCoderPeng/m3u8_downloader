@@ -1,17 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit_config.dart';
-import 'package:ffmpeg_kit_flutter_new/level.dart';
-import 'package:ffmpeg_kit_flutter_new/log.dart';
-import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:m3u8_downloader/models/video_file.dart';
 import 'package:m3u8_downloader/utils/file_util.dart';
 import 'package:m3u8_downloader/utils/fogger.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
-import 'package:video_thumbnail/video_thumbnail.dart';
 
 class PhoneVideoManager {
   // 内存缓存
@@ -33,31 +27,7 @@ class PhoneVideoManager {
     }
   }
 
-  static Future<void> _initializeFFmpeg() async {
-    try {
-      // 设置日志回调
-      FFmpegKitConfig.enableLogCallback((Log log) {
-        if (log.getLevel() <= Level.avLogWarning) {
-          Fogger.d('FFmpeg日志[${log.getLevel()}]: ${log.getMessage()}');
-        }
-      });
-
-      // 设置日志级别
-      await FFmpegKitConfig.setLogLevel(Level.avLogWarning);
-
-      // 测试FFmpeg是否正常工作
-      final session = await FFmpegKit.execute('-version');
-      final returnCode = await session.getReturnCode();
-      if (returnCode == null || !ReturnCode.isSuccess(returnCode)) {
-        final failStackTrace = await session.getFailStackTrace();
-        throw Exception('FFmpeg版本检查失败: $failStackTrace');
-      }
-      Fogger.d('FFmpeg初始化成功，版本: ${await session.getOutput()}');
-    } catch (e) {
-      Fogger.d('FFmpeg初始化失败: $e');
-      rethrow;
-    }
-  }
+  static Future<void> _initializeFFmpeg() async {}
 
   static Future<void> _initCacheDirectory() async {
     try {
@@ -270,7 +240,6 @@ class PhoneVideoManager {
     return imagePath;
   }
 
-  // TODO 使用ffmpegKit实时获取视频信息
   static Future<VideoFile?> _fetchVideoFileOnPhone(String videoPath) async {
     try {
       final file = File(videoPath);
@@ -285,24 +254,10 @@ class PhoneVideoManager {
 
       String resolution = '未知';
       String duration = '未知';
-
-      String? coverImagePath;
-      try {
-        final tempDir = await Directory.systemTemp.createTemp();
-        coverImagePath = await VideoThumbnail.thumbnailFile(
-          video: videoPath,
-          thumbnailPath: tempDir.path,
-          imageFormat: ImageFormat.PNG,
-          maxHeight: 240,
-          quality: 75,
-        );
-        await tempDir.delete(recursive: true);
-      } catch (e) {
-        Fogger.d('生成缩略图失败: $e');
-      }
+      String coverImagePath = '未知';
 
       return VideoFile(
-        coverImage: coverImagePath ?? '',
+        coverImage: coverImagePath,
         videoName: path.basename(videoPath),
         filePath: videoPath,
         resolution: resolution,
@@ -316,19 +271,8 @@ class PhoneVideoManager {
     }
   }
 
-  // TODO 使用ffmpegKit实时获取视频信息
   static Future<String?> _executeFFmpegCommand(List<String> arguments) async {
-    try {
-      // 移动平台使用插件
-      final session = await FFmpegKit.executeAsync(arguments.join(' '));
-      final returnCode = await session.getReturnCode();
-      if (returnCode != null && ReturnCode.isSuccess(returnCode)) {
-        return await session.getOutput();
-      } else {
-        final failStackTrace = await session.getFailStackTrace();
-        throw Exception('FFmpeg执行失败: $failStackTrace');
-      }
-    } catch (e) {
+    try {} catch (e) {
       Fogger.d('执行FFmpeg命令失败: $e');
       return null;
     }
