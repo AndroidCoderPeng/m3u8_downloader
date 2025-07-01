@@ -1,17 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:m3u8_downloader/models/video_file.dart';
 
-class DownloadFinishedItemWidget extends StatefulWidget {
-  final String filePath;
+class DownloadFinishedItemWidget extends StatelessWidget {
+  const DownloadFinishedItemWidget({super.key, required this.file});
 
-  const DownloadFinishedItemWidget({super.key, required this.filePath});
+  final VideoFile file;
 
-  @override
-  State<DownloadFinishedItemWidget> createState() =>
-      _DownloadFinishedItemWidgetState();
-}
-
-class _DownloadFinishedItemWidgetState
-    extends State<DownloadFinishedItemWidget> {
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -62,7 +56,7 @@ class _DownloadFinishedItemWidgetState
                     left: 0,
                     right: 0,
                     child: Text(
-                      widget.filePath,
+                      file.videoName,
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,

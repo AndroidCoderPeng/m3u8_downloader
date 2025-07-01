@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:m3u8_downloader/models/video_file.dart';
 import 'package:m3u8_downloader/utils/fogger.dart';
 import 'package:m3u8_downloader/views/divider_widget.dart';
 import 'package:m3u8_downloader/views/download_finished_item_widget.dart';
@@ -14,7 +15,7 @@ class DownloadFinishedWidget extends StatefulWidget {
 
 class _DownloadFinishedWidgetState extends State<DownloadFinishedWidget> {
   late SharedPreferences prefs;
-  List<String> downloadFiles = [];
+  List<VideoFile> downloadFiles = [];
 
   @override
   void initState() {
@@ -23,16 +24,29 @@ class _DownloadFinishedWidgetState extends State<DownloadFinishedWidget> {
       prefs = await SharedPreferences.getInstance();
       String? selectedFolderPath = prefs.getString("selected_folder_path");
       if (selectedFolderPath == null) return;
+      // 获取指定目录下的所有mp4文件
       List<String> result =
           Directory(selectedFolderPath)
               .listSync()
               .where((element) => element.path.endsWith(".mp4"))
               .map((e) => e.path)
               .toList();
+
+      // 异步获取视频信息
+      List<VideoFile> videos = await getVideoFilesAsync(result);
+
       setState(() {
-        downloadFiles = result;
+        downloadFiles = videos;
       });
     });
+  }
+
+  Future<List<VideoFile>> getVideoFilesAsync(List<String> videoPaths) async {
+    List<VideoFile> videos = [];
+    for (String videoPath in videoPaths) {
+      File video = File(videoPath);
+    }
+    return videos;
   }
 
   @override
@@ -71,7 +85,7 @@ class _DownloadFinishedWidgetState extends State<DownloadFinishedWidget> {
                     onTap: () {
                       Fogger.d('点击了第 $index 项');
                     },
-                    child: DownloadFinishedItemWidget(filePath: file),
+                    child: DownloadFinishedItemWidget(file: file),
                   ),
                 );
               },
