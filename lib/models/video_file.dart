@@ -30,4 +30,31 @@ class VideoFile {
     required this.duration,
     required this.lastModified,
   });
+
+  // 从JSON反序列化
+  factory VideoFile.fromJson(Map<String, dynamic> json) {
+    return VideoFile(
+      coverImage: json['coverImage'] ?? '',
+      videoName: json['videoName'] ?? '',
+      filePath: json['filePath'] ?? '',
+      resolution: json['resolution'] ?? '',
+      videoSize: json['videoSize'] ?? '',
+      duration: json['duration'] ?? '',
+      lastModified:
+          DateTime.tryParse(json['lastModified'] ?? '') ?? DateTime.now(),
+    );
+  }
+
+  // 序列化为JSON
+  Map<String, dynamic> toJson() {
+    return {
+      'coverImage': coverImage,
+      'videoName': videoName,
+      'filePath': filePath,
+      'resolution': resolution,
+      'videoSize': videoSize,
+      'duration': duration,
+      'lastModified': lastModified.toIso8601String(),
+    };
+  }
 }

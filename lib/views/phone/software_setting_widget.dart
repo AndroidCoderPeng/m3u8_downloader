@@ -16,7 +16,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
   String? _retryTimesValue;
   bool _isSwitchOn = true;
 
-  List<DropdownMenuItem<String>>? getFileTypeDropdowntems() {
+  List<DropdownMenuItem<String>>? _getFileTypeDropdowntems() {
     return ['ts', 'mp4']
         .map(
           (String value) => DropdownMenuItem(value: value, child: Text(value)),
@@ -24,7 +24,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
         .toList();
   }
 
-  List<DropdownMenuItem<String>>? getRetryTimesDropdownItems() {
+  List<DropdownMenuItem<String>>? _getRetryTimesDropdownItems() {
     return ['3', '4', '5', '6', '7', '8', '9', '10']
         .map(
           (String value) => DropdownMenuItem(value: value, child: Text(value)),
@@ -50,7 +50,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
     });
   }
 
-  void onSwitchChanged(bool value) {
+  void _onSwitchChanged(bool value) {
     setState(() {
       if (value) {
         prefs.setString('auto_encode', '1');
@@ -107,7 +107,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
                       _saveFileType = newValue;
                     });
                   },
-                  items: getFileTypeDropdowntems(),
+                  items: _getFileTypeDropdowntems(),
                 ),
               ),
 
@@ -129,7 +129,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
                       _retryTimesValue = newValue;
                     });
                   },
-                  items: getRetryTimesDropdownItems(),
+                  items: _getRetryTimesDropdownItems(),
                 ),
               ),
 
@@ -151,7 +151,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
                     thumbColor: WidgetStatePropertyAll(Colors.white),
                     onChanged:
                         _isSwitchEnabled
-                            ? (value) => onSwitchChanged(value)
+                            ? (value) => _onSwitchChanged(value)
                             : null,
                   ),
                 ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:m3u8_downloader/utils/video_manager.dart';
 import 'package:m3u8_downloader/views/computer_platform_widget.dart';
 import 'package:m3u8_downloader/views/mobile_platform_widget.dart';
 import 'package:window_manager/window_manager.dart';
@@ -9,14 +10,14 @@ void main() async {
 
   // 初始化窗口管理（仅桌面平台需要）
   if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
-    await initDesktopWindow();
+    await _initDesktopWindow();
   }
 
   runApp(const CrossPlatformApp());
 }
 
 // 桌面窗口初始化方法
-Future<void> initDesktopWindow() async {
+Future<void> _initDesktopWindow() async {
   await windowManager.ensureInitialized();
 
   WindowOptions windowOptions = WindowOptions(
@@ -39,12 +40,13 @@ class CrossPlatformApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(title: 'M3U8资源下载器', home: getPlatformWidget());
+    return MaterialApp(title: 'M3U8资源下载器', home: _getPlatformWidget());
   }
 
   // 根据平台返回对应组件
-  Widget getPlatformWidget() {
+  Widget _getPlatformWidget() {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
+      VideoManager.initialize();
       return const ComputerPlatformWidget();
     } else {
       return const MobilePlatformWidget();

@@ -44,8 +44,8 @@ class _SoftwareAboutWidgetState extends State<SoftwareAboutWidget> {
                 child: Column(
                   children: [
                     Image.asset('images/application.png'),
-                    renderGradientText('M3U8资源下载器', 36),
-                    renderGradientText('软件版本：v1.0.0.0', 20),
+                    _renderGradientText('M3U8资源下载器', 36),
+                    _renderGradientText('软件版本：v1.0.0.0', 20),
                   ],
                 ),
               ),
@@ -81,8 +81,8 @@ class _SoftwareAboutWidgetState extends State<SoftwareAboutWidget> {
                   child: Column(
                     children: [
                       Image.asset('images/application.png'),
-                      renderGradientText('M3U8资源下载器', 30),
-                      renderGradientText('软件版本：v1.0.0.0', 18),
+                      _renderGradientText('M3U8资源下载器', 30),
+                      _renderGradientText('软件版本：v1.0.0.0', 18),
                     ],
                   ),
                 ),
@@ -101,7 +101,7 @@ class _SoftwareAboutWidgetState extends State<SoftwareAboutWidget> {
     }
   }
 
-  Widget renderGradientText(String text, double fontSize) {
+  Widget _renderGradientText(String text, double fontSize) {
     return ShaderMask(
       shaderCallback: (Rect rect) {
         return LinearGradient(
