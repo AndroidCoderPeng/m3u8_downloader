@@ -58,23 +58,23 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
       }
 
       // final directory = await getApplicationDocumentsDirectory();
-      final cacheDir = Directory(path.join(directory.path, 'VideoCache'));
-      if (!cacheDir.existsSync()) {
-        setState(() {
-          _cacheSize = '0.00 MB';
-        });
-      } else {
-        int totalSize = 0;
-        await for (var entity in cacheDir.list()) {
-          if (entity is File) {
-            var stat = await entity.stat();
-            totalSize += stat.size;
-          }
-        }
-        setState(() {
-          _cacheSize = FileUtil.formatFileSize(totalSize);
-        });
-      }
+      // final cacheDir = Directory(path.join(directory.path, 'VideoCache'));
+      // if (!cacheDir.existsSync()) {
+      //   setState(() {
+      //     _cacheSize = '0.00 MB';
+      //   });
+      // } else {
+      //   int totalSize = 0;
+      //   await for (var entity in cacheDir.list()) {
+      //     if (entity is File) {
+      //       var stat = await entity.stat();
+      //       totalSize += stat.size;
+      //     }
+      //   }
+      //   setState(() {
+      //     _cacheSize = FileUtil.formatFileSize(totalSize);
+      //   });
+      // }
     });
   }
 
@@ -91,42 +91,42 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
 
   void _clearCache() async {
     // final directory = await getApplicationDocumentsDirectory();
-    final cacheDir = Directory(path.join(directory.path, 'VideoCache'));
+    // final cacheDir = Directory(path.join(directory.path, 'VideoCache'));
 
-    if (!cacheDir.existsSync()) {
-      Fogger.d('缓存目录不存在');
-      return;
-    }
+    // if (!cacheDir.existsSync()) {
+    //   Fogger.d('缓存目录不存在');
+    //   return;
+    // }
 
-    if (!mounted) return;
+    // if (!mounted) return;
 
-    final bool? isConfirmed = await showDialog<bool>(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('提示'),
-            content: const Text('确定清除缓存吗？'),
-            actions: [
-              TextButton(
-                onPressed: Navigator.of(context).pop,
-                child: const Text('取消'),
-              ),
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(true),
-                child: const Text('确定'),
-              ),
-            ],
-          ),
-    );
+    // final bool? isConfirmed = await showDialog<bool>(
+    //   context: context,
+    //   builder:
+    //       (context) => AlertDialog(
+    //         title: const Text('提示'),
+    //         content: const Text('确定清除缓存吗？'),
+    //         actions: [
+    //           TextButton(
+    //             onPressed: Navigator.of(context).pop,
+    //             child: const Text('取消'),
+    //           ),
+    //           TextButton(
+    //             onPressed: () => Navigator.of(context).pop(true),
+    //             child: const Text('确定'),
+    //           ),
+    //         ],
+    //       ),
+    // );
 
-    if (isConfirmed == true) {
-      await cacheDir.delete(recursive: true);
-      if (mounted) {
-        setState(() {
-          _cacheSize = '0.00 MB';
-        });
-      }
-    }
+    // if (isConfirmed == true) {
+    //   await cacheDir.delete(recursive: true);
+    //   if (mounted) {
+    //     setState(() {
+    //       _cacheSize = '0.00 MB';
+    //     });
+    //   }
+    // }
   }
 
   @override
