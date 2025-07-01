@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:m3u8_downloader/views/divider_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SoftwareSettingWidget extends StatefulWidget {
@@ -110,7 +111,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
                 ),
               ),
 
-              createDivider(),
+              DividerWidget(),
 
               ListTile(
                 iconColor: Colors.green,
@@ -132,7 +133,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
                 ),
               ),
 
-              createDivider(),
+              DividerWidget(),
 
               ListTile(
                 iconColor: Colors.purple,
@@ -159,15 +160,6 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget createDivider() {
-    return Divider(
-      height: 20,
-      indent: 15,
-      endIndent: 15,
-      color: Colors.grey[100],
     );
   }
 }
