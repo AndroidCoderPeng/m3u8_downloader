@@ -14,7 +14,7 @@ class DesktopVideoManager {
   // 硬盘缓存目录
   static String? _cacheDirectory;
 
-  // 初始化方法 - 新增
+  // 初始化
   static Future<void> initialize() async {
     try {
       await _checkSystemFFmpeg();
@@ -22,7 +22,7 @@ class DesktopVideoManager {
       // 初始化缓存目录
       await _initCacheDirectory();
     } catch (e) {
-      Fogger.d('VideoManager初始化失败: $e');
+      Fogger.d('初始化失败: $e');
       rethrow;
     }
   }

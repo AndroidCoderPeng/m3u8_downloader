@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:m3u8_downloader/utils/desktop_video_manager.dart';
+import 'package:m3u8_downloader/utils/phone_video_manager.dart';
 import 'package:m3u8_downloader/views/computer_platform_widget.dart';
 import 'package:m3u8_downloader/views/mobile_platform_widget.dart';
 import 'package:window_manager/window_manager.dart';
@@ -50,6 +51,7 @@ class CrossPlatformApp extends StatelessWidget {
       DesktopVideoManager.initialize();
       return const ComputerPlatformWidget();
     } else {
+      PhoneVideoManager.initialize();
       return const MobilePlatformWidget();
     }
   }
