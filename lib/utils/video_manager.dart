@@ -249,6 +249,16 @@ class VideoManager {
       'csv=s=x:p=0',
       videoPath,
     ]);
+    String? session = result.stdout;
+    if (session == null) return null;
+    final lines = session.split('\n');
+    for (final line in lines) {
+      if (line.isNotEmpty) {
+        final resolution = line.split('x');
+        return '${resolution[0]}x${resolution[1]}';
+      }
+    }
+    return null;
   }
 
   static Future<String?> _getMediaDuration(String videoPath) async {
