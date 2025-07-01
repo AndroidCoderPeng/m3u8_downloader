@@ -15,7 +15,6 @@ class _SoftwareAboutWidgetState extends State<SoftwareAboutWidget> {
     if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       return Container(
         color: Colors.grey[100],
-        //纵向布局，不是常规理解的列，其实是行
         child: Container(
           width: double.infinity,
           height: double.infinity,
@@ -91,6 +90,7 @@ class _SoftwareAboutWidgetState extends State<SoftwareAboutWidget> {
                   padding: EdgeInsets.all(5),
                   child: Text(
                     'Copyright © CoderPeng 2025 All rights reserved.',
+                    style: TextStyle(fontSize: 13),
                   ),
                 ),
               ],

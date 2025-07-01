@@ -1,7 +1,12 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:m3u8_downloader/utils/file_util.dart';
 import 'package:m3u8_downloader/utils/fogger.dart';
 import 'package:m3u8_downloader/views/divider_widget.dart';
+import 'package:path/path.dart' as path;
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SoftwareSettingWidget extends StatefulWidget {
@@ -18,8 +23,9 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
   bool _isSwitchEnabled = true;
   String? _retryTimesValue;
   bool _isSwitchOn = true;
+  String _cacheSize = '0 MB';
 
-  List<DropdownMenuItem<String>>? _getFileTypeDropdowntems() {
+  List<DropdownMenuItem<String>>? _getFileTypeDropdownItems() {
     return ['ts', 'mp4']
         .map(
           (String value) => DropdownMenuItem(value: value, child: Text(value)),
@@ -40,17 +46,32 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
     super.initState();
     Future.microtask(() async {
       prefs = await SharedPreferences.getInstance();
-      setState(() {
-        _selectedFolderPath = prefs.getString("selected_folder_path");
-        _saveFileType = prefs.getString("save_file_type");
-        _retryTimesValue = prefs.getString("retry_times_value");
-        String? autoEncodeValue = prefs.getString('auto_encode');
-        if (autoEncodeValue == null || autoEncodeValue == '1') {
+      _selectedFolderPath = prefs.getString("selected_folder_path");
+      _saveFileType = prefs.getString("save_file_type");
+      _retryTimesValue = prefs.getString("retry_times_value");
+      String? autoEncodeValue = prefs.getString('auto_encode');
+      if (autoEncodeValue == null || autoEncodeValue == '1') {
+        setState(() {
           _isSwitchOn = true;
-        } else {
+        });
+      } else {
+        setState(() {
           _isSwitchOn = false;
-        }
-      });
+        });
+      }
+
+      final directory = await getApplicationDocumentsDirectory();
+      final cacheDir = Directory(path.join(directory.path, 'VideoCache'));
+      if (!cacheDir.existsSync()) {
+        setState(() {
+          _cacheSize = '0 MB';
+        });
+      } else {
+        int size = cacheDir.statSync().size;
+        setState(() {
+          _cacheSize = FileUtil.formatFileSize(size);
+        });
+      }
     });
   }
 
@@ -81,6 +102,34 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
       }
       _isSwitchOn = value;
     });
+  }
+
+  void _clearCache() {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Text('提示'),
+            content: Text('确定清除缓存吗？'),
+            actions: [
+              TextButton(
+                onPressed: Navigator.of(context).pop,
+                child: Text('取消'),
+              ),
+              TextButton(
+                onPressed:
+                    () => {
+                      // _cacheDir!.delete(recursive: true).then((_) {
+                      //   setState(() {
+                      //     _cacheSize = '0.00 KB';
+                      //   });
+                      // }),
+                    },
+                child: Text('确定'),
+              ),
+            ],
+          ),
+    );
   }
 
   @override
@@ -172,7 +221,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
                     _saveFileType = newValue;
                   });
                 },
-                items: _getFileTypeDropdowntems(),
+                items: _getFileTypeDropdownItems(),
               ),
             ),
 
@@ -218,6 +267,22 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
                           : null,
                 ),
               ),
+            ),
+
+            DividerWidget(),
+
+            ListTile(
+              iconColor: Colors.red,
+              leading: Icon(Icons.delete),
+              title: Container(
+                alignment: Alignment.topLeft,
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Text('清除缓存', style: TextStyle(fontSize: 16)),
+                ),
+              ),
+              trailing: Text(_cacheSize, style: TextStyle(fontSize: 16)),
+              onTap: _clearCache,
             ),
           ],
         ),

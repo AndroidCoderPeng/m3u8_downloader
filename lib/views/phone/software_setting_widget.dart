@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:m3u8_downloader/utils/fogger.dart';
 import 'package:m3u8_downloader/views/divider_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -16,7 +17,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
   String? _retryTimesValue;
   bool _isSwitchOn = true;
 
-  List<DropdownMenuItem<String>>? _getFileTypeDropdowntems() {
+  List<DropdownMenuItem<String>>? _getFileTypeDropdownItems() {
     return ['ts', 'mp4']
         .map(
           (String value) => DropdownMenuItem(value: value, child: Text(value)),
@@ -37,16 +38,18 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
     super.initState();
     Future.microtask(() async {
       prefs = await SharedPreferences.getInstance();
-      setState(() {
-        _saveFileType = prefs.getString("save_file_type");
-        _retryTimesValue = prefs.getString("retry_times_value");
-        String? autoEncodeValue = prefs.getString('auto_encode');
-        if (autoEncodeValue == null || autoEncodeValue == '1') {
+      _saveFileType = prefs.getString("save_file_type");
+      _retryTimesValue = prefs.getString("retry_times_value");
+      String? autoEncodeValue = prefs.getString('auto_encode');
+      if (autoEncodeValue == null || autoEncodeValue == '1') {
+        setState(() {
           _isSwitchOn = true;
-        } else {
+        });
+      } else {
+        setState(() {
           _isSwitchOn = false;
-        }
-      });
+        });
+      }
     });
   }
 
@@ -59,6 +62,27 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
       }
       _isSwitchOn = value;
     });
+  }
+
+  void _clearCache() {
+    showDialog(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: Text('提示'),
+            content: Text('确定清除缓存吗？'),
+            actions: [
+              TextButton(
+                onPressed: Navigator.of(context).pop,
+                child: Text('取消'),
+              ),
+              TextButton(
+                onPressed: () => {Fogger.d('_clearCache')},
+                child: Text('确定'),
+              ),
+            ],
+          ),
+    );
   }
 
   @override
@@ -106,7 +130,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
                       _saveFileType = newValue;
                     });
                   },
-                  items: _getFileTypeDropdowntems(),
+                  items: _getFileTypeDropdownItems(),
                 ),
               ),
 
@@ -154,6 +178,21 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
                             : null,
                   ),
                 ),
+              ),
+
+              DividerWidget(),
+
+              ListTile(
+                iconColor: Colors.amber,
+                leading: Icon(Icons.delete),
+                title: Container(
+                  alignment: Alignment.topLeft,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Text('清除缓存', style: TextStyle(fontSize: 16)),
+                  ),
+                ),
+                onTap: _clearCache,
               ),
             ],
           ),
