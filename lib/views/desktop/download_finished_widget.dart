@@ -25,7 +25,6 @@ class _DownloadFinishedWidgetState extends State<DownloadFinishedWidget> {
       prefs = await SharedPreferences.getInstance();
       String? selectedFolderPath = prefs.getString("selected_folder_path");
       if (selectedFolderPath == null) return;
-      // 获取指定目录下的所有mp4文件
       List<String> result =
           Directory(selectedFolderPath)
               .listSync()
@@ -33,7 +32,6 @@ class _DownloadFinishedWidgetState extends State<DownloadFinishedWidget> {
               .map((e) => e.path)
               .toList();
 
-      // 异步获取视频信息
       List<VideoFile> videos = await VideoManager.getVideoFilesAsync(result);
 
       setState(() {
@@ -72,13 +70,14 @@ class _DownloadFinishedWidgetState extends State<DownloadFinishedWidget> {
               physics: NeverScrollableScrollPhysics(),
               itemCount: downloadFiles.length,
               itemBuilder: (context, index) {
-                final file = downloadFiles[index];
                 return Material(
                   child: InkWell(
                     onTap: () {
                       Fogger.d('点击了第 $index 项');
                     },
-                    child: DownloadFinishedItemWidget(file: file),
+                    child: DownloadFinishedItemWidget(
+                      file: downloadFiles[index],
+                    ),
                   ),
                 );
               },

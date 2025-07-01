@@ -5,6 +5,7 @@ import 'package:ffmpeg_kit_flutter_new/level.dart';
 import 'package:ffmpeg_kit_flutter_new/log.dart';
 import 'package:ffmpeg_kit_flutter_new/return_code.dart';
 import 'package:ffmpeg_kit_flutter_new/statistics.dart';
+import 'package:m3u8_downloader/utils/file_util.dart';
 import 'package:path/path.dart' as path;
 import 'package:ffmpeg_kit_flutter_new/ffmpeg_kit.dart';
 import 'package:m3u8_downloader/models/video_file.dart';
@@ -149,7 +150,7 @@ class VideoManager {
 
     final cacheFilePath = path.join(
       _cacheDirectory!,
-      '${_getSafeFileName(videoPath)}.cache',
+      '${FileUtil.getSafeFileName(videoPath)}.cache',
     );
 
     final file = File(cacheFilePath);
@@ -180,7 +181,7 @@ class VideoManager {
     try {
       final cacheFilePath = path.join(
         _cacheDirectory!,
-        '${_getSafeFileName(videoFile.filePath)}.cache',
+        '${FileUtil.getSafeFileName(videoFile.filePath)}.cache',
       );
 
       final jsonString = json.encode(videoFile.toJson());
@@ -213,7 +214,7 @@ class VideoManager {
         videoName: path.basename(videoPath),
         filePath: videoPath,
         resolution: resolution,
-        videoSize: _formatFileSize(stat.size),
+        videoSize: FileUtil.formatFileSize(stat.size),
         duration: duration,
         lastModified: stat.modified,
       );
@@ -332,7 +333,7 @@ class VideoManager {
         videoName: path.basename(videoPath),
         filePath: videoPath,
         resolution: resolution,
-        videoSize: _formatFileSize(stat.size),
+        videoSize: FileUtil.formatFileSize(stat.size),
         duration: duration,
         lastModified: stat.modified,
       );
@@ -358,24 +359,5 @@ class VideoManager {
       Fogger.d('执行FFmpeg命令失败: $e');
       return null;
     }
-  }
-
-  // 格式化文件大小
-  static String _formatFileSize(int bytes) {
-    if (bytes < 1024) {
-      return '$bytes B';
-    }
-    if (bytes < 1024 * 1024) {
-      return '${(bytes / 1024).toStringAsFixed(1)} KB';
-    }
-    if (bytes < 1024 * 1024 * 1024) {
-      return '${(bytes / (1024 * 1024)).toStringAsFixed(1)} MB';
-    }
-    return '${(bytes / (1024 * 1024 * 1024)).toStringAsFixed(1)} GB';
-  }
-
-  // 生成安全的文件名
-  static String _getSafeFileName(String filePath) {
-    return filePath.replaceAll(RegExp(r'[\\/:*?"<>|]'), '_');
   }
 }
