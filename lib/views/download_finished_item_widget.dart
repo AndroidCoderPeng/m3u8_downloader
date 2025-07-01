@@ -32,13 +32,8 @@ class DownloadFinishedItemWidget extends StatelessWidget {
         children: [
           Stack(
             children: [
-              Container(
-                width: 120,
-                height: 85,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  color: Colors.grey[200],
-                ),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(5),
                 child: _renderCoverImage(file.coverImage),
               ),
 
