@@ -1,0 +1,221 @@
+﻿<UserControl
+    x:Class="m3u8_downloader.Pages.SoftwareSettingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:hc="https://handyorg.github.io/handycontrol"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="400"
+    d:DesignWidth="600"
+    mc:Ignorable="d">
+    <Border
+        Margin="10"
+        Background="White"
+        CornerRadius="5">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="1" />
+                <RowDefinition />
+            </Grid.RowDefinitions>
+
+            <TextBlock
+                Grid.Row="0"
+                Padding="15"
+                FontSize="18"
+                FontWeight="Bold"
+                Foreground="{DynamicResource AppTextBrush}"
+                Text="软件设置" />
+
+            <Grid
+                Grid.Row="1"
+                Margin="15,0"
+                Background="{DynamicResource AppBorderBrush}" />
+
+            <StackPanel Grid.Row="2" Orientation="Vertical">
+                <Grid Margin="15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Image
+                        Grid.Column="0"
+                        Width="40"
+                        Height="40"
+                        Source="/Images/3.ico" />
+
+                    <StackPanel
+                        Grid.Column="1"
+                        Margin="15,0,0,0"
+                        VerticalAlignment="Center"
+                        Orientation="Vertical">
+                        <TextBlock
+                            FontSize="16"
+                            Foreground="{DynamicResource AppTextBrush}"
+                            Text="保存目录" />
+
+                        <TextBlock
+                            Margin="0,5,0,0"
+                            FontSize="12"
+                            Foreground="{DynamicResource AppTextBrush}"
+                            Text="{Binding SelectedOutputPath}" />
+                    </StackPanel>
+
+                    <Button
+                        Grid.Column="2"
+                        Width="80"
+                        Command="{Binding SelectFolderCommand}"
+                        Content="选择"
+                        Style="{DynamicResource ButtonPrimary}" />
+                </Grid>
+
+                <Grid
+                    Height="1"
+                    Margin="15,0"
+                    Background="{DynamicResource AppBorderBrush}" />
+
+                <Grid Margin="15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Image
+                        Grid.Column="0"
+                        Width="40"
+                        Height="40"
+                        Source="/Images/189.ico" />
+
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="15,0,0,0"
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        Foreground="{DynamicResource AppTextBrush}"
+                        Text="资源保存格式" />
+
+                    <ComboBox
+                        Grid.Column="2"
+                        Width="100"
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        SelectedIndex="1">
+                        <ComboBoxItem Content="*.ts" />
+                        <ComboBoxItem Content="*.mp4" />
+                    </ComboBox>
+                </Grid>
+
+                <Grid
+                    Height="1"
+                    Margin="15,0"
+                    Background="{DynamicResource AppBorderBrush}" />
+
+                <Grid Margin="15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Image
+                        Grid.Column="0"
+                        Width="40"
+                        Height="40"
+                        Source="/Images/5330.ico" />
+
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="15,0,0,0"
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        Foreground="{DynamicResource AppTextBrush}"
+                        Text="下载重试次数" />
+
+                    <ComboBox
+                        Grid.Column="2"
+                        Width="100"
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        SelectedIndex="0">
+                        <ComboBoxItem Content="5" />
+                        <ComboBoxItem Content="6" />
+                        <ComboBoxItem Content="7" />
+                        <ComboBoxItem Content="8" />
+                        <ComboBoxItem Content="9" />
+                        <ComboBoxItem Content="10" />
+                    </ComboBox>
+                </Grid>
+
+                <Grid
+                    Height="1"
+                    Margin="15,0"
+                    Background="{DynamicResource AppBorderBrush}" />
+
+                <Grid Margin="15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Image
+                        Grid.Column="0"
+                        Width="40"
+                        Height="40"
+                        Source="/Images/5357.ico" />
+
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="15,0,0,0"
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        Foreground="{DynamicResource AppTextBrush}"
+                        Text="自动转码" />
+
+                    <ToggleButton
+                        Grid.Column="2"
+                        hc:ToggleButtonAttach.ShowLabel="True"
+                        hc:VisualElement.HighlightBrush="{DynamicResource AppThemeBrush}"
+                        Style="{StaticResource ToggleButtonSwitch}" />
+                </Grid>
+
+                <Grid
+                    Height="1"
+                    Margin="15,0"
+                    Background="{DynamicResource AppBorderBrush}" />
+
+                <Grid Margin="15">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Image
+                        Grid.Column="0"
+                        Width="40"
+                        Height="40"
+                        Source="/Images/55.ico" />
+
+                    <TextBlock
+                        Grid.Column="1"
+                        Margin="15,0,0,0"
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        Foreground="{DynamicResource AppTextBrush}"
+                        Text="清除缓存" />
+
+                    <TextBlock
+                        Grid.Column="2"
+                        VerticalAlignment="Center"
+                        FontSize="16"
+                        Foreground="{DynamicResource AppTextBrush}"
+                        Text="{Binding CacheSize}" />
+                </Grid>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>

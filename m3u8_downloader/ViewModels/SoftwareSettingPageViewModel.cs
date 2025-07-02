@@ -1,7 +1,8 @@
-﻿namespace m3u8_downloader.ViewModels
+﻿using Prism.Mvvm;
+
+namespace m3u8_downloader.ViewModels
 {
-    public class SoftwareSettingPageViewModel
+    public class SoftwareSettingPageViewModel : BindableBase
     {
-        
     }
 }

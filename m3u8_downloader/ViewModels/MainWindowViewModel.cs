@@ -44,7 +44,7 @@ namespace m3u8_downloader.ViewModels
                         region.RequestNavigate("MergeSegmentPage");
                         break;
                     case 3:
-                        // region.RequestNavigate("SoftwareSettingPage");
+                        region.RequestNavigate("SoftwareSettingPage");
                         break;
                     case 4:
                         region.RequestNavigate("AboutSoftwarePage");

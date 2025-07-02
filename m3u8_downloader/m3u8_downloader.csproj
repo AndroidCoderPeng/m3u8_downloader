@@ -128,6 +128,9 @@
     <Compile Include="Pages\FinishedTaskPage.xaml.cs">
       <DependentUpon>FinishedTaskPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Pages\SoftwareSettingPage.xaml.cs">
+      <DependentUpon>SoftwareSettingPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Service\AppDataServiceImpl.cs" />
     <Compile Include="Service\IAppDataService.cs" />
     <Compile Include="Utils\DragAdorner.cs" />
@@ -178,6 +181,7 @@
     <Page Include="Pages\MergeSegmentPage.xaml" />
     <Page Include="Pages\DownloadTaskPage.xaml" />
     <Page Include="Pages\FinishedTaskPage.xaml" />
+    <Page Include="Pages\SoftwareSettingPage.xaml" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -190,6 +194,11 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include=".gitignore" />
+    <Resource Include="Images\5330.ico" />
+    <Resource Include="Images\55.ico" />
+    <Resource Include="Images\5357.ico" />
+    <Resource Include="Images\189.ico" />
+    <Resource Include="Images\3.ico" />
     <Resource Include="Images\empty_image.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
