@@ -23,7 +23,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
   bool _isSwitchEnabled = true;
   String? _retryTimesValue;
   bool _isSwitchOn = true;
-  String _cacheSize = '0.00 MB';
+  String _cacheSize = '0.00 B';
 
   List<DropdownMenuItem<String>>? _getFileTypeDropdownItems() {
     return ['ts', 'mp4']
@@ -64,7 +64,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
       final cacheDir = Directory(path.join(directory.path, 'VideoCache'));
       if (!cacheDir.existsSync()) {
         setState(() {
-          _cacheSize = '0.00 MB';
+          _cacheSize = '0.00 B';
         });
       } else {
         int totalSize = 0;
@@ -144,7 +144,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
       await cacheDir.delete(recursive: true);
       if (mounted) {
         setState(() {
-          _cacheSize = '0.00 MB';
+          _cacheSize = '0.00 B';
         });
       }
     }

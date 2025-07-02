@@ -1,8 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:ffmpeg_kit_flutter/ffmpeg_kit.dart';
-import 'package:ffmpeg_kit_flutter/return_code.dart';
 import 'package:m3u8_downloader/models/video_file.dart';
 import 'package:m3u8_downloader/utils/file_util.dart';
 import 'package:m3u8_downloader/utils/fogger.dart';
@@ -29,16 +27,7 @@ class PhoneVideoManager {
     }
   }
 
-  static Future<void> _initializeFFmpeg() async {
-    final session = await FFmpegKit.execute("-version");
-    final returnCode = await session.getReturnCode();
-
-    if (ReturnCode.isSuccess(returnCode)) {
-      Fogger.d('FFmpeg 初始化成功');
-    } else {
-      Fogger.d('FFmpeg 初始化失败，返回码: $returnCode');
-    }
-  }
+  static Future<void> _initializeFFmpeg() async {}
 
   static Future<void> _initCacheDirectory() async {
     try {
@@ -51,6 +40,9 @@ class PhoneVideoManager {
       if (!await cacheDir.exists()) {
         await cacheDir.create(recursive: true);
       }
+      /**
+       * /data/user/0/com.pengxh.flutter.app.m3u8_downloader/app_flutter/VideoCache
+       */
       Fogger.d('缓存目录已设置为: $_cacheDirectory');
     } catch (e) {
       Fogger.d('初始化缓存目录失败: $e');
