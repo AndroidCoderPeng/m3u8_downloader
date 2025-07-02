@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:m3u8_downloader/utils/file_util.dart';
 import 'package:m3u8_downloader/utils/fogger.dart';
+import 'package:m3u8_downloader/utils/phone_video_manager.dart';
 import 'package:m3u8_downloader/views/divider_widget.dart';
 import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
@@ -120,7 +121,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
     );
 
     if (isConfirmed == true) {
-      await cacheDir.delete(recursive: true);
+      await PhoneVideoManager.clearCache();
       if (mounted) {
         setState(() {
           _cacheSize = '0.00 B';
