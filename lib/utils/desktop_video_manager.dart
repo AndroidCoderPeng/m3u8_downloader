@@ -82,6 +82,10 @@ class DesktopVideoManager {
     return results.whereType<VideoFile>().toList();
   }
 
+  static openFileWithDefault(VideoFile file) {
+    Fogger.d('打开文件: ${file.filePath}');
+  }
+
   // 从多级缓存获取单个视频文件
   static Future<VideoFile?> _getVideoFileWithCache(String videoPath) async {
     // 1. 尝试从内存缓存获取

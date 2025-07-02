@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:m3u8_downloader/models/video_file.dart';
 import 'package:m3u8_downloader/utils/desktop_video_manager.dart';
-import 'package:m3u8_downloader/utils/fogger.dart';
 import 'package:m3u8_downloader/views/divider_widget.dart';
 import 'package:m3u8_downloader/views/download_finished_item_widget.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -63,31 +62,14 @@ class _DownloadFinishedWidgetState extends State<DownloadFinishedWidget> {
             ],
           ),
         ),
-        PopupMenuItem(
-          value: 'edit',
-          child: Row(
-            children: [
-              Icon(Icons.edit, color: Colors.blue),
-              SizedBox(width: 8),
-              Text('重命名'),
-            ],
-          ),
-        ),
       ],
     ).then((value) {
       if (value == null) return;
-      switch (value) {
-        case 'delete':
-          // 删除文件
-          File(downloadFiles[index].filePath).deleteSync();
-          setState(() {
-            downloadFiles.removeAt(index);
-          });
-          break;
-        case 'edit':
-          // 重命名文件
-          break;
-      }
+      // 删除文件
+      File(downloadFiles[index].filePath).deleteSync();
+      setState(() {
+        downloadFiles.removeAt(index);
+      });
     });
   }
 
@@ -151,9 +133,6 @@ class _DownloadFinishedWidgetState extends State<DownloadFinishedWidget> {
                 itemBuilder: (context, index) {
                   return Material(
                     child: InkWell(
-                      onTap: () {
-                        Fogger.d('点击了第 $index 项');
-                      },
                       onSecondaryTapDown: (details) {
                         _showContextMenu(
                           context,

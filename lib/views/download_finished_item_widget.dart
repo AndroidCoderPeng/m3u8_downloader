@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:m3u8_downloader/models/video_file.dart';
+import 'package:m3u8_downloader/utils/desktop_video_manager.dart';
 
 class DownloadFinishedItemWidget extends StatelessWidget {
   const DownloadFinishedItemWidget({super.key, required this.file});
@@ -95,6 +96,12 @@ class DownloadFinishedItemWidget extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+
+          IconButton(
+            color: Colors.blue,
+            icon: Icon(Icons.video_file_outlined),
+            onPressed: () => {DesktopVideoManager.openFileWithDefault(file)},
           ),
         ],
       ),

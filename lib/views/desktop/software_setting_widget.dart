@@ -143,11 +143,9 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
 
     if (isConfirmed == true) {
       await DesktopVideoManager.clearCache();
-      if (mounted) {
-        setState(() {
-          _cacheSize = '0.00 B';
-        });
-      }
+      setState(() {
+        _cacheSize = '0.00 B';
+      });
     }
   }
 
