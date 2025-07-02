@@ -43,50 +43,135 @@ class _DownloadFinishedWidgetState extends State<DownloadFinishedWidget> {
     });
   }
 
+  void _showContextMenu(BuildContext context, int index, Offset tapPosition) {
+    showMenu(
+      context: context,
+      position: RelativeRect.fromLTRB(
+        tapPosition.dx,
+        tapPosition.dy,
+        tapPosition.dx + 100,
+        tapPosition.dy + 100,
+      ),
+      items: [
+        PopupMenuItem(
+          value: 'delete',
+          child: Row(
+            children: [
+              Icon(Icons.delete, color: Colors.red),
+              SizedBox(width: 8),
+              Text('删除'),
+            ],
+          ),
+        ),
+        PopupMenuItem(
+          value: 'edit',
+          child: Row(
+            children: [
+              Icon(Icons.edit, color: Colors.blue),
+              SizedBox(width: 8),
+              Text('重命名'),
+            ],
+          ),
+        ),
+      ],
+    ).then((value) {
+      if (value == null) return;
+      switch (value) {
+        case 'delete':
+          // 删除文件
+          File(downloadFiles[index].filePath).deleteSync();
+          setState(() {
+            downloadFiles.removeAt(index);
+          });
+          break;
+        case 'edit':
+          // 重命名文件
+          break;
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.grey[100],
-      child: Container(
-        width: double.infinity,
-        height: double.infinity,
-        margin: EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(5),
-        ),
-        child: Column(
-          children: [
-            ListTile(
-              title: Text(
-                '已下载',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+    if (downloadFiles.isEmpty) {
+      return Container(
+        color: Colors.grey[100],
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          margin: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Column(
+            children: [
+              ListTile(
+                title: Text(
+                  '已下载',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
               ),
-            ),
 
-            DividerWidget(),
+              DividerWidget(),
 
-            // 已下载列表
-            ListView.builder(
-              shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
-              itemCount: downloadFiles.length,
-              itemBuilder: (context, index) {
-                return Material(
-                  child: InkWell(
-                    onTap: () {
-                      Fogger.d('点击了第 $index 项');
-                    },
-                    child: DownloadFinishedItemWidget(
-                      file: downloadFiles[index],
-                    ),
-                  ),
-                );
-              },
-            ),
-          ],
+              // 已下载列表
+              Expanded(child: Image.asset('images/empty_image.png')),
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Container(
+        color: Colors.grey[100],
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          margin: EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Column(
+            children: [
+              ListTile(
+                title: Text(
+                  '已下载',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+              ),
+
+              DividerWidget(),
+
+              // 已下载列表
+              ListView.builder(
+                shrinkWrap: true,
+                physics: NeverScrollableScrollPhysics(),
+                itemCount: downloadFiles.length,
+                itemBuilder: (context, index) {
+                  return Material(
+                    child: InkWell(
+                      onTap: () {
+                        Fogger.d('点击了第 $index 项');
+                      },
+                      onSecondaryTapDown: (details) {
+                        _showContextMenu(
+                          context,
+                          index,
+                          details.globalPosition,
+                        );
+                      },
+                      child: DownloadFinishedItemWidget(
+                        file: downloadFiles[index],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    }
   }
 }
