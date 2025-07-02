@@ -25,10 +25,11 @@ namespace m3u8_downloader.Service
         {
             return new List<NavigationMenu>
             {
-                new NavigationMenu { Icon = "\ue60c", Title = "下载进行中" },
-                new NavigationMenu { Icon = "\ue652", Title = "下载已完成" },
-                new NavigationMenu { Icon = "\ue676", Title = "自定义合并" },
-                new NavigationMenu { Icon = "\ue646", Title = "关于下载器" }
+                new NavigationMenu { Icon = "\ue60c", Title = "下载中" },
+                new NavigationMenu { Icon = "\ue652", Title = "已完成" },
+                new NavigationMenu { Icon = "\ue676", Title = "合并" },
+                new NavigationMenu { Icon = "\ue6cd", Title = "设置" },
+                new NavigationMenu { Icon = "\ue646", Title = "关于" }
             };
         }
 

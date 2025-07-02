@@ -19,8 +19,8 @@
         o:Freeze="True"
         Color="{DynamicResource AppTextColor}" />
     <LinearGradientBrush x:Key="AppThemeBrush" StartPoint="0,0" EndPoint="1,0">
-        <GradientStop Color="#A2EEA7" Offset="0.0" />
-        <GradientStop Color="#31E9D2" Offset="0.5" />
-        <GradientStop Color="#2CAAD7 " Offset="1.0" />
+        <GradientStop Offset="0.0" Color="#A2EEA7" />
+        <GradientStop Offset="0.5" Color="#31E9D2" />
+        <GradientStop Offset="1.0" Color="#2CAAD7 " />
     </LinearGradientBrush>
 </ResourceDictionary>

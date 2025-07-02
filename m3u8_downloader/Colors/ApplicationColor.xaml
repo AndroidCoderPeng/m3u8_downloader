@@ -1,6 +1,6 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Color x:Key="AppBackgroundColor">#F3F9FE</Color>
+    <Color x:Key="AppBackgroundColor">#F5F5F5</Color>
     <Color x:Key="AppBorderColor">#EEEFF0</Color>
-    <Color x:Key="AppMouseOverColor">#F5F7F9</Color>
+    <Color x:Key="AppMouseOverColor">#3031E9D2</Color>
     <Color x:Key="AppTextColor">#1B1B1B</Color>
 </ResourceDictionary>
