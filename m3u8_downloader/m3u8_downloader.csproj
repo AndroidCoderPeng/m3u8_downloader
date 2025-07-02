@@ -110,6 +110,7 @@
     <Compile Include="Dialogs\EditFileNameDialog.xaml.cs">
       <DependentUpon>EditFileNameDialog.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Events\UpdateCacheSizeEvent.cs" />
     <Compile Include="Events\UpdateVideoResourceEvent.cs" />
     <Compile Include="Models\SegmentFile.cs" />
     <Compile Include="Models\VideoFile.cs" />
