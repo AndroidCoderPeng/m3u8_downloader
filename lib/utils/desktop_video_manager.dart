@@ -11,8 +11,8 @@ class DesktopVideoManager {
   // 内存缓存
   static final Map<String, VideoFile> _memoryCache = {};
 
-  // 硬盘缓存目录
-  static String? _cacheDirectory;
+  // 硬盘缓存路径
+  static String _cacheDirectoryPath = '';
 
   // 初始化
   static Future<void> initialize() async {
@@ -43,17 +43,26 @@ class DesktopVideoManager {
       final directory = await getApplicationDocumentsDirectory();
 
       // 设置缓存目录为工作目录下的cache文件夹
-      _cacheDirectory = path.join(directory.path, 'VideoCache');
-      final cacheDir = Directory(_cacheDirectory!);
-
-      if (!await cacheDir.exists()) {
-        await cacheDir.create(recursive: true);
+      _cacheDirectoryPath = path.join(directory.path, 'VideoCache');
+      final cacheDirectory = Directory(_cacheDirectoryPath);
+      if (!await cacheDirectory.exists()) {
+        await cacheDirectory.create(recursive: true);
       }
-      Fogger.d('缓存目录已设置为: $_cacheDirectory');
+      Fogger.d('缓存目录已设置为: $_cacheDirectoryPath');
     } catch (e) {
       Fogger.d('初始化缓存目录失败: $e');
-      _cacheDirectory = path.join(Directory.systemTemp.path, 'VideoCache');
-      await Directory(_cacheDirectory!).create(recursive: true);
+    }
+  }
+
+  // 先清除缓存，在删除磁盘上的缓存文件
+  static Future<void> clearCache() async {
+    _memoryCache.clear();
+    final cacheDirectory = Directory(_cacheDirectoryPath);
+    if (await cacheDirectory.exists()) {
+      final files = cacheDirectory.listSync();
+      for (final file in files) {
+        await file.delete(); // 只删除文件
+      }
     }
   }
 
@@ -82,7 +91,7 @@ class DesktopVideoManager {
 
     // 2. 尝试从硬盘缓存获取
     final cachedFile = await DiskCacheUtil.loadFromDiskCache(
-      _cacheDirectory,
+      _cacheDirectoryPath,
       videoPath,
     );
     if (cachedFile != null) {
@@ -94,7 +103,7 @@ class DesktopVideoManager {
     VideoFile? videoFile = await _fetchVideoFileOnDesktop(videoPath);
     if (videoFile != null) {
       _memoryCache[videoPath] = videoFile;
-      await DiskCacheUtil.saveToDiskCache(_cacheDirectory, videoFile);
+      await DiskCacheUtil.saveToDiskCache(_cacheDirectoryPath, videoFile);
     }
     return videoFile;
   }
@@ -191,7 +200,7 @@ class DesktopVideoManager {
 
   static Future<String?> _generateCoverImage(String videoPath) async {
     final fileName = path.basenameWithoutExtension(videoPath);
-    final imagePath = path.join(_cacheDirectory!, '$fileName.jpg');
+    final imagePath = path.join(_cacheDirectoryPath, '$fileName.jpg');
     await Process.run('ffmpeg', [
       '-i',
       videoPath,

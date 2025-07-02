@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:m3u8_downloader/utils/desktop_video_manager.dart';
 import 'package:m3u8_downloader/utils/file_util.dart';
 import 'package:m3u8_downloader/utils/fogger.dart';
 import 'package:m3u8_downloader/views/divider_widget.dart';
@@ -141,7 +142,7 @@ class _SoftwareSettingWidgetState extends State<SoftwareSettingWidget> {
     );
 
     if (isConfirmed == true) {
-      await cacheDir.delete(recursive: true);
+      await DesktopVideoManager.clearCache();
       if (mounted) {
         setState(() {
           _cacheSize = '0.00 B';
