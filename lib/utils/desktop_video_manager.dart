@@ -1,7 +1,7 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:m3u8_downloader/models/video_file.dart';
+import 'package:m3u8_downloader/utils/disk_cache_util.dart';
 import 'package:m3u8_downloader/utils/file_util.dart';
 import 'package:m3u8_downloader/utils/fogger.dart';
 import 'package:path/path.dart' as path;
@@ -19,7 +19,6 @@ class DesktopVideoManager {
     try {
       await _checkSystemFFmpeg();
 
-      // 初始化缓存目录
       await _initCacheDirectory();
     } catch (e) {
       Fogger.d('初始化失败: $e');
@@ -82,7 +81,10 @@ class DesktopVideoManager {
     }
 
     // 2. 尝试从硬盘缓存获取
-    final cachedFile = await _loadFromDiskCache(videoPath);
+    final cachedFile = await DiskCacheUtil.loadFromDiskCache(
+      _cacheDirectory,
+      videoPath,
+    );
     if (cachedFile != null) {
       _memoryCache[videoPath] = cachedFile;
       return cachedFile;
@@ -92,57 +94,9 @@ class DesktopVideoManager {
     VideoFile? videoFile = await _fetchVideoFileOnDesktop(videoPath);
     if (videoFile != null) {
       _memoryCache[videoPath] = videoFile;
-      await _saveToDiskCache(videoFile);
+      await DiskCacheUtil.saveToDiskCache(_cacheDirectory, videoFile);
     }
     return videoFile;
-  }
-
-  // 从硬盘加载缓存
-  static Future<VideoFile?> _loadFromDiskCache(String videoPath) async {
-    if (_cacheDirectory == null) return null;
-
-    final cacheFilePath = path.join(
-      _cacheDirectory!,
-      '${FileUtil.getSafeFileName(videoPath)}.cache',
-    );
-
-    final file = File(cacheFilePath);
-    if (!await file.exists()) return null;
-
-    try {
-      final jsonString = await file.readAsString();
-      final jsonMap = json.decode(jsonString) as Map<String, dynamic>;
-
-      final cachedFile = VideoFile.fromJson(jsonMap);
-      final actualFile = File(videoPath);
-      if (await actualFile.exists()) {
-        final actualModified = await actualFile.lastModified();
-        if (actualModified == cachedFile.lastModified) {
-          return cachedFile;
-        }
-      }
-    } catch (e) {
-      Fogger.d('加载硬盘缓存失败: $e');
-    }
-    return null;
-  }
-
-  // 保存到硬盘缓存
-  static Future<void> _saveToDiskCache(VideoFile videoFile) async {
-    if (_cacheDirectory == null) return;
-
-    try {
-      final cacheFilePath = path.join(
-        _cacheDirectory!,
-        '${FileUtil.getSafeFileName(videoFile.filePath)}.cache',
-      );
-
-      final jsonString = json.encode(videoFile.toJson());
-      final file = File(cacheFilePath);
-      await file.writeAsString(jsonString);
-    } catch (e) {
-      Fogger.d('保存硬盘缓存失败: $e');
-    }
   }
 
   // 使用ffmpeg实时获取视频信息
