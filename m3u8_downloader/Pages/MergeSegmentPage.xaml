@@ -61,173 +61,199 @@
         </Style>
     </UserControl.Resources>
 
-    <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition />
-        </Grid.RowDefinitions>
-
-        <Grid Grid.Row="0" Margin="5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <hc:TextBox
-                x:Name="RootPathTextBox"
-                Grid.Column="0"
-                hc:InfoElement.Placeholder="选择你要合并片段的根目录"
-                hc:InfoElement.ShowClearButton="True"
-                Text="{Binding SegmentsRootPath}"
-                TextChanged="RootPathTextBox_OnTextChanged" />
-
-            <Button
-                Grid.Column="1"
-                Width="100"
-                Margin="5,0,0,0"
-                Command="{Binding SelectSegmentsCommand}"
-                Content="选择" />
-        </Grid>
-
-        <Grid Grid.Row="1" Margin="5,0,5,5">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
-
-            <TextBlock
-                Grid.Column="0"
-                VerticalAlignment="Center"
-                FontSize="14"
-                Text="合并进度" />
-
-            <ProgressBar
-                Grid.Column="1"
-                Height="12"
-                Margin="5,0"
-                Style="{DynamicResource ProgressBarInfo}"
-                Value="{Binding MergeProgressValue}" />
-
-            <Button
-                Grid.Column="2"
-                Width="100"
-                Command="{Binding MergeSegmentsCommand}"
-                Content="合并" />
-        </Grid>
-
-        <Grid
-            Grid.Row="2"
-            VerticalAlignment="Center"
-            Visibility="{Binding IsLoadingVisible}">
+    <Border
+        Margin="10"
+        Background="White"
+        CornerRadius="5">
+        <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition />
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="1" />
+                <RowDefinition />
             </Grid.RowDefinitions>
 
-            <ProgressBar
+            <TextBlock
                 Grid.Row="0"
-                Width="400"
-                IsIndeterminate="True"
-                Style="{StaticResource ProgressBarPrimaryStripe}" />
+                Padding="15"
+                FontSize="18"
+                FontWeight="Bold"
+                Foreground="{DynamicResource AppTextBrush}"
+                Text="合并TS片段" />
 
-            <TextBlock
+            <Grid
                 Grid.Row="1"
-                Margin="0,20"
-                HorizontalAlignment="Center"
-                FontSize="18"
-                Text="数据加载中，请稍后..." />
+                Margin="15,0"
+                Background="{DynamicResource AppBorderBrush}" />
+
+            <Grid Grid.Row="2" Margin="10,5">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                </Grid.RowDefinitions>
+
+                <Grid Grid.Row="0" Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <hc:TextBox
+                        x:Name="RootPathTextBox"
+                        Grid.Column="0"
+                        hc:InfoElement.Placeholder="选择你要合并片段的根目录"
+                        hc:InfoElement.ShowClearButton="True"
+                        Text="{Binding SegmentsRootPath}"
+                        TextChanged="RootPathTextBox_OnTextChanged" />
+
+                    <Button
+                        Grid.Column="1"
+                        Width="100"
+                        Margin="5,0,0,0"
+                        Command="{Binding SelectSegmentsCommand}"
+                        Content="选择" />
+                </Grid>
+
+                <Grid Grid.Row="1" Margin="5,0,5,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock
+                        Grid.Column="0"
+                        VerticalAlignment="Center"
+                        FontSize="14"
+                        Text="进度" />
+
+                    <ProgressBar
+                        Grid.Column="1"
+                        Height="12"
+                        Margin="5,0"
+                        Style="{DynamicResource ProgressBarInfo}"
+                        Value="{Binding MergeProgressValue}" />
+
+                    <Button
+                        Grid.Column="2"
+                        Width="100"
+                        Command="{Binding MergeSegmentsCommand}"
+                        Content="合并" />
+                </Grid>
+
+                <Grid
+                    Grid.Row="2"
+                    VerticalAlignment="Center"
+                    Visibility="{Binding IsLoadingVisible}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <ProgressBar
+                        Grid.Row="0"
+                        Width="400"
+                        IsIndeterminate="True"
+                        Style="{StaticResource ProgressBarPrimaryStripe}" />
+
+                    <TextBlock
+                        Grid.Row="1"
+                        Margin="0,20"
+                        HorizontalAlignment="Center"
+                        FontSize="18"
+                        Text="数据加载中，请稍后..." />
+                </Grid>
+
+                <ListBox
+                    x:Name="SegmentsListBox"
+                    Grid.Row="2"
+                    AllowDrop="True"
+                    BorderThickness="0"
+                    DragOver="SegmentsListBox_DragOver"
+                    Drop="SegmentsListBox_Drop"
+                    ItemsSource="{Binding ResourceSegments}"
+                    PreviewMouseLeftButtonDown="SegmentsListBox_PreviewMouseLeftButtonDown"
+                    PreviewMouseMove="SegmentsListBox_PreviewMouseMove"
+                    SelectionMode="Single"
+                    Visibility="{Binding IsSegmentsVisible}">
+
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <DockPanel LastChildFill="True">
+                                <Border
+                                    Width="110"
+                                    Height="80"
+                                    CornerRadius="5">
+                                    <Image Source="{Binding CoverImage}" Stretch="UniformToFill">
+                                        <Image.Clip>
+                                            <RectangleGeometry
+                                                RadiusX="5"
+                                                RadiusY="5"
+                                                Rect="0,0,110,80" />
+                                        </Image.Clip>
+                                    </Image>
+                                </Border>
+
+                                <Grid Margin="5,0,0,0">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+
+                                    <TextBlock
+                                        Grid.Row="0"
+                                        FontSize="16"
+                                        Text="{Binding SegmentName}"
+                                        TextWrapping="Wrap" />
+
+                                    <TextBlock Grid.Row="1" Text="{Binding Duration, StringFormat=时长：{0}}" />
+
+                                    <TextBlock Grid.Row="2" Text="{Binding SegmentSize, StringFormat=大小：{0}}" />
+                                </Grid>
+                            </DockPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+
+                    <!--  右键菜单  -->
+                    <ListBox.ContextMenu>
+                        <ContextMenu Width="120">
+                            <MenuItem
+                                Command="{Binding DeleteSegmentCommand}"
+                                CommandParameter="{Binding Path=PlacementTarget.(ListBox.SelectedItem).(model:SegmentFile.SegmentName), RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                                Header="删除" />
+                        </ContextMenu>
+                    </ListBox.ContextMenu>
+
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+
+                    <ListBox.ItemContainerStyle>
+                        <Style BasedOn="{StaticResource ListBoxItemStyleKey}" TargetType="ListBoxItem" />
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+
+                <Grid Grid.Row="2" Visibility="{Binding IsEmptyImageVisible}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="100" />
+                        <RowDefinition />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="100" />
+                    </Grid.RowDefinitions>
+
+                    <Image Grid.Row="1" Source="/m3u8_downloader;component/Images/empty_image.png" />
+
+                    <TextBlock
+                        Grid.Row="2"
+                        HorizontalAlignment="Center"
+                        FontSize="18"
+                        Text="这里什么都没有~" />
+                </Grid>
+            </Grid>
         </Grid>
-
-        <ListBox
-            x:Name="SegmentsListBox"
-            Grid.Row="2"
-            AllowDrop="True"
-            BorderThickness="0"
-            DragOver="SegmentsListBox_DragOver"
-            Drop="SegmentsListBox_Drop"
-            ItemsSource="{Binding ResourceSegments}"
-            PreviewMouseLeftButtonDown="SegmentsListBox_PreviewMouseLeftButtonDown"
-            PreviewMouseMove="SegmentsListBox_PreviewMouseMove"
-            SelectionMode="Single"
-            Visibility="{Binding IsSegmentsVisible}">
-
-            <ListBox.ItemTemplate>
-                <DataTemplate>
-                    <DockPanel LastChildFill="True">
-                        <Border
-                            Width="110"
-                            Height="80"
-                            CornerRadius="5">
-                            <Image Source="{Binding CoverImage}" Stretch="UniformToFill">
-                                <Image.Clip>
-                                    <RectangleGeometry
-                                        RadiusX="5"
-                                        RadiusY="5"
-                                        Rect="0,0,110,80" />
-                                </Image.Clip>
-                            </Image>
-                        </Border>
-
-                        <Grid Margin="5,0,0,0">
-                            <Grid.RowDefinitions>
-                                <RowDefinition />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-
-                            <TextBlock
-                                Grid.Row="0"
-                                FontSize="16"
-                                Text="{Binding SegmentName}"
-                                TextWrapping="Wrap" />
-
-                            <TextBlock Grid.Row="1" Text="{Binding Duration, StringFormat=时长：{0}}" />
-
-                            <TextBlock Grid.Row="2" Text="{Binding SegmentSize, StringFormat=大小：{0}}" />
-                        </Grid>
-                    </DockPanel>
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-
-            <!--  右键菜单  -->
-            <ListBox.ContextMenu>
-                <ContextMenu Width="120">
-                    <MenuItem
-                        Command="{Binding DeleteSegmentCommand}"
-                        CommandParameter="{Binding Path=PlacementTarget.(ListBox.SelectedItem).(model:SegmentFile.SegmentName), RelativeSource={RelativeSource AncestorType=ContextMenu}}"
-                        Header="删除" />
-                </ContextMenu>
-            </ListBox.ContextMenu>
-
-            <ListBox.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <WrapPanel Orientation="Horizontal" />
-                </ItemsPanelTemplate>
-            </ListBox.ItemsPanel>
-
-            <ListBox.ItemContainerStyle>
-                <Style BasedOn="{StaticResource ListBoxItemStyleKey}" TargetType="ListBoxItem" />
-            </ListBox.ItemContainerStyle>
-        </ListBox>
-
-        <Grid Grid.Row="2" Visibility="{Binding IsEmptyImageVisible}">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="100" />
-                <RowDefinition />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="100" />
-            </Grid.RowDefinitions>
-
-            <Image Grid.Row="1" Source="/m3u8_downloader;component/Images/empty_image.png" />
-
-            <TextBlock
-                Grid.Row="2"
-                HorizontalAlignment="Center"
-                FontSize="18"
-                Text="这里什么都没有~" />
-        </Grid>
-    </Grid>
+    </Border>
 </UserControl>

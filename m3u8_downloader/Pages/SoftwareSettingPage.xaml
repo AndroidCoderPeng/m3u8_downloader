@@ -8,6 +8,7 @@
     d:DesignHeight="400"
     d:DesignWidth="600"
     mc:Ignorable="d">
+
     <Border
         Margin="10"
         Background="White"
