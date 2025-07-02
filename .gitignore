@@ -122,3 +122,4 @@ app.*.symbols
 /.flutter-plugins
 /.flutter-plugins-dependencies
 pubspec.lock
+devtools_options.yaml
