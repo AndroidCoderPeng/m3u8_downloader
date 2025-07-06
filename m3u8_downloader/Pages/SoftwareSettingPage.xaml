@@ -30,11 +30,6 @@
                 Foreground="{DynamicResource AppTextBrush}"
                 Text="软件设置" />
 
-            <Grid
-                Grid.Row="1"
-                Margin="15,0"
-                Background="{DynamicResource AppBorderBrush}" />
-
             <StackPanel Grid.Row="2" Orientation="Vertical">
                 <Grid Margin="15">
                     <Grid.ColumnDefinitions>
@@ -76,7 +71,7 @@
 
                 <Grid
                     Height="1"
-                    Margin="15,0"
+                    Margin="70,0,15,0"
                     Background="{DynamicResource AppBorderBrush}" />
 
                 <Grid Margin="15">
@@ -113,7 +108,7 @@
 
                 <Grid
                     Height="1"
-                    Margin="15,0"
+                    Margin="70,0,15,0"
                     Background="{DynamicResource AppBorderBrush}" />
 
                 <Grid Margin="15">
@@ -154,7 +149,7 @@
 
                 <Grid
                     Height="1"
-                    Margin="15,0"
+                    Margin="70,0,15,0"
                     Background="{DynamicResource AppBorderBrush}" />
 
                 <Grid Margin="15">
@@ -187,7 +182,7 @@
 
                 <Grid
                     Height="1"
-                    Margin="15,0"
+                    Margin="70,0,15,0"
                     Background="{DynamicResource AppBorderBrush}" />
 
                 <Grid Margin="15">

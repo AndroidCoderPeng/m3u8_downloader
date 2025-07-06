@@ -80,11 +80,6 @@
                 Foreground="{DynamicResource AppTextBrush}"
                 Text="合并TS片段" />
 
-            <Grid
-                Grid.Row="1"
-                Margin="15,0"
-                Background="{DynamicResource AppBorderBrush}" />
-
             <Grid Grid.Row="2" Margin="10,5">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

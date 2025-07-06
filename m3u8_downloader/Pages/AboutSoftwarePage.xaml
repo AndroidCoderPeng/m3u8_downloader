@@ -29,11 +29,6 @@
                 Text="关于软件" />
 
             <Grid
-                Grid.Row="1"
-                Margin="15,0"
-                Background="{DynamicResource AppBorderBrush}" />
-
-            <Grid
                 Grid.Row="2"
                 HorizontalAlignment="Center"
                 VerticalAlignment="Top">

@@ -61,12 +61,7 @@
                 FontSize="18"
                 FontWeight="Bold"
                 Foreground="{DynamicResource AppTextBrush}"
-                Text="软件设置" />
-
-            <Grid
-                Grid.Row="1"
-                Margin="15,0"
-                Background="{DynamicResource AppBorderBrush}" />
+                Text="下载中" />
 
             <Grid Grid.Row="2" Margin="10,5">
                 <Grid.RowDefinitions>
